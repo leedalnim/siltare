@@ -229,6 +229,24 @@ const DRAW = {
         ctx.fillStyle = css(b, 0.05); ctx.beginPath(); ctx.arc(cx, cy, r * 0.25, 0, Math.PI * 2); ctx.fill();
       }
     },
+    cat: (ctx, W, H, C) => {
+      const a = C[0], b = C[1] || mix(a, -0.3), T = 84;
+      const ox = (W - T * Math.ceil(W / T)) / 2, oy = (H - T * Math.ceil(H / T)) / 2;
+      for (let i = -1; ox + i * T < W; i++) for (let j = -1; oy + j * T < H; j++) {
+        const cx = ox + i * T + T / 2, cy = oy + j * T + T / 2 + 4, rx = 30, ry = 25;
+        ctx.save(); ctx.translate(cx, cy);
+        ctx.fillStyle = css(b, -0.1);
+        for (const s of [-1, 1]) { ctx.beginPath(); ctx.moveTo(s * 8, -ry + 4); ctx.lineTo(s * 28, -ry - 12); ctx.lineTo(s * 30, -ry + 10); ctx.closePath(); ctx.fill(); }
+        const g = ctx.createRadialGradient(-6, -8, 4, 0, 0, rx); g.addColorStop(0, css(a, 0.15)); g.addColorStop(1, css(a, -0.25));
+        ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = css(a, -0.4); ctx.lineWidth = 0.9;
+        for (let q = 0; q < 16; q++) { const t = q / 16 * Math.PI * 2; ctx.beginPath(); ctx.moveTo(Math.cos(t) * 5, Math.sin(t) * 4); ctx.lineTo(Math.cos(t) * rx * 0.92, Math.sin(t) * ry * 0.92); ctx.stroke(); }
+        ctx.fillStyle = css(a, -0.55);
+        for (const s of [-1, 1]) { ctx.beginPath(); ctx.ellipse(s * 11, -2, 2.6, 3.4, 0, 0, Math.PI * 2); ctx.fill(); }
+        ctx.beginPath(); ctx.moveTo(-3, 6); ctx.lineTo(3, 6); ctx.lineTo(0, 10); ctx.closePath(); ctx.fill();
+        ctx.restore();
+      }
+    },
     amigu: (ctx, W, H, C) => {
       const c = C[0], cx = W / 2, cy = H * 0.56, r = Math.min(W, H) * 0.4;
       ctx.save(); ctx.beginPath(); ctx.ellipse(cx, cy, r * 1.12, r, 0, 0, Math.PI * 2); ctx.clip();

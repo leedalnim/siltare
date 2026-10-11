@@ -91,7 +91,7 @@ function renderGuide() {
       <h3 class="sub">모티브 한 장 보기</h3>
       <figure class="cat-fig one"><svg viewBox="-80 -90 160 170" fill="none" stroke="currentColor" role="img" aria-label="고양이 얼굴 모티브 한 장">${catMotif(0, 0, true)}</svg></figure>
       <h3 class="sub">기호 뜻</h3>
-      <ul class="legend">${CAT.legend.map(([n, nm, where, g]) => `<li><span class="lg-n">${n}</span><span class="lg-g">${glyphSVG(g)}</span><span><b>${nm}</b><small>${where}</small></span></li>`).join("")}</ul>
+      <ul class="cat-legend">${CAT.legend.map(([n, nm, where, g]) => `<li><span class="lg-n">${n}</span><span class="lg-g">${glyphSVG(g)}</span><span><b>${nm}</b><small>${where}</small></span></li>`).join("")}</ul>
       <h3 class="sub">모티브 뜨는 순서</h3>
       <ol class="steps">${CAT.motif.map(([t, d]) => `<li><b>${t}</b><p>${d}</p></li>`).join("")}</ol>
       <h3 class="sub">이어서 완성하기</h3>
@@ -102,7 +102,7 @@ function renderGuide() {
 
 document.addEventListener("click", e => {
   const o = e.target.closest("[data-cat-open]");
-  if (o) { guideUI.seg = "cat"; state.tab = "guide"; saveLocal(); render(); window.scrollTo(0, 0); return; }
+  if (o) { guideUI.seg = "cat"; state.tab = "guide"; saveLocal(); closeSheets(); render(); window.scrollTo(0, 0); return; }
   const b = e.target.closest("[data-gseg]"); if (!b) return;
   guideUI.seg = b.dataset.gseg; renderGuide(); window.scrollTo(0, 0);
 });

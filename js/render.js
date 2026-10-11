@@ -79,7 +79,6 @@ function renderPatterns() {
   const G = g || PH, A = analyse(G), act = activeSet(), mode = state.mode === "all" ? "all" : "rec";
   let html = `<div class="view-title"><h2 id="h-patterns">무늬</h2><span class="meta">${craftName()} 기준</span></div>`;
   if (g) html += groupBar(gs, g);
-  if (state.craft === "crochet") html += `<button type="button" class="cat-banner" data-cat-open><span class="cb-ico">${glyphSVG("ring")}</span><span><b>고양이 얼굴 도안</b><small>3×3 모티브 도안과 뜨는 방법 보기</small></span><span class="cb-go" aria-hidden="true">›</span></button>`;
   html += `<div class="seg2" role="group" aria-label="무늬 보기"><button type="button" data-mode="rec" aria-pressed="${mode === "rec"}">추천 무늬<span class="n">${g ? A.ok.length : 0}</span></button><button type="button" data-mode="all" aria-pressed="${mode === "all"}">전체 무늬<span class="n">${A.pats.length}</span></button></div>`;
   const keyOf = x => starKey("p", x.p.id);
   if (mode === "rec") {
@@ -167,7 +166,7 @@ function renderDetail() {
   if (r.skip || !r.doable.length) {
     $("pat-body").innerHTML = `<div class="stage"><canvas class="big" data-sw="${p.id}" role="img" aria-label="${p.name} 무늬 미리보기"></canvas></div>
       <div class="size-line">${esc(r.skip || "지금 가진 실로는 가장 작은 작품도 뜨기엔 양이 적어요. 다른 실을 더 담으면 다시 계산해요.")}</div>
-      <p class="how">${p.how}</p>${startBtns}${recipeHTML(rx, cols)}`;
+      <p class="how">${p.how}</p>${startBtns}${p.id === "cat" ? `<button type="button" class="ghost-btn wide" data-cat-open>전체 도안·이어 붙이기 보기</button>` : ""}${recipeHTML(rx, cols)}`;
     requestAnimationFrame(() => paintAll($("pat-body"), g));
     return;
   }
@@ -199,6 +198,7 @@ function renderDetail() {
       return `<li><button type="button" class="proj ${x.st}" data-pv="${x.pr.id}" aria-pressed="${sel && x.pr.id === sel.pr.id}"><span class="nm">${x.pr.name}</span><span class="st">${stLabel[x.st]}</span><span class="nt">${nt}</span><span class="g">${x.need}g 필요</span></button></li>`;
     }).join("")}</ul>
     ${r.later.length ? `<p class="more">실이 더 있으면: ${r.later.slice(0, 4).map(x => `${x.pr.name} ${x.need}g`).join(" · ")}</p>` : ""}
+    ${p.id === "cat" ? `<button type="button" class="ghost-btn wide" data-cat-open>전체 도안·이어 붙이기 보기</button>` : ""}
     ${recipeHTML(rx, cols)}
     <p class="note">소요량과 크기는 일반적인 굵기와 손땀으로 잡은 대략값이에요. 실이나 손땀에 따라 10~20% 차이가 날 수 있어요.</p>`;
   requestAnimationFrame(() => paintAll($("pat-body"), g));

@@ -1,7 +1,7 @@
 // ---------- 뜨기 전 설정: 폭→콧수, 길이→목표 단수 ----------
 const GAUGE = { knit: { thin: [28, 36], mid: [18, 24], thick: [12, 16] }, crochet: { thin: [24, 26], mid: [16, 18], thick: [10, 11] } };
 const ROWMUL = { knit: { garter: 1.4, brioche: 1.9 }, crochet: { dc: 0.5, shell: 0.5, waffle: 0.5, lace: 0.5, mesh: 0.6, popcorn: 0.9 } };
-const ROWPX = { knit: 10, crochet: { sc: 9, moss: 9, stripe: 9, popcorn: 11, dc: 18, shell: 15, waffle: 20, lace: 20, mesh: 13 } };
+const ROWPX = { knit: 10, crochet: { sc: 9, moss: 9, stripe: 9, popcorn: 11, dc: 18, shell: 15, waffle: 20, lace: 20, mesh: 13, cat: 9 } };
 const DIMS = { coaster: [10, 10], scrunchie: [40, 8], sleeve: [24, 8, 1], pouch: [20, 30], headband: [45, 10], wrist: [18, 18, 1], babyhat: [40, 16, 1],
   cowl: [56, 25, 1], mitten: [20, 22, 1], beanie: [50, 22, 1], socks: [20, 45, 1], scarf: [20, 150], shawl: [120, 55], vest: [90, 55, 1],
   sweater: [100, 60, 1], blanket: [80, 100], scrubby: [12, 12], bucket: [55, 20], netbag: [35, 70] };
