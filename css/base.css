@@ -1,0 +1,55 @@
+/* 기본 리셋 + 안전 영역 */
+body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+
+/* Layout: phone-style app column; sticky top bar with knit band, three views switched by a fixed bottom tab bar, bottom sheets for adding yarn and pattern detail. */
+/* Dark only: the page keeps one dark look whatever the device or viewer theme is. */
+:root {
+  --bg: #17141F;
+  --surface: #211D2C;
+  --surface-2: #2B2639;
+  --ink: #ECE9F5;
+  --muted: #A8A2BD;
+  --line: #3A3450;
+  --accent: #B9A0FF;
+  --accent-ink: #1A1426;
+  --yarn: #F0B65A;
+  --ok: #6CCB9C;
+  --tight: #E6B45C;
+  --risk: #F28CA0;
+  --scrim: rgba(0, 0, 0, .6);
+  --font-display: "Hahmlet", "Nanum Myeongjo", "Apple SD Gothic Neo", serif;
+  --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+  --radius: 12px;
+  --tabbar: 64px;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html.lock, html.lock body { overflow: hidden; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.app { max-width: 640px; margin: 0 auto; padding-inline: 16px; padding-block: 0 calc(var(--tabbar) + 32px + env(safe-area-inset-bottom, 0px)); }
+
+/* Top bar */
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); margin-inline: -16px; padding-inline: 16px; padding-block: 0 10px; }
+.band { height: 16px; background: var(--accent); opacity: .85;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 24'%3E%3Cpath d='M10 23C6 19 1.5 13 1.5 1.5 6 5 9 12 10 23Z M10 23C14 19 18.5 13 18.5 1.5 14 5 11 12 10 23Z'/%3E%3C/svg%3E") 0 2px / 11px 11px repeat-x;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 24'%3E%3Cpath d='M10 23C6 19 1.5 13 1.5 1.5 6 5 9 12 10 23Z M10 23C14 19 18.5 13 18.5 1.5 14 5 11 12 10 23Z'/%3E%3C/svg%3E") 0 2px / 11px 11px repeat-x;
+  margin-inline: -16px; }
+.bar-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 10px; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 20px; letter-spacing: -.01em; margin: 0; }
+.seg { display: inline-flex; background: var(--surface-2); border-radius: 999px; padding: 3px; gap: 2px; }
+.seg button { border: 0; background: transparent; padding: 6px 13px; border-radius: 999px; font-weight: 600; font-size: 13.5px; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+
+.view { padding-top: 6px; display: flex; flex-direction: column; gap: 14px; }
+.view-title { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.view-title h2 { font-family: var(--font-display); font-weight: 600; font-size: 22px; margin: 0; }
+.view-title .meta { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.label { font-size: 12px; font-weight: 600; letter-spacing: .06em; color: var(--muted); }
+.empty { color: var(--muted); font-size: 14px; padding: 18px; border: 1px dashed var(--line); border-radius: var(--radius); text-align: center; display: grid; gap: 10px; justify-items: center; }
