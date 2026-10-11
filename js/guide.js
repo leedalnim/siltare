@@ -75,11 +75,11 @@ function symCard(sym) {
 function renderGuide() {
   const crochet = state.craft === "crochet";
   const syms = crochet ? CROCHET_SYMS : KNIT_SYMS;
-  const seg = guideUI.seg === "cat" && crochet ? "cat" : "sym";
+  const seg = guideUI.seg === "cat" ? "cat" : "sym";
   let h = `<div class="view-title"><h2 id="h-guide">기호 도안</h2></div>
     <div class="seg guide-seg" role="group" aria-label="보기">
       <button type="button" data-gseg="sym" aria-pressed="${seg === "sym"}">${crochet ? "코바늘" : "대바늘"} 기호 사전</button>
-      ${crochet ? `<button type="button" data-gseg="cat" aria-pressed="${seg === "cat"}">고양이 얼굴 도안</button>` : ""}
+      <button type="button" data-gseg="cat" aria-pressed="${seg === "cat"}">고양이 얼굴 도안</button>
     </div>`;
   if (seg === "sym") {
     h += `<p class="lead">기호를 누르면 <b>뜻</b>, <b>뜨는 방법</b>, <b>도안에서 보이는 모양</b>이 따로 나와요.${crochet ? "" : " 위의 '코바늘'로 바꾸면 코바늘 기호와 고양이 도안이 나와요."}</p>
@@ -101,6 +101,8 @@ function renderGuide() {
 }
 
 document.addEventListener("click", e => {
+  const o = e.target.closest("[data-cat-open]");
+  if (o) { guideUI.seg = "cat"; state.tab = "guide"; saveLocal(); render(); window.scrollTo(0, 0); return; }
   const b = e.target.closest("[data-gseg]"); if (!b) return;
   guideUI.seg = b.dataset.gseg; renderGuide(); window.scrollTo(0, 0);
 });

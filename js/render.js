@@ -79,6 +79,7 @@ function renderPatterns() {
   const G = g || PH, A = analyse(G), act = activeSet(), mode = state.mode === "all" ? "all" : "rec";
   let html = `<div class="view-title"><h2 id="h-patterns">무늬</h2><span class="meta">${craftName()} 기준</span></div>`;
   if (g) html += groupBar(gs, g);
+  if (state.craft === "crochet") html += `<button type="button" class="cat-banner" data-cat-open><span class="cb-ico">${glyphSVG("ring")}</span><span><b>고양이 얼굴 도안</b><small>3×3 모티브 도안과 뜨는 방법 보기</small></span><span class="cb-go" aria-hidden="true">›</span></button>`;
   html += `<div class="seg2" role="group" aria-label="무늬 보기"><button type="button" data-mode="rec" aria-pressed="${mode === "rec"}">추천 무늬<span class="n">${g ? A.ok.length : 0}</span></button><button type="button" data-mode="all" aria-pressed="${mode === "all"}">전체 무늬<span class="n">${A.pats.length}</span></button></div>`;
   const keyOf = x => starKey("p", x.p.id);
   if (mode === "rec") {

@@ -145,8 +145,8 @@ const PATTERNS = {
       how: "사슬 고리에 <b>꽃잎을 한 장씩</b> 둘러 떠요. 작은 양으로 하나 완성되고, 여러 장을 이으면 담요나 가방이 돼요.", note: "적은 양 OK" },
     { id: "amigu", name: "아미구루미", en: "Amigurumi", f: 1.0, w: ["thin","mid","thick"], tex: ["smooth","fluffy"], c: 1, d: 2, suits: ["toy"],
       how: "<b>매직링에서 짧은뜨기를 나선으로</b> 늘리고 줄여 입체를 만들어요. 솜을 넣으면 인형이 돼요.", note: "입체 인형" },
-    { id: "lace", name: "레이스 무늬", en: "Lace", f: 0.8, w: ["thin"], tex: ["smooth"], c: 1, d: 3, suits: ["flat","garment","motif"],
-      how: "<b>사슬과 긴뜨기로 큰 구멍</b>을 만들어 부채꼴이나 거미줄 무늬를 떠요. 가는 실로 떠야 섬세하게 살아요.", note: "섬세함" }
+    { id: "lace", name: "레이스 무늬", en: "Lace", f: 0.8, w: ["thin","mid"], tex: ["smooth"], c: 1, d: 3, suits: ["flat","garment","motif"],
+      how: "<b>사슬과 긴뜨기로 큰 구멍</b>을 만들어 부채꼴이나 거미줄 무늬를 떠요. 가는 실이면 더 섬세하고, 보통 실이면 구멍이 크고 시원하게 떠져요.", note: "섬세함" }
   ]
 };
 

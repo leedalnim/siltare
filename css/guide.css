@@ -39,3 +39,10 @@
 .steps li { background: var(--surface); border-radius: 10px; padding: 10px 12px; counter-increment: st; }
 .steps li b::before { content: counter(st) ". "; color: var(--accent); }
 .steps p { margin: 4px 0 0; font-size: 14px; }
+
+/* 무늬 탭 바로가기 */
+.cat-banner { display: flex; align-items: center; gap: 12px; width: 100%; margin: 0 0 12px; padding: 10px 14px; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.cat-banner .cb-ico { width: 40px; height: 40px; display: grid; place-items: center; background: var(--bg); border-radius: 10px; color: var(--yarn); flex: none; }
+.cat-banner .cb-ico .glyph { width: 28px; height: 32px; }
+.cat-banner small { display: block; color: var(--muted); font-size: 13px; }
+.cat-banner .cb-go { margin-left: auto; color: var(--muted); font-size: 22px; }
