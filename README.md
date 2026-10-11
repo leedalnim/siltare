@@ -13,7 +13,7 @@ GitHub Pages가 켜진 주소(`https://<계정>.github.io/siltare/`)를 폰에�
 ## GitHub Pages 켜기 (한 번만)
 
 저장소 `Settings → Pages → Build and deployment → Source`를 **GitHub Actions**로 바꿔요.
-이후 `main`에 푸시하면 `.github/workflows/pages.yml`이 자동으로 배포해요.
+이후 `main`(또는 `claude/zen-pascal-1c1kdm`)에 푸시하면 `.github/workflows/pages.yml`이 자동으로 배포해요.
 
 ## 파일 구조
 
