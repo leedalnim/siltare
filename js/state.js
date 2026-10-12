@@ -21,6 +21,14 @@ try {
     state.wake = !!saved.wake; state.updatedAt = saved.updatedAt || 0;
   }
 } catch (e) {}
+// 한 번만: 잠깐 배포됐던 버전이 예시 실을 비운 채 저장했을 수 있어서, 바구니가 비어 있으면 예시 실을 되살려요.
+try {
+  if (!localStorage.getItem("leftover-yarn-exfix1")) {
+    if (!state.yarns.length) { state.yarns = EXAMPLE.slice(); state.example = true; }
+    localStorage.setItem("leftover-yarn-exfix1", "1");
+    setTimeout(saveLocal, 0);
+  }
+} catch (e) {}
 function saveLocal() {
   try { localStorage.setItem(STORE, JSON.stringify({ craft: state.craft, tab: state.tab, sess: state.sess, mode: state.mode, cat: state.cat, wake: state.wake,
     yarns: state.yarns, example: state.example, doubled: state.doubled, stars: state.stars, sessions: state.sessions, updatedAt: state.updatedAt })); } catch (e) {}
