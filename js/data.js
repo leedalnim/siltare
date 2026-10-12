@@ -65,6 +65,14 @@ const BLACKCAT = [
   "22222222222222222222", "22222222222222222222", "22222222222222222222"
 ];
 
+// 얼룩 고양이 카드지갑 앞판 칸 도안 (20코 × 14단, 위쪽 줄부터). 0 = 털색, 1 = 흰색 — 사진에서 코를 세어 옮김
+const CALICO = [
+  "00000000000000000000", "00000000000000000000", "00000000000000000000",
+  "00000000001000000000", "00000000001100000000", "00000000011110000000", "00000000011111000000",
+  "00000000111111110000", "00000001111111111100", "00000011111111111111", "00000111111111111111",
+  "11111111111111111111", "11111111111111111111", "11111111111111111111"
+];
+
 const PROJECTS = {
   knit: [
     { id: "coaster", name: "컵 코스터", g: [8, 10, 15], tags: ["flat"] },
@@ -89,13 +97,13 @@ const PROJECTS = {
     { id: "catcoaster", name: "고양이 코스터", g: [8, 12, 18], tags: ["cat"] },
     { id: "catround", name: "검은 고양이 원형 가방", g: [90, 130, 180], tags: ["cat"] },
     { id: "catbag", name: "검은 고양이 네모 가방", g: [110, 160, 220], tags: ["cat"] },
-    { id: "cardwallet", name: "똑딱이 카드지갑", g: [25, 35, 50], tags: ["wallet"], photo: "images/ref/cardwallet.jpg",
+    { id: "cardwallet", name: "똑딱이 카드지갑", g: [25, 35, 50], tags: ["wallet", "pt_cardwallet"], photo: "images/ref/cardwallet.jpg",
       how: "짧은뜨기로 폭 11cm쯤 되는 긴 판을 떠서, 아래를 두 번 접어 카드 칸 2개를 만들고 남은 부분을 덮개로 접어요. 옆을 짧은뜨기로 잇고 자석 똑딱이 단추를 달아요." },
     { id: "cakewallet", name: "케이크 카드지갑", g: [30, 40, 55], tags: ["wallet"], photo: "images/ref/cakewallet.jpg",
       how: "케이크 색과 크림 색 두 가지로 짧은뜨기 카드 주머니를 떠요. 딸기와 생크림은 작은 아미구루미로 떠서 위에 달고, 눈·코는 단추나 자수로 붙여요." },
     { id: "catpurse", name: "고양이 동전지갑", g: [25, 35, 50], tags: ["wallet", "cat"], photo: "images/ref/catpurse.jpg",
       how: "짧은뜨기 배색(감싸뜨기)으로 고양이 무늬를 넣어 앞·뒤 판을 뜨고, 위쪽에 귀를 떠 붙여요. 지퍼와 꼬리 고리를 달고, 수염과 코는 자수로 놓아요." },
-    { id: "calicowallet", name: "얼룩 고양이 카드지갑", g: [25, 35, 50], tags: ["wallet", "cat"], photo: "images/ref/calicowallet.jpg",
+    { id: "calicowallet", name: "얼룩 고양이 카드지갑", g: [25, 35, 50], tags: ["wallet", "cat", "pt_calico"], photo: "images/ref/calicowallet.jpg",
       how: "윗부분은 고양이 털 색, 얼굴 가운데 흰 무늬와 아랫단은 흰색으로 짧은뜨기 배색(감싸뜨기)을 해요. 둥근 귀 두 개를 떠서 달고, 눈은 인형 눈을 붙이고 줄무늬와 입은 검정 자수, 볼은 분홍 실로 놓아요." },
     { id: "breadcat", name: "식빵 고양이 카드지갑", g: [25, 35, 50], tags: ["wallet"],
       how: "식빵 속 색(아이보리)으로 짧은뜨기 카드 주머니를 뜨고 위쪽에 고양이 귀를 떠 붙여요. 빵 껍질 색(갈색)으로 둘레를 짧은뜨기 한 바퀴 둘러 테두리를 만들고, 눈·입·수염은 자수로 놓아요." },
@@ -171,6 +179,10 @@ const PATTERNS = {
       how: "사슬 고리에 <b>꽃잎을 한 장씩</b> 둘러 떠요. 작은 양으로 하나 완성되고, 여러 장을 이으면 담요나 가방이 돼요.", note: "적은 양 OK" },
     { id: "cat", name: "고양이 얼굴 모티브", en: "Cat face motif", f: 1.0, w: ["thin","mid","thick"], tex: ["smooth"], c: 1, mc: true, d: 2, suits: ["motif","flat"],
       how: "<b>매직링에서 부채꼴로 코를 떠서</b> 귀가 달린 고양이 얼굴을 만드는 모티브예요. 9장을 3×3으로 놓고 짧은뜨기로 채워 이어요. 도안은 첨부한 원본 이미지 기준이에요.", note: "고양이 도안" },
+    { id: "pt_cardwallet", name: "똑딱이 카드지갑 도안", en: "Snap card wallet", f: 1.0, w: ["thin","mid","thick"], tex: ["smooth"], c: 1, mc: true, d: 1, suits: ["pt_cardwallet"],
+      how: "<b>짧은뜨기 띠 하나를 4구역으로 떠서 접어</b> 카드 칸 2개를 만들어요. 아래·위 구역을 안쪽으로 접어 주머니를 만들고, 가운데를 반으로 접어 닫아요. 자석 똑딱이 단추 1쌍이 필요해요.", note: "카드지갑" },
+    { id: "pt_calico", name: "얼룩 고양이 카드지갑 도안", en: "Calico cat card wallet", f: 1.1, w: ["thin","mid","thick"], tex: ["smooth"], c: 2, d: 2, suits: ["pt_calico"],
+      how: "<b>털색과 흰색 두 가지로 짧은뜨기 배색</b>을 해서 고양이 얼굴이 들어간 앞판을 뜨고, 뒷판과 이어 주머니를 만들어요. 귀 2개를 달고 인형 눈(6mm)과 자수로 얼굴을 완성해요.", note: "카드지갑" },
     { id: "blackcat", name: "검은 고양이 배색", en: "Peeking black cat", f: 1.15, w: ["thin","mid","thick"], tex: ["smooth"], c: 2, d: 2, suits: ["cat","flat"],
       how: "<b>짧은뜨기로 바탕 · 고양이 · 아랫단 세 가지 색</b>을 칸 도안대로 바꿔 가며 떠요. 안 쓰는 색 실은 코 안에 감싸 넣으며 떠서 뒤에 실이 걸치지 않아요. 네모 가방, 원형 가방, 코스터에 써요.", note: "고양이 배색" },
     { id: "amigu", name: "아미구루미", en: "Amigurumi", f: 1.0, w: ["thin","mid","thick"], tex: ["smooth","fluffy"], c: 1, d: 2, suits: ["toy"],

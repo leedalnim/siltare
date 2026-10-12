@@ -250,6 +250,17 @@ const DRAW = {
         ctx.restore();
       }
     },
+    pt_cardwallet: (ctx, W, H, C) => cgrid(W, H, CH, (i, j, px, py) => scSt(ctx, px, py, CW, CH, C[0])),
+    pt_calico: (ctx, W, H, C) => {
+      const col = [C[0], C[1] || mix(C[0], 0.75)];
+      const k = Math.min(W / (20 * CW), H / (14 * CH)), ox = (W - 20 * CW * k) / 2, oy = (H - 14 * CH * k) / 2;
+      ctx.fillStyle = css(col[0], -0.15); ctx.fillRect(0, 0, W, H);
+      ctx.save(); ctx.translate(ox, oy); ctx.scale(k, k);
+      CALICO.forEach((row, j) => { for (let i = 0; i < 20; i++) scSt(ctx, i * CW, j * CH, CW, CH, col[+row[i]]); });
+      ctx.fillStyle = "#1d1a24";   // 인형 눈 자리
+      for (const ex of [9, 14]) { ctx.beginPath(); ctx.arc(ex * CW + CW / 2, 7 * CH + CH / 2, CW * 0.38, 0, Math.PI * 2); ctx.fill(); }
+      ctx.restore();
+    },
     blackcat: (ctx, W, H, C) => {
       const col = [C[0], C[1] || mix(C[0], -0.7), C[2] || mix(C[0], -0.35)];
       const k = Math.min(W / (20 * CW), H / (18 * CH)), ox = (W - 20 * CW * k) / 2, oy = (H - 18 * CH * k) / 2;
