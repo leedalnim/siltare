@@ -220,9 +220,9 @@ function renderDetail() {
     <p class="how">${p.how}</p>
     ${startBtns}
     <p class="sub-h">이 무늬로 뜰 수 있는 것</p>
-    <ul class="projects">${r.doable.map(x => {
-      const nt = x.st === "ok" ? `약 ${r.have - x.need}g 남아요` : x.st === "tight" ? (r.have >= x.need ? "거의 딱 맞아요" : `약 ${x.need - r.have}g 모자라요. 몇 코만 줄이면 돼요`) : `약 ${x.need - r.have}g 모자라요. 작게 뜨거나 끝단을 다른 실로`;
-      return `<li><button type="button" class="proj ${x.st}" data-pv="${x.pr.id}" aria-pressed="${sel && x.pr.id === sel.pr.id}"><span class="nm">${x.pr.name}</span><span class="st">${stLabel[x.st]}</span><span class="nt">${nt}</span><span class="g">${x.need}g 필요</span></button></li>`;
+    <ul class="pgrid3">${r.doable.map(x => {
+      const nt = x.st === "ok" ? `약 ${r.have - x.need}g 남아요` : r.have >= x.need ? "거의 딱 맞아요" : `약 ${x.need - r.have}g 부족`;
+      return `<li class="pc3 ${x.st}"><span class="st">${stLabel[x.st]}</span><b class="nm">${x.pr.name}</b><span class="g">${x.need}g 필요</span><span class="nt">${nt}</span></li>`;
     }).join("")}</ul>
     ${r.later.length ? `<p class="more">실이 더 있으면: ${r.later.slice(0, 4).map(x => `${x.pr.name} ${x.need}g`).join(" · ")}</p>` : ""}
     ${recipeHTML(rx, cols)}

@@ -69,3 +69,14 @@
 .cc-n { font-size: 12px; font-weight: 600; font-family: var(--font-mono); }
 .cc-cap { margin: 0; font-size: 13px; color: var(--muted); }
 .empty-chart { background: var(--surface); border-radius: var(--radius); padding: 28px 16px; text-align: center; color: var(--muted); }
+
+/* 무늬 상세: 이 무늬로 뜰 수 있는 것 — 3열 카드 */
+.pgrid3 { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.pc3 { display: grid; gap: 3px; align-content: start; padding: 10px 10px 11px; border-radius: 12px; background: var(--surface-2); border-top: 3px solid var(--line); min-width: 0; }
+.pc3 .st { font-size: 11.5px; font-weight: 700; }
+.pc3 .nm { font-size: 14px; line-height: 1.3; word-break: keep-all; }
+.pc3 .g { font-family: var(--font-mono); font-size: 12px; color: var(--ink); }
+.pc3 .nt { font-size: 11.5px; color: var(--muted); line-height: 1.35; word-break: keep-all; }
+.pc3.ok { border-top-color: var(--ok); } .pc3.ok .st { color: var(--ok); }
+.pc3.tight { border-top-color: var(--tight); } .pc3.tight .st { color: var(--tight); }
+.pc3.risk { border-top-color: var(--risk); } .pc3.risk .st { color: var(--risk); }
