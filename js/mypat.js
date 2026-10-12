@@ -61,14 +61,14 @@ async function myProcess(file) {
 // ----- 무늬 탭의 '내 도안' 목록 -----
 const MY_CRAFT = { crochet: "코바늘", knit: "대바늘", any: "공통" };
 function myListHTML() {
-  const add = `<button type="button" class="primary wide my-add-btn" data-my-add>+ 내 도안 등록</button>
-    <p class="note my-note">인터넷에서 받은 도안 이미지나 PDF를 등록해 두고, 크게 보면서 뜰 수 있어요. 파일은 이 기기에만 저장돼요.</p>`;
-  if (!myPats.length) return `<div class="empty">아직 등록한 도안이 없어요.<br>도안 이미지나 PDF를 올려 보세요.</div>${add}`;
+  const add = `<div class="my-add-row"><button type="button" class="primary my-add-btn" data-my-add>+ 이미지·PDF 도안</button><button type="button" class="primary my-add-btn" data-dot-new>+ 도트 도안 그리기</button></div>
+    <p class="note my-note">인터넷에서 받은 도안 이미지·PDF를 등록하거나, 칸에 색을 칠해 도트 도안을 직접 그릴 수 있어요. 이 기기에만 저장돼요.</p>`;
+  if (!myPats.length) return `<div class="empty">아직 등록한 도안이 없어요.<br>도안 이미지를 올리거나 도트 도안을 그려 보세요.</div>${add}`;
   const items = myPats.slice().sort((a, b) => b.created - a.created).map(p => {
     const pct = p.target ? Math.min(100, Math.round(p.row / p.target * 100)) : 0;
     return `<li><button type="button" class="my-card" data-my-open="${p.id}">
-      <span class="my-th">${p.thumb ? `<img src="${p.thumb}" alt="">` : `<span class="my-pdf">PDF</span>`}${p.pages.length > 1 ? `<i>${p.pages.length}장</i>` : ""}</span>
-      <span class="my-tx"><b>${esc(p.name)}</b><span class="s">${MY_CRAFT[p.craft] || ""}${p.row ? ` · ${p.row}단${p.target ? ` / ${p.target}단` : ""}` : ""}</span>
+      <span class="my-th${p.type === "dot" ? " dot" : ""}">${p.thumb ? `<img src="${p.thumb}" alt="">` : `<span class="my-pdf">PDF</span>`}${(p.pages || []).length > 1 ? `<i>${p.pages.length}장</i>` : ""}</span>
+      <span class="my-tx"><b>${esc(p.name)}</b><span class="s">${p.type === "dot" ? `도트 도안 · ${p.w}×${p.h}` : MY_CRAFT[p.craft] || ""}${p.row ? ` · ${p.row}단${p.target ? ` / ${p.target}단` : ""}` : ""}</span>
       ${p.target ? `<span class="pbar sm"><i style="width:${pct}%"></i></span>` : ""}</span></button></li>`;
   }).join("");
   return `${add}<ul class="my-list">${items}</ul>`;
@@ -141,6 +141,7 @@ const MY_ZOOMS = [1, 1.6, 2.4, 3.4];
 function myClean() { myView.urls.forEach(u => URL.revokeObjectURL(u)); myView.urls = []; }
 async function myOpenView(id, keepPage) {
   const p = myPats.find(x => x.id === id); if (!p) return;
+  if (p.type === "dot") return dotOpenView(p);
   if (myView.id !== id) { myView.page = 0; myView.zoom = 1; } else if (!keepPage) myView.page = 0;
   myView.id = id; myClean();
   $("mypat-h").textContent = p.name;
@@ -204,7 +205,7 @@ document.addEventListener("click", e => {
   }
   const dl = t.closest("[data-my-del]"); if (dl && p) {
     if (!confirm(`'${p.name}' 도안을 삭제할까요? 파일도 함께 지워져요.`)) return;
-    p.pages.forEach(pgx => myDel(pgx.id).catch(() => {}));
+    (p.pages || []).forEach(pgx => myDel(pgx.id).catch(() => {}));
     myPats = myPats.filter(x => x.id !== p.id); mySave(); myClean(); myView.id = null; closeSheets(); render(); toast("도안을 지웠어요");
   }
 });

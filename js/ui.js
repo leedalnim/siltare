@@ -1,5 +1,5 @@
 // ---------- Sheets & toast ----------
-const SHEETS = ["sheet-add", "sheet-pat", "sheet-start", "sheet-sym", "sheet-myadd", "sheet-mypat"];
+const SHEETS = ["sheet-add", "sheet-pat", "sheet-start", "sheet-sym", "sheet-myadd", "sheet-mypat", "sheet-dot"];
 const anySheetOpen = () => SHEETS.some(id => !$(id).hidden);
 let lastFocus = null;
 function openSheet(id) {
