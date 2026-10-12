@@ -21,7 +21,7 @@ GitHub Pages가 켜진 주소(`https://<계정>.github.io/siltare/`)를 폰에�
 index.html              화면 뼈대와 스크립트·CSS 불러오기
 manifest.webmanifest    앱 이름·아이콘·색 (설치용)
 sw.js                   오프라인 저장 (서비스 워커)
-icons/                  앱 아이콘 (icon.svg가 원본, png는 여기서 뽑은 것)
+icons/                  앱 아이콘 (흰 여백을 잘라 크기별로 만든 png)
 css/
   base.css              변수·레이아웃·상단 바
   basket.css            내 실 · 무늬 선택
