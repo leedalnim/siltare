@@ -6,7 +6,7 @@ function openSheet(id) {
   const close = $(id).querySelector(".close"); if (close) close.focus({ preventScroll: true });
 }
 function closeSheets() {
-  ["sheet-add", "sheet-pat", "sheet-start"].forEach(id => $(id).hidden = true);
+  ["sheet-add", "sheet-pat", "sheet-start", "sheet-sym"].forEach(id => $(id).hidden = true);
   document.documentElement.classList.remove("lock"); state.detail = null; state.pv = null;
   if (lastFocus && document.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
 }

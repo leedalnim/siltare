@@ -4,7 +4,7 @@ document.addEventListener("click", e => {
   if (e.target.closest("[data-close]")) { closeSheets(); return; }
   const t = e.target.closest("button"); if (!t) return;
   const d = t.dataset;
-  if (d.tab) { state.tab = d.tab; if (d.tab !== "counter") state.sess = state.sess; saveLocal(); if (!$("sheet-pat").hidden || !$("sheet-add").hidden) closeSheets(); render(); window.scrollTo(0, 0); return; }
+  if (d.tab) { state.tab = d.tab; if (d.tab !== "counter") state.sess = state.sess; saveLocal(); if (!$("sheet-pat").hidden || !$("sheet-add").hidden || !$("sheet-sym").hidden) closeSheets(); render(); window.scrollTo(0, 0); return; }
   if (d.craft) { state.craft = d.craft; saveLocal(); render(); return; }
   if (d.star) {
     if (state.stars[d.star]) delete state.stars[d.star]; else state.stars[d.star] = Date.now();
@@ -103,7 +103,7 @@ document.addEventListener("input", e => {
   document.querySelectorAll("#opt-color .sw[data-c]").forEach(b => b.setAttribute("aria-pressed", "false"));
   $("color-name").textContent = cinfo(form.color).name;
 });
-document.addEventListener("keydown", e => { if (e.key === "Escape" && (!$("sheet-add").hidden || !$("sheet-pat").hidden || !$("sheet-start").hidden)) closeSheets(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && (!$("sheet-add").hidden || !$("sheet-pat").hidden || !$("sheet-start").hidden || !$("sheet-sym").hidden)) closeSheets(); });
 $("add-form").addEventListener("submit", e => {
   e.preventDefault();
   const gIn = parseFloat($("gram-input").value), s = SIZES[form.size];
