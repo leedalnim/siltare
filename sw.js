@@ -1,7 +1,7 @@
 // 오프라인에서도 열리도록 앱 파일을 저장해 두는 서비스 워커.
 // 같은 주소의 파일은 "인터넷 먼저, 안 되면 저장본" 방식이라 업데이트하면 바로 새 버전이 떠요.
 const CACHE = "yarn-rx-v1";
-const SHELL = ["./", "index.html", "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png", "icons/icon-512.png"];
+const SHELL = ["./", "index.html", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
