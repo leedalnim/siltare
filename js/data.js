@@ -144,7 +144,7 @@ const PATTERNS = {
     { id: "flower", name: "꽃 모티브", en: "Flower motif", f: 1.0, w: ["thin","mid","thick"], tex: ["smooth","fluffy"], c: 1, mc: true, d: 2, suits: ["motif","flat"],
       how: "사슬 고리에 <b>꽃잎을 한 장씩</b> 둘러 떠요. 작은 양으로 하나 완성되고, 여러 장을 이으면 담요나 가방이 돼요.", note: "적은 양 OK" },
     { id: "cat", name: "고양이 얼굴 모티브", en: "Cat face motif", f: 1.0, w: ["thin","mid","thick"], tex: ["smooth"], c: 1, mc: true, d: 2, suits: ["motif","flat"],
-      how: "<b>매직링에서 동그란 얼굴</b>을 뜨고 이마와 귀를 달아 고양이 얼굴을 만들어요. 9장을 3×3으로 이어 짧은뜨기로 채우면 담요 한 장이 돼요.", note: "고양이 도안" },
+      how: "<b>매직링에서 부채꼴로 코를 떠서</b> 귀가 달린 고양이 얼굴을 만드는 모티브예요. 9장을 3×3으로 놓고 짧은뜨기로 채워 이어요. 도안은 첨부한 원본 이미지 기준이에요.", note: "고양이 도안" },
     { id: "amigu", name: "아미구루미", en: "Amigurumi", f: 1.0, w: ["thin","mid","thick"], tex: ["smooth","fluffy"], c: 1, d: 2, suits: ["toy"],
       how: "<b>매직링에서 짧은뜨기를 나선으로</b> 늘리고 줄여 입체를 만들어요. 솜을 넣으면 인형이 돼요.", note: "입체 인형" },
     { id: "lace", name: "레이스 무늬", en: "Lace", f: 0.8, w: ["thin","mid"], tex: ["smooth"], c: 1, d: 3, suits: ["flat","garment","motif"],

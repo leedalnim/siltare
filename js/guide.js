@@ -30,37 +30,6 @@ const GLYPH = {
 };
 const glyphSVG = (k, cls = "") => `<svg class="glyph ${cls}" viewBox="0 0 48 56" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${GLYPH[k] || ""}</svg>`;
 
-// 고양이 얼굴 모티브 하나 (cx, cy가 중심, 가로 56 · 세로 44 타원)
-function catMotif(cx, cy, labels) {
-  let s = `<g transform="translate(${cx} ${cy})">`;
-  s += `<ellipse rx="56" ry="44" fill="none" stroke="var(--line)" stroke-width="1.2"/>`;
-  for (let i = 0; i < 16; i++) {
-    const a = i / 16 * Math.PI * 2, x = Math.cos(a) * 52, y = Math.sin(a) * 40;
-    const nx = -Math.sin(a), ny = Math.cos(a);
-    s += `<path d="M${(Math.cos(a) * 6).toFixed(1)} ${(Math.sin(a) * 5).toFixed(1)}L${x.toFixed(1)} ${y.toFixed(1)}M${(x + nx * 5).toFixed(1)} ${(y + ny * 4).toFixed(1)}L${(x - nx * 5).toFixed(1)} ${(y - ny * 4).toFixed(1)}" stroke="currentColor" stroke-width="1.3" fill="none"/>`;
-  }
-  s += `<path d="M0 0a2 2 0 0 1 4 0a4.5 4.5 0 0 1-9 0a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-width="1.3"/>`;
-  [-24, 0, 24].forEach(x => { s += `<path d="M${x - 5} -62H${x + 5}M${x} -62V-46M${x - 4} -56L${x + 4} -60" stroke="currentColor" stroke-width="1.3" fill="none"/>`; });
-  s += `<ellipse cx="-38" cy="-52" rx="5" ry="8" transform="rotate(-25 -38 -52)" fill="none" stroke="currentColor" stroke-width="1.3"/>`;
-  s += `<ellipse cx="38" cy="-52" rx="5" ry="8" transform="rotate(25 38 -52)" fill="none" stroke="currentColor" stroke-width="1.3"/>`;
-  s += `<circle cx="0" cy="52" r="2.6" fill="currentColor"/>`;
-  if (labels) [["1", 0, 8], ["2", 30, 16], ["3", 0, -70], ["4", 46, -60], ["5", 12, 54]].forEach(([n, x, y]) => {
-    s += `<g transform="translate(${x} ${y})"><circle r="8" fill="var(--accent)"/><text y="4" text-anchor="middle" font-size="11" font-weight="700" fill="var(--accent-ink)">${n}</text></g>`;
-  });
-  return s + `</g>`;
-}
-
-function catChartSVG() {
-  const W = 450, H = 410, cols = [105, 225, 345], rows = [100, 206, 312];
-  let s = `<svg class="cat-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="고양이 얼굴 모티브 9장을 3×3으로 이은 도안" fill="none" stroke="currentColor">`;
-  for (let y = 14; y < H - 8; y += 15) for (let x = 24; x < W - 12; x += 15) {
-    if (cols.some(cx => Math.abs(x - cx) < 66) && rows.some(cy => Math.abs(y - cy) < 56)) continue;
-    s += `<path d="M${x - 3} ${y - 3}l6 6M${x + 3} ${y - 3}l-6 6" stroke-width="1.2" opacity=".75"/>`;
-  }
-  rows.forEach(cy => cols.forEach(cx => { s += `<g transform="translate(${cx} ${cy}) scale(.9) translate(${-cx} ${-cy})">${catMotif(cx, cy)}</g>`; }));
-  return s + `</svg>`;
-}
-
 function symCard(sym) {
   return `<details class="sym">
     <summary><span class="sym-fig">${glyphSVG(sym.glyph)}</span><span class="sym-hd"><b>${esc(sym.name)}</b><small>${esc(sym.en)}</small></span></summary>
@@ -87,20 +56,21 @@ function renderGuide() {
     if (crochet) h += `<details class="rules"><summary>도안 읽는 법</summary><dl>${CHART_RULES.map(([t, d]) => `<dt>${t}</dt><dd>${d}</dd>`).join("")}</dl></details>`;
   } else {
     h += `<div class="notice">${CAT.notice}</div>
-      <figure class="cat-fig"><div class="cat-scroll">${catChartSVG()}</div><figcaption>9장을 3×3으로 배치하고, 사이와 둘레를 짧은뜨기(X)로 채워 이은 모습이에요.</figcaption></figure>
-      <h3 class="sub">모티브 한 장 보기</h3>
-      <figure class="cat-fig one"><svg viewBox="-80 -90 160 170" fill="none" stroke="currentColor" role="img" aria-label="고양이 얼굴 모티브 한 장">${catMotif(0, 0, true)}</svg></figure>
-      <h3 class="sub">기호 뜻</h3>
-      <ul class="cat-legend">${CAT.legend.map(([n, nm, where, g]) => `<li><span class="lg-n">${n}</span><span class="lg-g">${glyphSVG(g)}</span><span><b>${nm}</b><small>${where}</small></span></li>`).join("")}</ul>
-      <h3 class="sub">모티브 뜨는 순서</h3>
-      <ol class="steps">${CAT.motif.map(([t, d]) => `<li><b>${t}</b><p>${d}</p></li>`).join("")}</ol>
-      <h3 class="sub">이어서 완성하기</h3>
-      <ol class="steps">${CAT.join.map(([t, d]) => `<li><b>${t}</b><p>${d}</p></li>`).join("")}</ol>`;
+      <figure class="cat-fig"><div class="cat-scroll" id="cat-scroll"><img id="cat-img" src="${CAT.img}" alt="고양이 얼굴 모티브 9장을 3×3으로 이은 원본 도안"></div>
+        <figcaption><button type="button" class="ghost-btn" data-cat-zoom>크게 보기</button> 원본 이미지 그대로예요. 크게 보면 옆으로 밀어서 볼 수 있어요.</figcaption></figure>
+      <h3 class="sub">도안 속 기호 읽기</h3>
+      <ul class="cat-legend">${CAT.legend.map(x => `<li><img class="lg-img" src="images/sym-${x.img}.png" alt="${esc(x.name)} 기호"><span><b>${x.name}</b>${x.sure ? "" : '<em class="unsure">불확실</em>'}<small>${x.look}</small><span class="lg-mean">${x.mean}</span></span></li>`).join("")}</ul>
+      <h3 class="sub">도안에서 확인한 구조</h3>
+      <ul class="cat-read">${CAT.read.map(([k, v]) => `<li><b>${k}</b><span>${v}</span></li>`).join("")}</ul>
+      <h3 class="sub">뜨는 순서 (단수 세기에서 쓰는 순서)</h3>
+      <ol class="steps">${CAT.rows.map(([k, v]) => `<li><b>${k}</b><p>${v}</p></li>`).join("")}</ol>`;
   }
   $("v-guide").innerHTML = h;
 }
 
 document.addEventListener("click", e => {
+  const zb = e.target.closest("[data-cat-zoom]");
+  if (zb) { const img = $("cat-img"); const big = img.classList.toggle("big"); zb.textContent = big ? "작게 보기" : "크게 보기"; return; }
   const o = e.target.closest("[data-cat-open]");
   if (o) { guideUI.seg = "cat"; state.tab = "guide"; saveLocal(); closeSheets(); render(); window.scrollTo(0, 0); return; }
   const b = e.target.closest("[data-gseg]"); if (!b) return;

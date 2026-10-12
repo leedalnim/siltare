@@ -230,20 +230,23 @@ const DRAW = {
       }
     },
     cat: (ctx, W, H, C) => {
+      // 원본 도안의 기호 방향(도): 위 3, 아래 2, 왼쪽 3, 오른쪽 3
+      const ANG = [-119, -90, -57, -15, 0, 22, 58, 122, 158, 179, -164];
       const a = C[0], b = C[1] || mix(a, -0.3), T = 84;
       const ox = (W - T * Math.ceil(W / T)) / 2, oy = (H - T * Math.ceil(H / T)) / 2;
       for (let i = -1; ox + i * T < W; i++) for (let j = -1; oy + j * T < H; j++) {
-        const cx = ox + i * T + T / 2, cy = oy + j * T + T / 2 + 4, rx = 30, ry = 25;
+        const cx = ox + i * T + T / 2, cy = oy + j * T + T / 2 + 5;
         ctx.save(); ctx.translate(cx, cy);
-        ctx.fillStyle = css(b, -0.1);
-        for (const s of [-1, 1]) { ctx.beginPath(); ctx.moveTo(s * 8, -ry + 4); ctx.lineTo(s * 28, -ry - 12); ctx.lineTo(s * 30, -ry + 10); ctx.closePath(); ctx.fill(); }
-        const g = ctx.createRadialGradient(-6, -8, 4, 0, 0, rx); g.addColorStop(0, css(a, 0.15)); g.addColorStop(1, css(a, -0.25));
-        ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = css(a, -0.4); ctx.lineWidth = 0.9;
-        for (let q = 0; q < 16; q++) { const t = q / 16 * Math.PI * 2; ctx.beginPath(); ctx.moveTo(Math.cos(t) * 5, Math.sin(t) * 4); ctx.lineTo(Math.cos(t) * rx * 0.92, Math.sin(t) * ry * 0.92); ctx.stroke(); }
-        ctx.fillStyle = css(a, -0.55);
-        for (const s of [-1, 1]) { ctx.beginPath(); ctx.ellipse(s * 11, -2, 2.6, 3.4, 0, 0, Math.PI * 2); ctx.fill(); }
-        ctx.beginPath(); ctx.moveTo(-3, 6); ctx.lineTo(3, 6); ctx.lineTo(0, 10); ctx.closePath(); ctx.fill();
+        const head = new Path2D();
+        head.moveTo(-31, -4); head.bezierCurveTo(-33, -16, -30, -26, -24, -29); head.lineTo(-10, -20); head.lineTo(10, -20); head.lineTo(24, -29);
+        head.bezierCurveTo(30, -26, 33, -16, 31, -4); head.bezierCurveTo(33, 12, 18, 25, 0, 25); head.bezierCurveTo(-18, 25, -33, 12, -31, -4); head.closePath();
+        const g = ctx.createRadialGradient(-6, -8, 4, 0, 0, 36); g.addColorStop(0, css(a, 0.15)); g.addColorStop(1, css(a, -0.25));
+        ctx.fillStyle = g; ctx.fill(head);
+        ctx.strokeStyle = css(a, -0.45); ctx.lineWidth = 1; ctx.stroke(head);
+        ctx.strokeStyle = css(b, -0.2); ctx.lineWidth = 1.1;
+        for (const d of ANG) { const r = d * Math.PI / 180; ctx.beginPath(); ctx.moveTo(Math.cos(r) * 4, Math.sin(r) * 3); ctx.lineTo(Math.cos(r) * 26, Math.sin(r) * 19); ctx.stroke(); }
+        ctx.strokeStyle = css(a, -0.5); ctx.lineWidth = 1;
+        for (const s of [-1, 1]) for (const k of [0, 1]) { ctx.beginPath(); ctx.ellipse(s * (22 + k * 4), -16 - k * 3, 2.2, 4.4, s * 0.4, 0, Math.PI * 2); ctx.stroke(); }
         ctx.restore();
       }
     },
