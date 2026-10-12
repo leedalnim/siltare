@@ -9,7 +9,7 @@ function ctrViews(s, rx) {
 }
 function ctrChartBody(s, rx, info) {
   const done = info.done, hi = done ? -1 : info.hi;
-  if (s.pid === "cat") return `<div class="cchart"><div class="cchart-card"><img class="cat-mini" src="${CAT.vec}" alt="고양이 얼굴 도안"></div><p class="cc-cap">단계 목록은 '단계' 보기에서, 기호 뜻은 무늬 상세의 도안에서 볼 수 있어요.</p></div>`;
+  if (s.pid === "cat") return `<div class="cchart"><div class="cchart-card"><img class="cat-mini" src="${CAT.redraw}" alt="고양이 얼굴 도안 (다시 그린 도안)"></div><p class="cc-cap">단계 목록은 '단계' 보기에서, 기호 뜻은 무늬 상세의 도안에서 볼 수 있어요.</p></div>`;
   if (rx.chart) return `<div class="kchart"><div class="chart-scroll">${chartHTML(rx.chart, chartHexes(s.cols), hi, labelsFor(s.cols))}</div><p class="cc-cap">${hi >= 0 ? `지금은 ${hi + 1}번 줄이에요. 초록 ✓ = 다 뜬 줄, 보라 = 지금 줄, 흐림 = 아직이에요.` : "겉면에서 본 모양, 아래에서 위로 읽어요."}</p></div>`;
   if (s.craft === "crochet") { const h = crochetChartHTML(s.pid, s.cols, done ? -1 : s.row); if (h) return h; }
   return `<div class="empty-chart">이 무늬는 기호 도안이 없어요. 아래 '도안 전체 보기'를 따라 떠 주세요.</div>`;

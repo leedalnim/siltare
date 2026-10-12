@@ -91,3 +91,9 @@
 .sym-top .g-chips { margin: 0; padding-bottom: 2px; }
 .sym-top .g-chip { background: #1B1726; border-color: #2E2842; }
 .sym-top .g-chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); }
+
+/* 고양이 도안: 이미지 위 전환·확대 버튼 */
+.cat-stage { position: relative; }
+.cat-ov { position: absolute; border: 1px solid rgba(29, 26, 36, .25); background: rgba(255, 255, 255, .92); color: #1d1a24; font-weight: 700; border-radius: 999px; box-shadow: 0 2px 8px rgba(0, 0, 0, .25); }
+.cat-ov-v { top: 10px; right: 10px; padding: 7px 14px; font-size: 13px; }
+.cat-ov-z { bottom: 10px; right: 10px; width: 40px; height: 40px; font-size: 20px; line-height: 1; }

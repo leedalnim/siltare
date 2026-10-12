@@ -1,9 +1,10 @@
 // ---------- 고양이 얼굴 모티브 도안 (무늬 상세 안에 표시) ----------
-// 첨부 원본 이미지(images/cat-chart.png)를 그대로 쓰고, 이미지에서 읽히는 것만 적어요.
+// 원본: 받은 이미지를 선 하나하나 따라 그린 벡터(images/cat-vector.svg)
+// 다시 그린 도안: 원본에서 잰 위치에 기호를 깔끔한 선으로 다시 그린 것(images/cat-redraw.svg)
 // sure: false 인 항목은 해석이 불확실하다는 표시예요.
 const CAT = {
-  notice: "원본 이미지와, 원본을 그대로 따라 그린 도안을 함께 실었어요. 아래 설명은 이미지에서 읽히는 것만 적었고, 확실하지 않은 해석은 '불확실'로 표시했어요. 코 수나 단 설명이 적힌 원문이 있다면 그쪽을 우선해 주세요.",
-  img: "images/cat-chart.png", vec: "images/cat-vector.svg",
+  notice: "기본은 기호를 깔끔하게 다시 그린 도안이고, 이미지 위 버튼으로 원본(받은 도안을 그대로 따라 그린 벡터)과 바꿔 볼 수 있어요. 아래 설명은 이미지에서 읽히는 것만 적었고, 확실하지 않은 해석은 '불확실'로 표시했어요. 코 수나 단 설명이 적힌 원문이 있다면 그쪽을 우선해 주세요.",
+  orig: "images/cat-vector.svg", redraw: "images/cat-redraw.svg",
   legend: [
     { img: "ring",   name: "매직링", look: "가운데 소용돌이", mean: "얼굴이 시작되는 자리예요. 사방으로 뻗는 기호가 모두 이 고리에서 나와요.", sure: true },
     { img: "spoke",  name: "사방으로 뻗은 긴 선", look: "끝에 가로선(T)이 있고, 사선이 있는 것도 없는 것도 있어요", mean: "매직링에서 뻗는 코예요. 사선이 한 줄 있으면 한길긴뜨기, 사선 없이 가로선만 있으면 중간뜨기로 읽혀요. 옆쪽 코가 더 길게 그려져 있어요.", sure: false },
@@ -33,18 +34,15 @@ const CAT = {
   ]
 };
 
-const catUI = { v: "vec", zoom: false };
+const catUI = { v: "redraw", zoom: false };
 function catBlockHTML() {
-  const src = catUI.v === "vec" ? CAT.vec : CAT.img;
+  const red = catUI.v !== "orig", src = red ? CAT.redraw : CAT.orig;
   return `<section class="cat-block" id="cat-block" aria-labelledby="cat-h">
-    <h4 id="cat-h">고양이 얼굴 도안</h4>
-    <div class="seg cat-seg" role="group" aria-label="도안 보기">
-      <button type="button" data-catv="vec" aria-pressed="${catUI.v === "vec"}">다시 그린 도안</button>
-      <button type="button" data-catv="img" aria-pressed="${catUI.v === "img"}">원본 이미지</button>
-    </div>
-    <figure class="cat-fig"><div class="cat-scroll"><img id="cat-img" class="${catUI.zoom ? "big" : ""}" src="${src}" alt="고양이 얼굴 모티브 9장을 3×3으로 이은 도안 (${catUI.v === "vec" ? "다시 그린 도안" : "원본 이미지"})"></div>
-      <figcaption><button type="button" class="ghost-btn" data-cat-zoom>${catUI.zoom ? "작게 보기" : "크게 보기"}</button>
-        <span>${catUI.v === "vec" ? "원본을 선 하나하나 따라 그린 벡터예요. 확대해도 깨지지 않아요. 캡처 아이콘에 가려진 부분(오른쪽 X 4개, 오른쪽 아래 모서리)은 대칭으로 복원했어요." : "받은 원본 그대로예요. 오른쪽 아래에 캡처 화면의 확대·돋보기 아이콘이 겹쳐 있어요."}</span></figcaption></figure>
+    <h4 id="cat-h">고양이 얼굴 도안 · ${red ? "다시 그린 도안" : "원본"}</h4>
+    <figure class="cat-fig"><div class="cat-stage"><div class="cat-scroll"><img id="cat-img" class="${catUI.zoom ? "big" : ""}" src="${src}" alt="고양이 얼굴 모티브 9장을 3×3으로 이은 도안 (${red ? "다시 그린 도안" : "원본"})"></div>
+        <button type="button" class="cat-ov cat-ov-v" data-catv="${red ? "orig" : "redraw"}">${red ? "원본 보기" : "다시 그린 도안 보기"}</button>
+        <button type="button" class="cat-ov cat-ov-z" data-cat-zoom aria-label="${catUI.zoom ? "작게 보기" : "크게 보기"}">${catUI.zoom ? "−" : "＋"}</button></div>
+      <figcaption>${red ? "원본에서 잰 위치에 기호를 깔끔한 선으로 다시 그렸어요. 캡처 아이콘에 가려졌던 오른쪽 X와 오른쪽 아래 모서리는 대칭으로 채웠어요." : "받은 도안을 선 하나하나 그대로 따라 그린 원본이에요. 확대해도 깨지지 않아요."}</figcaption></figure>
     <div class="notice">${CAT.notice}</div>
     <details class="cat-fold"><summary>도안 속 기호 읽기 (${CAT.legend.length})</summary>
       <ul class="cat-legend">${CAT.legend.map(x => `<li><img class="lg-img" src="images/sym-${x.img}.png" alt="${esc(x.name)} 기호"><span><b>${x.name}</b>${x.sure ? "" : '<em class="unsure">불확실</em>'}<small>${x.look}</small><span class="lg-mean">${x.mean}</span></span></li>`).join("")}</ul></details>
