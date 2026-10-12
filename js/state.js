@@ -3,7 +3,7 @@ const EXAMPLE = [
   { id: "e1", weight: "mid", grams: 100, color: "gray", texture: "smooth", label: "주먹 ×2" },
   { id: "e2", weight: "mid", grams: 30, color: "navy", texture: "smooth", label: "귤 ×1" },
   { id: "e3", weight: "mid", grams: 15, color: "mustard", texture: "smooth", label: "탁구공 ×1" },
-  { id: "e4", weight: "thin", grams: 60, color: "pink", texture: "fluffy", label: "귤 ×2" }
+  { id: "e4", weight: "thin", grams: 60, color: "ivory", texture: "smooth", label: "귤 ×2" }
 ];
 let state = { craft: "knit", tab: "patterns", yarns: EXAMPLE.slice(), example: true, doubled: false, group: null, detail: null, pv: null, main: {}, openProj: new Set(),
   stars: {}, sessions: [], sess: null, mode: "rec", cat: "all", wake: false, updatedAt: 0, openMaybe: false };
@@ -29,6 +29,8 @@ try {
     setTimeout(saveLocal, 0);
   }
 } catch (e) {}
+// 예시 실만 들어 있으면 항상 최신 예시로 바꿔요 (예전 예시의 분홍 보송한 가는 실 → 아이보리 매끈한 실)
+if (state.example && state.yarns.some(y => /^e\d$/.test(y.id) && y.color === "pink")) { state.yarns = EXAMPLE.slice(); setTimeout(saveLocal, 0); }
 function saveLocal() {
   try { localStorage.setItem(STORE, JSON.stringify({ craft: state.craft, tab: state.tab, sess: state.sess, mode: state.mode, cat: state.cat, wake: state.wake,
     yarns: state.yarns, example: state.example, doubled: state.doubled, stars: state.stars, sessions: state.sessions, updatedAt: state.updatedAt })); } catch (e) {}

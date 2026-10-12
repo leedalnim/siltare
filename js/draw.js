@@ -260,7 +260,6 @@ const DRAW = {
       for (const s of [-1, 1]) {
         ctx.fillStyle = "#1D1A24"; ctx.beginPath(); ctx.arc(cx + s * r * 0.32, cy - r * 0.05, Math.max(1.5, r * 0.08), 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = "#FFFFFF"; ctx.beginPath(); ctx.arc(cx + s * r * 0.32 - r * 0.025, cy - r * 0.08, Math.max(0.6, r * 0.025), 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = "rgba(240,130,155,.5)"; ctx.beginPath(); ctx.ellipse(cx + s * r * 0.52, cy + r * 0.16, r * 0.12, r * 0.07, 0, 0, Math.PI * 2); ctx.fill();
       }
     },
     lace: (ctx, W, H, C) => {
@@ -280,14 +279,8 @@ const DRAW = {
 };
 
 function rng(seed) { return () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
-function fuzz(ctx, W, H, c) {
-  const rand = rng(7); ctx.save(); ctx.globalAlpha = 0.4; ctx.strokeStyle = css(c, 0.4); ctx.lineWidth = 0.6;
-  const n = Math.round(W * H / 40);
-  for (let k = 0; k < n; k++) {
-    const x = rand() * W, y = rand() * H, a = rand() * Math.PI * 2, l = 3 + rand() * 6;
-    ctx.beginPath(); ctx.moveTo(x, y); ctx.quadraticCurveTo(x + Math.cos(a + 0.6) * l * 0.6, y + Math.sin(a + 0.6) * l * 0.6, x + Math.cos(a) * l, y + Math.sin(a) * l); ctx.stroke();
-  }
-  ctx.globalAlpha = 0.12; ctx.fillStyle = css(c, 0.3); ctx.fillRect(0, 0, W, H); ctx.restore();
+function fuzz(ctx, W, H, c) {   // 보송한 실: 잔털 없이 살짝 부드러운 기운만
+  ctx.save(); ctx.globalAlpha = 0.1; ctx.fillStyle = css(c, 0.35); ctx.fillRect(0, 0, W, H); ctx.restore();
 }
 
 function paintSwatch(cv, pid, C, fluffy, craft) {

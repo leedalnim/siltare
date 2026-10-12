@@ -56,7 +56,6 @@ function drawProduct(ctx, W, H, proj, pid, C, fluffy) {
       after: (c, w, h) => {
         for (const sd of [-1, 1]) {
           c.fillStyle = "#1D1A24"; c.beginPath(); c.arc(w / 2 + sd * w * .15, h * .55, Math.max(1.4, w * .035), 0, Math.PI * 2); c.fill();
-          c.fillStyle = "rgba(240,130,155,.5)"; c.beginPath(); c.ellipse(w / 2 + sd * w * .25, h * .66, w * .06, w * .035, 0, 0, Math.PI * 2); c.fill();
         }
         c.fillStyle = css(C[1] || mix(C[0], 0.45)); c.beginPath(); c.ellipse(w / 2, h * .7, w * .11, w * .08, 0, 0, Math.PI * 2); c.fill();
         c.fillStyle = "#1D1A24"; c.beginPath(); c.ellipse(w / 2, h * .67, w * .03, w * .02, 0, 0, Math.PI * 2); c.fill();
