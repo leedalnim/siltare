@@ -250,6 +250,14 @@ const DRAW = {
         ctx.restore();
       }
     },
+    blackcat: (ctx, W, H, C) => {
+      const col = [C[0], C[1] || mix(C[0], -0.7), C[2] || mix(C[0], -0.35)];
+      const k = Math.min(W / (20 * CW), H / (18 * CH)), ox = (W - 20 * CW * k) / 2, oy = (H - 18 * CH * k) / 2;
+      ctx.fillStyle = css(col[0], -0.1); ctx.fillRect(0, 0, W, H);
+      ctx.save(); ctx.translate(ox, oy); ctx.scale(k, k);
+      BLACKCAT.forEach((row, j) => { for (let i = 0; i < 20; i++) scSt(ctx, i * CW, j * CH, CW, CH, col[+row[i]]); });
+      ctx.restore();
+    },
     amigu: (ctx, W, H, C) => {
       const c = C[0], cx = W / 2, cy = H * 0.56, r = Math.min(W, H) * 0.4;
       ctx.save(); ctx.beginPath(); ctx.ellipse(cx, cy, r * 1.12, r, 0, 0, Math.PI * 2); ctx.clip();

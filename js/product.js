@@ -130,6 +130,19 @@ function drawProduct(ctx, W, H, proj, pid, C, fluffy) {
           c.fillStyle = css(C[0], -0.35); c.beginPath(); c.moveTo(w, h * .72); c.lineTo(w, h); c.lineTo(w * .82, h); c.closePath(); c.fill();
         } });
     },
+    catbag: () => {
+      shadow(.3, .38);
+      ctx.save(); ctx.translate(cx, cy); ctx.strokeStyle = css(C[0], -0.2); ctx.lineWidth = s * .035; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(-.2 * s, -.17 * s); ctx.bezierCurveTo(-.22 * s, -.62 * s, .22 * s, -.62 * s, .2 * s, -.17 * s); ctx.stroke(); ctx.restore();
+      part({ x: 0, y: .07, w: .54, h: .5, shade: "flat", path: (p, w, h) => rrp(p, 0, 0, w, h, w * .05) });
+    },
+    catround: () => {
+      shadow(.3, .38);
+      ctx.save(); ctx.translate(cx, cy); ctx.strokeStyle = css(C[0], -0.2); ctx.lineWidth = s * .035; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(-.22 * s, -.12 * s); ctx.bezierCurveTo(-.26 * s, -.62 * s, .26 * s, -.62 * s, .22 * s, -.12 * s); ctx.stroke(); ctx.restore();
+      part({ x: 0, y: .07, w: .54, h: .54, shade: "dome", path: (p, w, h) => p.arc(w / 2, h / 2, w / 2, 0, Math.PI * 2) });
+    },
+    catcoaster: () => { shadow(.32, .42); part({ x: 0, y: 0, w: .5, h: .5, shade: "flat", path: (p, w, h) => p.arc(w / 2, h / 2, w / 2, 0, Math.PI * 2) }); },
     coaster: () => {
       shadow(.32, .42);
       const round = craft === "crochet";
