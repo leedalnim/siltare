@@ -18,7 +18,7 @@ async function pushNow() {
 function refreshSyncLines() { if (state.tab === "basket" || state.tab === "counter") render(); }
 function applyRemote(d) {
   if (!d || !Array.isArray(d.yarns)) return;
-  state.yarns = d.yarns; state.example = !!d.example; state.doubled = !!d.doubled;
+  state.yarns = d.example ? [] : d.yarns; state.example = false; state.doubled = !!d.doubled;
   state.stars = d.stars && typeof d.stars === "object" ? { ...d.stars } : {};
   state.sessions = Array.isArray(d.sessions) ? d.sessions.map(s => ({ ...s, cols: Array.isArray(s.cols) ? s.cols : [] })) : [];
   state.updatedAt = d.updatedAt || 0;

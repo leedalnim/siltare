@@ -30,10 +30,14 @@ function colsFor(p, r, g) {
   return keys.slice(0, 4).map(k => ({ name: cinfo(k).name, hex: hexFor(k) }));
 }
 
+// 굵기는 색이 아니라 실 두께 모양으로 보여줘요
+const strandFor = x => x.doubled
+  ? `<span class="gstrand" aria-hidden="true"><i style="height:${WEIGHTS.thin.line}px"></i><i style="height:${WEIGHTS.thin.line}px"></i></span>`
+  : `<span class="gstrand" aria-hidden="true"><i style="height:${WEIGHTS[x.w].line}px"></i></span>`;
 function groupBar(gs, g) {
   const hasThin = state.yarns.some(y => y.weight === "thin");
   return `<div class="chiprow" role="group" aria-label="어떤 실로 뜰까요">${gs.map(x =>
-    `<button type="button" class="gchip" id="g-${x.key}" data-g="${x.key}" aria-pressed="${x.key === g.key}">${dotsFor(x.yarns)}${x.title}<span class="n">${sum(x.yarns)}g</span></button>`).join("")}</div>
+    `<button type="button" class="gchip" id="g-${x.key}" data-g="${x.key}" aria-pressed="${x.key === g.key}">${strandFor(x)}${x.title}<span class="n">${sum(x.yarns)}g</span></button>`).join("")}</div>
     ${hasThin ? `<label class="toggle"><input type="checkbox" class="dbl" ${state.doubled ? "checked" : ""}> 가는 실을 두 가닥 합쳐 보통 굵기로 뜨는 것도 보기</label>` : ""}`;
 }
 const emptyBox = msg => `<div class="empty">${msg}<button type="button" class="primary" data-open-add>+ 실 담기</button></div>`;
@@ -47,7 +51,6 @@ function renderBasket() {
   const ys = state.yarns, total = sum(ys);
   let html = `<div class="view-title"><h2 id="h-basket">내 실 바구니</h2><span class="meta">${ys.length ? `${ys.length}뭉치 · 약 ${total}g` : ""}</span></div>`;
   html += `<div class="weights">${WKEYS.map(k => { const g = sum(ys.filter(y => y.weight === k)); return `<div class="wt ${g ? "" : "zero"}"><span>${WEIGHTS[k].name}</span><b>${g}g</b><span>약 ${Math.round(g * WEIGHTS[k].mpg)}m</span></div>`; }).join("")}</div>`;
-  if (state.example && ys.length) html += `<div class="example-note ex-row"><span>지금은 예시 실이 들어 있어요.</span><button type="button" class="ex-btn" data-clear-example>예시 실 모두 지우기</button></div>`;
   html += `<button type="button" class="primary wide" data-open-add>+ 실 담기</button>`;
   if (!ys.length) html += `<div class="empty">바구니가 비었어요. 남은 실을 하나씩 담아 주세요.</div>`;
   else html += `<ul class="basket">${ys.map(y => {
@@ -86,7 +89,7 @@ function renderPatterns() {
     if (!g) html += emptyBox("실을 담으면 뜰 수 있는 무늬를 골라 드려요. 실 없이 둘러보려면 '전체 무늬'를 눌러 보세요.");
     else {
       if (A.best) {
-        html += `<button type="button" class="pick" data-p="${A.best.p.id}" data-pv="${A.best.x.pr.id}"><canvas data-sw="${A.best.p.id}" data-prod="${A.best.x.pr.id}" aria-hidden="true" style="background:var(--surface)"></canvas>
+        html += `<button type="button" class="pick" data-p="${A.best.p.id}" data-pv="${A.best.x.pr.id}"><canvas data-sw="${A.best.p.id}" aria-hidden="true" style="background:var(--surface)"></canvas>
           <span><span class="label">가장 알뜰한 조합</span><strong>${A.best.p.name}로 뜬 ${A.best.x.pr.name}</strong>
           <span class="s">필요 약 ${A.best.x.need}g · 가진 실 ${A.best.r.have}g · ${tool()} ${g.doubled ? WEIGHTS.mid.needle : WEIGHTS[g.w].needle}</span></span></button>`;
       }
@@ -162,14 +165,11 @@ function detailChartHTML(p, rx, cols) {
 }
 function stageHTML(p, sel, cols, rx) {
   if (detailUI.pid !== p.id) { detailUI.pid = p.id; detailUI.view = p.id === "cat" ? "chart" : "swatch"; detailUI.zoom = 1; }
-  const views = [["swatch", "무늬 크게"], ["chart", "기호 도안"]]; if (sel) views.push(["product", "완성품"]);
+  const views = [["swatch", "무늬 크게"], ["chart", "기호 도안"]];
   if (!views.some(v => v[0] === detailUI.view)) detailUI.view = "swatch";
   const seg = `<div class="seg dv-seg" role="group" aria-label="무늬 보기 방식">${views.map(([k, n]) => `<button type="button" data-dv="${k}" aria-pressed="${detailUI.view === k}">${n}</button>`).join("")}</div>`;
   let body;
   if (detailUI.view === "chart") body = detailChartHTML(p, rx, cols);
-  else if (detailUI.view === "product" && sel) body = `<div class="stage">
-      <canvas class="big" data-sw="${p.id}" data-prod="${sel.pr.id}" role="img" aria-label="${p.name}로 뜬 ${sel.pr.name} 완성 미리보기"></canvas><span class="cap">${p.name}로 뜬 ${sel.pr.name}</span>
-      <span class="inset"><canvas data-sw="${p.id}" aria-hidden="true"></canvas>무늬 확대</span></div>`;
   else body = `<div class="stage"><canvas class="big swbig" data-sw="${p.id}" data-zoom="${detailUI.zoom}" role="img" aria-label="${p.name} 무늬 크게 보기"></canvas>
       <span class="zoomer"><button type="button" data-dz="-1" aria-label="작게">−</button><button type="button" data-dz="1" aria-label="크게">＋</button></span></div>`;
   return seg + body;
@@ -219,7 +219,7 @@ function renderDetail() {
     <div class="chips">${chips.map(c => `<span class="chip">${c}</span>`).join("")}</div>
     <p class="how">${p.how}</p>
     ${startBtns}
-    <p class="sub-h">이 무늬로 뜰 수 있는 것 · 눌러서 미리보기</p>
+    <p class="sub-h">이 무늬로 뜰 수 있는 것</p>
     <ul class="projects">${r.doable.map(x => {
       const nt = x.st === "ok" ? `약 ${r.have - x.need}g 남아요` : x.st === "tight" ? (r.have >= x.need ? "거의 딱 맞아요" : `약 ${x.need - r.have}g 모자라요. 몇 코만 줄이면 돼요`) : `약 ${x.need - r.have}g 모자라요. 작게 뜨거나 끝단을 다른 실로`;
       return `<li><button type="button" class="proj ${x.st}" data-pv="${x.pr.id}" aria-pressed="${sel && x.pr.id === sel.pr.id}"><span class="nm">${x.pr.name}</span><span class="st">${stLabel[x.st]}</span><span class="nt">${nt}</span><span class="g">${x.need}g 필요</span></button></li>`;
