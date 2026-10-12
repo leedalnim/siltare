@@ -10,7 +10,7 @@ const craftName = c => (c || state.craft) === "knit" ? "대바늘" : "코바늘"
 const PH = { key: "ph", w: "mid", use: "mid", yarns: [], title: "", mpg: 2, ph: true };
 
 const CATS = [["all", "전체"], ["small", "소품"], ["wear", "모자·워머"], ["big", "목도리·담요"], ["garment", "옷"], ["bag", "가방"], ["toy", "인형"]];
-const CAT_OF = { breadcat: "small", cardwallet: "small", cakewallet: "small", catpurse: "small", tomatowallet: "small", catcoaster: "small", catround: "small", catbag: "small", coaster: "small", scrunchie: "small", sleeve: "small", flower: "small", scrubby: "small", granny1: "small",
+const CAT_OF = { calicowallet: "small", breadcat: "small", cardwallet: "small", cakewallet: "small", catpurse: "small", tomatowallet: "small", catcoaster: "small", catround: "small", catbag: "small", coaster: "small", scrunchie: "small", sleeve: "small", flower: "small", scrubby: "small", granny1: "small",
   beanie: "wear", babyhat: "wear", bucket: "wear", headband: "wear", wrist: "wear", mitten: "wear", socks: "wear", cowl: "wear",
   scarf: "big", shawl: "big", blanket: "big", sweater: "garment", vest: "garment", pouch: "bag", netbag: "bag", keyring: "toy", amigurumi: "toy" };
 

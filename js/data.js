@@ -95,6 +95,8 @@ const PROJECTS = {
       how: "케이크 색과 크림 색 두 가지로 짧은뜨기 카드 주머니를 떠요. 딸기와 생크림은 작은 아미구루미로 떠서 위에 달고, 눈·코는 단추나 자수로 붙여요." },
     { id: "catpurse", name: "고양이 동전지갑", g: [25, 35, 50], tags: ["wallet", "cat"], photo: "images/ref/catpurse.jpg",
       how: "짧은뜨기 배색(감싸뜨기)으로 고양이 무늬를 넣어 앞·뒤 판을 뜨고, 위쪽에 귀를 떠 붙여요. 지퍼와 꼬리 고리를 달고, 수염과 코는 자수로 놓아요." },
+    { id: "calicowallet", name: "얼룩 고양이 카드지갑", g: [25, 35, 50], tags: ["wallet", "cat"], photo: "images/ref/calicowallet.jpg",
+      how: "윗부분은 고양이 털 색, 얼굴 가운데 흰 무늬와 아랫단은 흰색으로 짧은뜨기 배색(감싸뜨기)을 해요. 둥근 귀 두 개를 떠서 달고, 눈은 인형 눈을 붙이고 줄무늬와 입은 검정 자수, 볼은 분홍 실로 놓아요." },
     { id: "breadcat", name: "식빵 고양이 카드지갑", g: [25, 35, 50], tags: ["wallet"],
       how: "식빵 속 색(아이보리)으로 짧은뜨기 카드 주머니를 뜨고 위쪽에 고양이 귀를 떠 붙여요. 빵 껍질 색(갈색)으로 둘레를 짧은뜨기 한 바퀴 둘러 테두리를 만들고, 눈·입·수염은 자수로 놓아요." },
     { id: "tomatowallet", name: "토마토 냥이 카드지갑", g: [30, 40, 55], tags: ["wallet"], photo: "images/ref/tomatowallet.jpg",

@@ -4,7 +4,7 @@ const ROWMUL = { knit: { garter: 1.4, brioche: 1.9 }, crochet: { dc: 0.5, shell:
 const ROWPX = { knit: 10, crochet: { sc: 9, moss: 9, stripe: 9, popcorn: 11, dc: 18, shell: 15, waffle: 20, lace: 20, mesh: 13, cat: 9, blackcat: 9 } };
 const DIMS = { coaster: [10, 10], scrunchie: [40, 8], sleeve: [24, 8, 1], pouch: [20, 30], headband: [45, 10], wrist: [18, 18, 1], babyhat: [40, 16, 1],
   cowl: [56, 25, 1], mitten: [20, 22, 1], beanie: [50, 22, 1], socks: [20, 45, 1], scarf: [20, 150], shawl: [120, 55], vest: [90, 55, 1],
-  sweater: [100, 60, 1], blanket: [80, 100], scrubby: [12, 12], bucket: [55, 20], netbag: [35, 70], catbag: [24, 24], catround: [22, 22], catcoaster: [11, 11], cardwallet: [11, 24], cakewallet: [11, 16], catpurse: [13, 18], tomatowallet: [11, 16], breadcat: [11, 16] };
+  sweater: [100, 60, 1], blanket: [80, 100], scrubby: [12, 12], bucket: [55, 20], netbag: [35, 70], catbag: [24, 24], catround: [22, 22], catcoaster: [11, 11], cardwallet: [11, 24], cakewallet: [11, 16], catpurse: [13, 18], tomatowallet: [11, 16], breadcat: [11, 16], calicowallet: [12, 17] };
 const TAIL_TARGET = { granny: 6, c2c: 20 };
 function gaugeOf(craft, use, pid) { const g = GAUGE[craft][use] || GAUGE[craft].mid; return [g[0], g[1] * ((ROWMUL[craft] || {})[pid] || 1)]; }
 const toMult = (x, m) => Math.max(m[0] + m[1], Math.round((x - m[1]) / m[0]) * m[0] + m[1]);
