@@ -21,6 +21,17 @@ try {
     state.wake = !!saved.wake; state.updatedAt = saved.updatedAt || 0;
   }
 } catch (e) {}
+// 저장된 데이터가 오래됐거나 일부 깨져 있어도 앱이 멈추지 않게 정리해요 (멀쩡한 항목은 그대로 둬요)
+function cleanData() {
+  state.yarns = (Array.isArray(state.yarns) ? state.yarns : []).filter(y => y && typeof y === "object" && +y.grams > 0).map(y => ({ ...y,
+    id: String(y.id || "y" + Math.random().toString(36).slice(2, 8)), weight: WEIGHTS[y.weight] ? y.weight : y.weight === "thin2" ? "thin" : "mid",
+    grams: Math.round(+y.grams), color: y.color || "unknown", texture: y.texture === "fluffy" ? "fluffy" : "smooth", label: String(y.label || "") }));
+  state.sessions = (Array.isArray(state.sessions) ? state.sessions : []).filter(s => s && s.id && PATTERNS[s.craft] && PATTERNS[s.craft].some(p => p.id === s.pid))
+    .map(s => ({ ...s, cols: Array.isArray(s.cols) ? s.cols : [], row: Math.max(0, parseInt(s.row, 10) || 0), st: Math.max(0, parseInt(s.st, 10) || 0) }));
+  if (state.sess && !state.sessions.some(s => s.id === state.sess)) state.sess = null;
+  if (!state.stars || typeof state.stars !== "object") state.stars = {};
+}
+cleanData();
 // 한 번만: 잠깐 배포됐던 버전이 예시 실을 비운 채 저장했을 수 있어서, 바구니가 비어 있으면 예시 실을 되살려요.
 try {
   if (!localStorage.getItem("leftover-yarn-exfix1")) {

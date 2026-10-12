@@ -75,10 +75,10 @@ function dotRenderEditor() {
     <div class="dot-pal" role="group" aria-label="색">${d.pal.map((c, i) => `<button type="button" class="dot-sw" data-dot-c="${i}" style="background:${c}" aria-pressed="${d.cur === i && d.tool !== "erase"}" aria-label="${i === 0 ? "바탕색" : `${i + 1}번 색`}"><span style="color:${inkOn(c)}">${DOT_SYM[i]}</span>${i === 0 ? "<small>바탕</small>" : ""}</button>`).join("")}
       ${d.pal.length < 12 ? `<label class="dot-sw dot-add" aria-label="색 추가">＋<input type="color" id="dot-addc" value="#7DA9D8"></label>` : ""}
       <button type="button" class="dot-cedit-btn" data-dot-pop aria-haspopup="dialog">✎ 색 편집</button></div>
-    <div class="dot-tools">${[["pen", "칠하기"], ["fill", "채우기"], ["erase", "지우개"]].map(([k, n]) => `<button type="button" data-dot-tool="${k}" aria-pressed="${d.tool === k}">${n}</button>`).join("")}
+    <div class="dot-tools">${[["pen", "칠하기"], ["fill", "채우기"], ["erase", "지우개"], ["move", "✋ 화면 이동"]].map(([k, n]) => `<button type="button" data-dot-tool="${k}" aria-pressed="${d.tool === k}">${n}</button>`).join("")}
       <button type="button" data-dot-undo${d.hist.length ? "" : " disabled"}>되돌리기</button><button type="button" data-dot-clear>모두 지우기</button><button type="button" data-dot-sym aria-pressed="${d.sym}">기호 ${d.sym ? "켜짐" : "꺼짐"}</button></div>
-    <div class="dot-wrap"><canvas id="dot-cv" aria-label="도트 도안 그리기 판"></canvas></div>
-    <p class="my-hint">칸을 누르거나 끌어서 칠해요. 지우개는 바탕색으로 칠하고, 채우기는 같은 색으로 이어진 칸을 한 번에 칠해요. 맨 아래 줄이 1단이에요.</p>
+    <div class="dot-wrap${d.tool === "move" ? " move" : ""}"><canvas id="dot-cv" aria-label="도트 도안 그리기 판"></canvas></div>
+    <p class="my-hint">칸을 누르거나 끌어서 칠해요. 판이 화면보다 크면 ‘화면 이동’을 골라 밀어서 옮겨요. 지우개는 바탕색으로 칠하고, 채우기는 같은 색으로 이어진 칸을 한 번에 칠해요. 맨 아래 줄이 1단이에요.</p>
     <button type="button" class="primary wide" data-dot-save>저장</button></div>`;
   requestAnimationFrame(() => { dotDraw.last = dotDraw($("dot-cv"), d, { sym: d.sym }); });
   dotDraft(true);
@@ -160,10 +160,10 @@ function dotPop(open) {
 document.addEventListener("click", e => {
   const t = e.target;
   if (t.closest("[data-dot-new]")) { dotOpenEditor(); return; }
-  if (t.closest("[data-dot-pop]")) { if (dotEd.tool === "erase") dotEd.tool = "pen"; dotPop(true); return; }
+  if (t.closest("[data-dot-pop]")) { if (dotEd.tool === "erase" || dotEd.tool === "move") dotEd.tool = "pen"; dotPop(true); return; }
   if (t.closest("[data-dot-popx]") || t.id === "dot-pop") { dotPop(false); dotRenderEditor(); return; }
   const pc = t.closest("[data-dot-pc]"); if (pc) { dotEd.cur = +pc.dataset.dotPc; dotPop(true); return; }
-  const c = t.closest("[data-dot-c]"); if (c) { if (dotEd.cur === +c.dataset.dotC && dotEd.tool !== "erase") { dotPop(true); return; } dotEd.cur = +c.dataset.dotC; if (dotEd.tool === "erase") dotEd.tool = "pen"; dotRenderEditor(); return; }
+  const c = t.closest("[data-dot-c]"); if (c) { if (dotEd.cur === +c.dataset.dotC && dotEd.tool !== "erase") { dotPop(true); return; } dotEd.cur = +c.dataset.dotC; if (dotEd.tool === "erase" || dotEd.tool === "move") dotEd.tool = "pen"; dotRenderEditor(); return; }
   const tl = t.closest("[data-dot-tool]"); if (tl) { dotEd.tool = tl.dataset.dotTool; dotRenderEditor(); return; }
   if (t.closest("[data-dot-undo]")) { const h = dotEd.hist.pop(); if (h) { dotEd.name = $("dot-name").value; Object.assign(dotEd, h); dotEd.cur = Math.min(dotEd.cur, dotEd.pal.length - 1); } dotRenderEditor(); return; }
   if (t.closest("[data-dot-clear]")) { if (!confirm("그린 칸을 모두 지울까요?")) return; dotPush(); dotEd.cells.fill(0); dotRenderEditor(); return; }
@@ -205,7 +205,7 @@ document.addEventListener("change", e => {
 (function () {   // 칸 칠하기 (누르고 끌기)
   let painting = false;
   document.addEventListener("pointerdown", e => {
-    if (e.target.id !== "dot-cv") return;
+    if (e.target.id !== "dot-cv" || dotEd.tool === "move") return;
     painting = true; e.target.setPointerCapture(e.pointerId); e.preventDefault();
     dotPush();
     dotDraw.last = dotDraw.last || { cs: 20, L: 26 };

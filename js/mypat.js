@@ -5,6 +5,19 @@
 const MY_STORE = "leftover-yarn-my-v1";
 let myPats = [];
 try { const s = JSON.parse(localStorage.getItem(MY_STORE) || "[]"); if (Array.isArray(s)) myPats = s; } catch (e) {}
+// 깨진 항목 정리: 도트 도안은 칸 수·팔레트를 맞추고, 나머지는 기본값을 채워요
+myPats = myPats.filter(p => p && typeof p === "object" && p.id).map(p => {
+  const q = { ...p, name: String(p.name || "이름 없는 도안"), row: Math.max(0, parseInt(p.row, 10) || 0), created: +p.created || 0, pages: Array.isArray(p.pages) ? p.pages : [] };
+  if (p.target != null) q.target = Math.max(0, parseInt(p.target, 10) || 0) || null;
+  if (q.type === "dot") {
+    q.w = Math.max(4, Math.min(80, parseInt(p.w, 10) || 20)); q.h = Math.max(4, Math.min(80, parseInt(p.h, 10) || 16));
+    q.pal = Array.isArray(p.pal) && p.pal.length ? p.pal.slice(0, 12) : ["#FFFFFF", "#1D1A24"];
+    const top = (q.pal.length - 1).toString(36), cs = String(p.cells || "").replace(/[^0-9a-z]/g, "0").split("").map(ch => parseInt(ch, 36) < q.pal.length ? ch : top);
+    q.cells = cs.concat(new Array(Math.max(0, q.w * q.h - cs.length)).fill("0")).slice(0, q.w * q.h).join("");
+    q.row = Math.min(q.row, q.h); q.target = q.h;
+  }
+  return q;
+});
 function mySave() { try { localStorage.setItem(MY_STORE, JSON.stringify(myPats)); return true; } catch (e) { toast("저장 공간이 부족해요. 안 쓰는 도안을 지워 주세요"); return false; } }
 
 // ----- IndexedDB (파일 보관) -----
@@ -146,7 +159,7 @@ async function myOpenView(id, keepPage) {
   myView.id = id; myClean();
   $("mypat-h").textContent = p.name;
   const pg = p.pages[Math.min(myView.page, p.pages.length - 1)];
-  const rec = await myGet(pg.id).catch(() => null);
+  const rec = pg && pg.id ? await myGet(pg.id).catch(() => null) : null;
   let src = null;
   if (rec && rec.blob) { src = URL.createObjectURL(rec.blob); myView.urls.push(src); }
   const m = p.mark || { y: .1, h: .08, on: true };

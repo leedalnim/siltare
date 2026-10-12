@@ -99,3 +99,4 @@
 .dot-pop-ft { display: flex; gap: 8px; justify-content: flex-end; }
 .dot-pop-ft .primary { padding: 9px 22px; }
 .dot-pop-ft .danger { color: var(--risk); margin-right: auto; }
+.dot-wrap.move canvas { touch-action: auto; cursor: grab; }

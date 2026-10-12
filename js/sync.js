@@ -22,7 +22,7 @@ function applyRemote(d) {
   state.stars = d.stars && typeof d.stars === "object" ? { ...d.stars } : {};
   state.sessions = Array.isArray(d.sessions) ? d.sessions.map(s => ({ ...s, cols: Array.isArray(s.cols) ? s.cols : [] })) : [];
   state.updatedAt = d.updatedAt || 0;
-  saveLocal(); render();
+  cleanData(); saveLocal(); render();
 }
 async function initSync() {
   if (!window.claude || typeof window.claude.use !== "function") { sync.status = "offline"; refreshSyncLines(); return; }
