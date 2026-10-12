@@ -1,4 +1,6 @@
 // ---------- Sheets & toast ----------
+const SHEETS = ["sheet-add", "sheet-pat", "sheet-start", "sheet-sym", "sheet-myadd", "sheet-mypat"];
+const anySheetOpen = () => SHEETS.some(id => !$(id).hidden);
 let lastFocus = null;
 function openSheet(id) {
   lastFocus = document.activeElement;
@@ -6,7 +8,8 @@ function openSheet(id) {
   const close = $(id).querySelector(".close"); if (close) close.focus({ preventScroll: true });
 }
 function closeSheets() {
-  ["sheet-add", "sheet-pat", "sheet-start", "sheet-sym"].forEach(id => $(id).hidden = true);
+  SHEETS.forEach(id => $(id).hidden = true);
+  if (typeof myClean === "function") myClean();
   document.documentElement.classList.remove("lock"); state.detail = null; state.pv = null;
   if (lastFocus && document.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
 }

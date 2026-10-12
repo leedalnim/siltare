@@ -76,10 +76,11 @@ function patCard(p, r, g, act) {
 
 function renderPatterns() {
   const { gs, g } = currentGroup();
-  const G = g || PH, A = analyse(G), act = activeSet(), mode = state.mode === "all" ? "all" : "rec";
+  const G = g || PH, A = analyse(G), act = activeSet(), mode = ["all", "mine"].includes(state.mode) ? state.mode : "rec";
   let html = `<div class="view-title"><h2 id="h-patterns">무늬</h2><span class="meta">${craftName()} 기준</span></div>`;
   if (g) html += groupBar(gs, g);
-  html += `<div class="seg2" role="group" aria-label="무늬 보기"><button type="button" data-mode="rec" aria-pressed="${mode === "rec"}">추천 무늬<span class="n">${g ? A.ok.length : 0}</span></button><button type="button" data-mode="all" aria-pressed="${mode === "all"}">전체 무늬<span class="n">${A.pats.length}</span></button></div>`;
+  html += `<div class="seg2" role="group" aria-label="무늬 보기"><button type="button" data-mode="rec" aria-pressed="${mode === "rec"}">추천 무늬<span class="n">${g ? A.ok.length : 0}</span></button><button type="button" data-mode="all" aria-pressed="${mode === "all"}">전체 무늬<span class="n">${A.pats.length}</span></button><button type="button" data-mode="mine" aria-pressed="${mode === "mine"}">내 도안<span class="n">${myPats.length}</span></button></div>`;
+  if (mode === "mine") { $("v-patterns").innerHTML = html + myListHTML(); return; }
   const keyOf = x => starKey("p", x.p.id);
   if (mode === "rec") {
     if (!g) html += emptyBox("실을 담으면 뜰 수 있는 무늬를 골라 드려요. 실 없이 둘러보려면 '전체 무늬'를 눌러 보세요.");

@@ -24,6 +24,7 @@
 <link rel="stylesheet" href="css/counter.css">
 <link rel="stylesheet" href="css/projects.css">
 <link rel="stylesheet" href="css/guide.css">
+<link rel="stylesheet" href="css/mypat.css">
 <link rel="stylesheet" href="css/nav-sheets.css">
 </head>
 <body>
@@ -134,6 +135,24 @@
   </div>
 </div>
 
+<div class="sheet" id="sheet-myadd" hidden>
+  <div class="scrim" data-close></div>
+  <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="myadd-h">
+    <div class="grab" aria-hidden="true"></div>
+    <div class="sheet-hd"><h3 id="myadd-h">내 도안 등록</h3><button class="close" type="button" data-close aria-label="닫기">×</button></div>
+    <div id="myadd-body"></div>
+  </div>
+</div>
+
+<div class="sheet" id="sheet-mypat" hidden>
+  <div class="scrim" data-close></div>
+  <div class="sheet-panel tall" role="dialog" aria-modal="true" aria-labelledby="mypat-h">
+    <div class="grab" aria-hidden="true"></div>
+    <div class="sheet-hd"><h3 id="mypat-h"></h3><button class="close" type="button" data-close aria-label="닫기">×</button></div>
+    <div id="mypat-body"></div>
+  </div>
+</div>
+
 <div class="sheet" id="sheet-sym" hidden>
   <div class="scrim" data-close></div>
   <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sym-h">
@@ -160,6 +179,7 @@
 <script src="js/cchart.js"></script>
 <script src="js/sync.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/mypat.js"></script>
 <script src="js/events.js"></script>
 <script src="js/main.js"></script>
 <script src="js/pwa.js"></script>

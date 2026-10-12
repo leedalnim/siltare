@@ -1,0 +1,50 @@
+/* 내 도안 */
+.my-add-btn { margin: 12px 0 4px; }
+.my-note { margin: 4px 0 12px; }
+.my-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.my-card { display: flex; gap: 12px; width: 100%; padding: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); text-align: left; align-items: center; }
+.my-th { position: relative; flex: none; width: 64px; height: 64px; border-radius: 10px; background: #f3efe6; overflow: hidden; display: grid; place-items: center; }
+.my-th img { width: 100%; height: 100%; object-fit: cover; }
+.my-th i { position: absolute; right: 3px; bottom: 3px; font-style: normal; font-size: 11px; background: rgba(23,20,31,.8); color: var(--ink); border-radius: 6px; padding: 0 5px; }
+.my-pdf { font-family: var(--font-mono); font-weight: 700; color: #b3402a; font-size: 14px; }
+.my-pdf.big { font-size: 28px; }
+.my-tx { display: grid; gap: 3px; min-width: 0; flex: 1; }
+.my-tx b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.my-tx .s { font-size: 13px; color: var(--muted); }
+.my-form { display: grid; gap: 14px; padding-bottom: 8px; }
+.my-pick { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.my-pick .ghost-btn { text-align: center; padding: 11px 4px; font-size: 13.5px; cursor: pointer; }
+.my-prev { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; flex-wrap: wrap; }
+.my-prev li { position: relative; }
+.my-x { position: absolute; top: -6px; right: -6px; width: 24px; height: 24px; border-radius: 50%; border: 0; background: var(--risk); color: #1a1426; font-size: 16px; line-height: 1; }
+.my-hint { margin: 0; font-size: 13px; color: var(--muted); }
+.my-in { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; }
+.my-craft { display: flex; width: 100%; }
+.my-craft button { flex: 1; }
+.sheet-panel.tall { max-height: 94vh; }
+.my-viewer { display: grid; gap: 8px; }
+.my-scroll { overflow: auto; max-height: 56vh; background: #f3efe6; border-radius: var(--radius); -webkit-overflow-scrolling: touch; }
+.my-stage { position: relative; min-width: 100%; }
+.my-stage img { display: block; width: 100%; height: auto; user-select: none; -webkit-user-select: none; }
+.my-band { position: absolute; left: 0; right: 0; border-top: 2px solid var(--accent); border-bottom: 2px solid var(--accent); box-shadow: 0 0 0 100vmax rgba(23, 20, 31, .62); touch-action: none; cursor: grab; }
+.my-tools { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.my-tools .sp { flex: 1; }
+.my-tools span { font-family: var(--font-mono); font-size: 13px; color: var(--muted); min-width: 44px; text-align: center; }
+.my-tools button { min-width: 40px; height: 36px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-weight: 600; }
+.my-tools button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.my-pages { display: flex; margin-bottom: 8px; }
+.my-pages button { flex: 1; }
+.my-pdfbox { display: grid; gap: 10px; justify-items: center; background: var(--surface); border-radius: var(--radius); padding: 24px 16px; text-align: center; }
+.my-ctr { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 14px; margin-top: 10px; display: grid; gap: 8px; }
+.my-ctr-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.my-ctr-row output { font-size: 20px; text-align: center; flex: 1; }
+.my-ctr-row output b { font-size: 34px; font-family: var(--font-display); }
+.my-ctr-row button { height: 52px; min-width: 64px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); font-size: 22px; font-weight: 700; }
+.my-ctr-row button.plus { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); min-width: 96px; }
+.my-ctr-row button:disabled { opacity: .4; }
+.my-meta { display: flex; gap: 12px; align-items: center; margin-top: 8px; }
+.my-meta a { color: var(--accent); font-size: 14px; }
+.my-memo { background: var(--surface); border-radius: 10px; padding: 10px 12px; margin: 8px 0 0; font-size: 14px; }
+.my-acts { display: flex; gap: 8px; margin-top: 10px; }
+.my-acts .ghost-btn { flex: 1; }
+.my-acts .danger { color: var(--risk); }

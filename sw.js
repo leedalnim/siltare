@@ -14,8 +14,23 @@ self.addEventListener("activate", e => {
   );
 });
 
+// 다른 앱에서 '공유 → 남은 실'로 보낸 이미지·PDF를 임시 보관함에 넣고 앱으로 넘겨요.
+async function receiveShare(req) {
+  try {
+    const fd = await req.formData(), cache = await caches.open("share-inbox");
+    for (const k of await cache.keys()) await cache.delete(k);
+    let i = 0;
+    for (const f of fd.getAll("files")) {
+      if (!(f instanceof File)) continue;
+      await cache.put(new Request("shared/" + Date.now() + "-" + i++), new Response(f, { headers: { "content-type": f.type || "application/octet-stream", "x-name": encodeURIComponent(f.name || "공유한 도안") } }));
+    }
+  } catch (err) {}
+  return Response.redirect("./?share=1", 303);
+}
+
 self.addEventListener("fetch", e => {
   const req = e.request;
+  if (req.method === "POST" && new URL(req.url).pathname.endsWith("/share-target")) { e.respondWith(receiveShare(req)); return; }
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   const sameOrigin = url.origin === self.location.origin;
