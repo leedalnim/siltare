@@ -10,7 +10,7 @@ function ctrViews(s, rx) {
 function ctrChartBody(s, rx, info) {
   const done = info.done, hi = done ? -1 : info.hi;
   if (s.pid === "cat") return `<div class="cchart"><div class="cchart-card"><img class="cat-mini" src="${CAT.vec}" alt="고양이 얼굴 도안"></div><p class="cc-cap">단계 목록은 '단계' 보기에서, 기호 뜻은 무늬 상세의 도안에서 볼 수 있어요.</p></div>`;
-  if (rx.chart) return `<div class="kchart"><div class="chart-scroll">${chartHTML(rx.chart, chartHexes(s.cols), hi, labelsFor(s.cols))}</div><p class="cc-cap">${hi >= 0 ? `지금은 ${hi + 1}번 줄이에요. 지나간 줄은 ✓, 남은 줄은 흐려요.` : "겉면에서 본 모양, 아래에서 위로 읽어요."}</p></div>`;
+  if (rx.chart) return `<div class="kchart"><div class="chart-scroll">${chartHTML(rx.chart, chartHexes(s.cols), hi, labelsFor(s.cols))}</div><p class="cc-cap">${hi >= 0 ? `지금은 ${hi + 1}번 줄이에요. 초록 ✓ = 다 뜬 줄, 보라 = 지금 줄, 흐림 = 아직이에요.` : "겉면에서 본 모양, 아래에서 위로 읽어요."}</p></div>`;
   if (s.craft === "crochet") { const h = crochetChartHTML(s.pid, s.cols, done ? -1 : s.row); if (h) return h; }
   return `<div class="empty-chart">이 무늬는 기호 도안이 없어요. 아래 '도안 전체 보기'를 따라 떠 주세요.</div>`;
 }
@@ -25,7 +25,7 @@ function progressHTML(s, rx, info) {
   const seg = `<div class="seg cv-seg" role="group" aria-label="보기 방식">${list.map(([k, n]) => `<button type="button" data-cv="${k}" aria-pressed="${view === k}">${n}</button>`).join("")}</div>`;
   const total = kind === "once" ? (rx.setup || []).length + rx.rows.length : s.target;
   let body = "", stats = `<div class="prog-stats"><b>${Math.min(s.row, total)} / ${total}단</b><span>${pct}%</span></div>`;
-  if (view === "pat") body = `<canvas class="prog-cv pw" data-pw="${s.id}" style="height:280px" role="img" aria-label="무늬 확대: ${s.row}단까지 떴어요"></canvas><p class="cc-cap">지나간 단은 선명하게, 남은 단은 흐리게 보여요. +1을 누르면 지금 단이 한 줄 올라가요.</p>`;
+  if (view === "pat") body = `<canvas class="prog-cv pw" data-pw="${s.id}" style="height:280px" role="img" aria-label="무늬 확대: ${s.row}단까지 떴어요"></canvas><p class="cc-cap">초록 = 다 뜬 단, 밝은 줄 = 지금 단, 흐림 = 아직이에요. +1을 누르면 지금 단이 한 줄 올라가요.</p>`;
   else if (view === "chart") body = ctrChartBody(s, rx, info);
   else if (view === "all") {
     const cm = Math.round(s.row / s.target * s.l), left = Math.max(0, Math.round(s.l - cm));
@@ -60,6 +60,11 @@ function drawPatWindow(cv, s) {
   ctx.restore();
   const yl = y0 + winH - done * rowH;
   if (yl > y0 + 0.5) { ctx.globalAlpha = .74; ctx.fillStyle = bg; ctx.fillRect(x0, y0, fw, yl - y0); ctx.globalAlpha = 1; }
+  if (done > 0) {   // 다 뜬 부분: 초록 기운 + 왼쪽 완료 막대
+    const dh = Math.min(winH, done * rowH);
+    ctx.fillStyle = "rgba(108, 203, 156, .18)"; ctx.fillRect(x0, y0 + winH - dh, fw, dh);
+    ctx.fillStyle = cssVar("--ok"); ctx.fillRect(x0 - 6, y0 + winH - dh, 4, dh);
+  }
   ctx.strokeStyle = muted; ctx.lineWidth = 1; ctx.setLineDash([4, 3]); ctx.strokeRect(x0 + .5, y0 + .5, fw - 1, winH - 1); ctx.setLineDash([]);
   if (!finished) {
     ctx.shadowColor = accent; ctx.shadowBlur = 8; ctx.strokeStyle = accent; ctx.lineWidth = 3; ctx.lineCap = "round";
