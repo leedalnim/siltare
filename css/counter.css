@@ -72,3 +72,17 @@
 .skipped { font-size: 13px; color: var(--muted); }
 .skipped summary { cursor: pointer; width: fit-content; padding-block: 4px; }
 .skipped ul { margin: 6px 0 0; padding-left: 18px; }
+
+/* 진행: 지나간 단은 선명하게, 남은 단은 흐리게 */
+.steps span.todo { opacity: .45; }
+.rowlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.rowlist li { display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 10px; background: var(--surface-2); font-size: 14px; }
+.rowlist .sn { flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-mono); font-size: 12px; background: var(--bg); color: var(--muted); }
+.rowlist li.done { background: transparent; }
+.rowlist li.done .sn { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.rowlist li.done .st-t { color: var(--ink); }
+.rowlist li.now { background: var(--accent); color: var(--accent-ink); font-weight: 600; box-shadow: 0 0 0 2px var(--accent); }
+.rowlist li.now .sn { background: var(--accent-ink); color: var(--accent); }
+.rowlist li.todo { opacity: .4; }
+.crow.dn { opacity: 1; }
+.crow.up { opacity: .35; filter: grayscale(.5); }

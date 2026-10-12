@@ -182,7 +182,7 @@ function chartHTML(ch, hexes, hi, cn) {
       cells += `<span class="cc"${hex ? ` style="background:${hex};color:${inkOn(hex)}"` : ""}>${SYM[s[i]] || ""}</span>`;
       i++;
     }
-    out += `<div class="crow${r === hi ? " hi" : ""}" style="grid-template-columns:repeat(${w}, var(--cell)) 2.4em">${cells}<span class="rn">${r + 1}</span></div>`;
+    out += `<div class="crow${r === hi ? " hi" : hi >= 0 ? (r < hi ? " dn" : " up") : ""}" style="grid-template-columns:repeat(${w}, var(--cell)) 2.4em">${cells}<span class="rn">${hi >= 0 && r < hi ? "✓" : r + 1}</span></div>`;
   }
   const legend = [...used].map(k => `<span><b class="lg">${k === "x" ? "╳" : SYM[k]}</b>${SYM_DESC[k]}</span>`);
   if (ch.cols) [...new Set(ch.cols.join("").split(""))].sort().forEach(d => legend.push(`<span><i class="lgc" style="background:${hexes[+d] || hexes[0]}"></i>${esc(cn[+d])}</span>`));

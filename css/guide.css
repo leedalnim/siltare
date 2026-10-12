@@ -34,10 +34,10 @@
 .lg-g { width: 34px; flex: none; color: var(--yarn); }
 .lg-g .glyph { width: 28px; height: 32px; }
 .cat-legend small { display: block; color: var(--muted); font-size: 12px; }
-.steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; counter-reset: st; }
-.steps li { background: var(--surface); border-radius: 10px; padding: 10px 12px; counter-increment: st; }
-.steps li b::before { content: counter(st) ". "; color: var(--accent); }
-.steps p { margin: 4px 0 0; font-size: 14px; }
+.g-steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; counter-reset: st; }
+.g-steps li { background: var(--surface); border-radius: 10px; padding: 10px 12px; counter-increment: st; }
+.g-steps li b::before { content: counter(st) ". "; color: var(--accent); }
+.g-steps p { margin: 4px 0 0; font-size: 14px; }
 .cat-scroll { overflow: auto; max-height: 70vh; }
 #cat-img { display: block; width: 100%; height: auto; background: #fff; border-radius: 6px; }
 #cat-img.big { width: 220%; max-width: none; }

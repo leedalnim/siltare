@@ -63,7 +63,7 @@ function renderGuide() {
       <h3 class="sub">도안에서 확인한 구조</h3>
       <ul class="cat-read">${CAT.read.map(([k, v]) => `<li><b>${k}</b><span>${v}</span></li>`).join("")}</ul>
       <h3 class="sub">뜨는 순서 (단수 세기에서 쓰는 순서)</h3>
-      <ol class="steps">${CAT.rows.map(([k, v]) => `<li><b>${k}</b><p>${v}</p></li>`).join("")}</ol>`;
+      <ol class="g-steps">${CAT.rows.map(([k, v]) => `<li><b>${k}</b><p>${v}</p></li>`).join("")}</ol>`;
   }
   $("v-guide").innerHTML = h;
 }
