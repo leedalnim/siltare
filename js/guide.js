@@ -43,7 +43,7 @@ const symCatName = id => (SYM_CATS[state.craft].find(c => c[0] === id) || [id, i
 
 // 높이 비교 그림: 같은 바닥선에 기호를 키 순서대로 세워 놓아요
 function heightChartHTML() {
-  const base = 124, step = 19, W = 300;
+  const base = 108, step = 17, W = 300;
   let s = "";
   HEIGHT_ROWS.forEach((r, i) => {
     const x = 30 + i * 60, h = r.chain * step, top = base - h;
@@ -56,7 +56,7 @@ function heightChartHTML() {
   });
   return `<div class="hchart" role="img" aria-label="기호 높이 비교: 짧은뜨기 사슬 1코, 중간뜨기 2코, 한길 3코, 두길 4코, 세길 5코 높이">
     <p class="label">높이 한눈에 비교 · 세우는 사슬 수</p>
-    <svg viewBox="0 0 ${W} 172" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="8" y1="${base}" x2="${W - 8}" y2="${base}" stroke-width="1" class="ht-base"/>${s}</svg>
+    <svg viewBox="0 0 ${W} 142" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="8" y1="${base}" x2="${W - 8}" y2="${base}" stroke-width="1" class="ht-base"/>${s}</svg>
     <p class="ht-note">사선이 한 줄 늘 때마다 실을 한 번 더 감아요. 중간뜨기는 사선이 없지만 실을 한 번 감아요.</p></div>`;
 }
 
