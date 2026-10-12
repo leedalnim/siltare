@@ -5,7 +5,7 @@
 const MY_STORE = "leftover-yarn-my-v1";
 let myPats = [];
 try { const s = JSON.parse(localStorage.getItem(MY_STORE) || "[]"); if (Array.isArray(s)) myPats = s; } catch (e) {}
-function mySave() { try { localStorage.setItem(MY_STORE, JSON.stringify(myPats)); } catch (e) { toast("저장 공간이 부족해요. 안 쓰는 도안을 지워 주세요"); } }
+function mySave() { try { localStorage.setItem(MY_STORE, JSON.stringify(myPats)); return true; } catch (e) { toast("저장 공간이 부족해요. 안 쓰는 도안을 지워 주세요"); return false; } }
 
 // ----- IndexedDB (파일 보관) -----
 let myDB = null;

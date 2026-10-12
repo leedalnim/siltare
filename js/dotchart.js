@@ -5,6 +5,17 @@ const DOT_PAL = ["#FFFFFF", "#1D1A24", "#E07A2F", "#9A9AA2"];
 const DOT_SYM = ["♡", "●", "@", "Σ", "▲", "★", "◆", "✕", "○", "■", "♣", "♠"];   // 색마다 붙는 기호 (출력하거나 비슷한 색일 때 구분용)
 const dotView = { sym: true };
 const dotEd = { id: null, w: 20, h: 16, cells: [], pal: DOT_PAL.slice(), cur: 1, tool: "pen", hist: [], name: "", sym: true };
+const DOT_DRAFT = "siltare-dot-draft";   // 저장 전 그림 임시 보관 (앱이 꺼지거나 실수로 닫아도 이어 그리기)
+const dotSnap = () => ({ w: dotEd.w, h: dotEd.h, cells: dotEd.cells.slice(), pal: dotEd.pal.slice() });
+const dotPush = () => { dotEd.hist.push(dotSnap()); if (dotEd.hist.length > 40) dotEd.hist.shift(); };
+const dotKey = () => JSON.stringify([dotEd.name.trim(), dotEd.w, dotEd.h, enc(dotEd.cells), dotEd.pal]);
+const dotDirty = () => dotEd.base != null && dotKey() !== dotEd.base;
+function dotDraft(save) {
+  try {
+    if (!save) { localStorage.removeItem(DOT_DRAFT); return; }
+    if (!dotDirty()) localStorage.removeItem(DOT_DRAFT); else localStorage.setItem(DOT_DRAFT, JSON.stringify({ id: dotEd.id, name: dotEd.name, w: dotEd.w, h: dotEd.h, cells: enc(dotEd.cells), pal: dotEd.pal }));
+  } catch (e) {}
+}
 const enc = a => a.map(v => v.toString(36)).join(""), dec = s => s.split("").map(ch => parseInt(ch, 36));
 
 function dotCellSize(w, h, maxW) { return Math.max(8, Math.min(30, Math.floor(maxW / w), Math.floor(560 / h))); }
@@ -47,7 +58,12 @@ function dotDraw(cv, d, opt = {}) {
 function dotOpenEditor(p) {
   if (p) Object.assign(dotEd, { id: p.id, w: p.w, h: p.h, cells: dec(p.cells), pal: p.pal.slice(), name: p.name, cur: Math.min(1, p.pal.length - 1) });
   else Object.assign(dotEd, { id: null, w: 20, h: 16, cells: new Array(320).fill(0), pal: DOT_PAL.slice(), name: "", cur: 1 });
-  dotEd.tool = "pen"; dotEd.hist = []; dotEd.sym = true;
+  dotEd.tool = "pen"; dotEd.hist = []; dotEd.sym = true; dotEd.base = dotKey();
+  let dr = null; try { dr = JSON.parse(localStorage.getItem(DOT_DRAFT) || "null"); } catch (e) {}
+  if (dr && dr.id === dotEd.id && dr.cells && dr.cells.length === dr.w * dr.h) {
+    if (confirm("저장하지 않은 그림이 남아 있어요. 이어서 그릴까요?")) Object.assign(dotEd, { name: dr.name || "", w: dr.w, h: dr.h, cells: dec(dr.cells), pal: dr.pal.slice(), cur: Math.min(dotEd.cur, dr.pal.length - 1) });
+    else dotDraft(false);
+  }
   $("dot-title").textContent = p ? "도트 도안 고치기" : "도트 도안 그리기";
   dotRenderEditor(); openSheet("sheet-dot");
 }
@@ -65,6 +81,7 @@ function dotRenderEditor() {
     <p class="my-hint">칸을 누르거나 끌어서 칠해요. 지우개는 바탕색으로 칠하고, 채우기는 같은 색으로 이어진 칸을 한 번에 칠해요. 맨 아래 줄이 1단이에요.</p>
     <button type="button" class="primary wide" data-dot-save>저장</button></div>`;
   requestAnimationFrame(() => { dotDraw.last = dotDraw($("dot-cv"), d, { sym: d.sym }); });
+  dotDraft(true);
 }
 function dotCellAt(e) {
   const cv = $("dot-cv"), r = cv.getBoundingClientRect(), { cs, L, T } = dotDraw.last || { cs: 20, L: 26, T: 2 };
@@ -78,7 +95,7 @@ function dotPaint(i) {
     const from = d.cells[i]; if (from === col) return;
     const st = [i]; while (st.length) { const k = st.pop(); if (d.cells[k] !== from) continue; d.cells[k] = col; const r = Math.floor(k / d.w), c = k % d.w;
       if (c > 0) st.push(k - 1); if (c < d.w - 1) st.push(k + 1); if (r > 0) st.push(k - d.w); if (r < d.h - 1) st.push(k + d.w); }
-  } else d.cells[i] = col;
+  } else { if (d.cells[i] === col) return; d.cells[i] = col; }
   dotDraw.last = dotDraw($("dot-cv"), d, { sym: d.sym });
 }
 function dotResize(w, h) {
@@ -97,7 +114,8 @@ function dotSave() {
   const old = d.id && myPats.find(x => x.id === d.id);
   if (old) Object.assign(old, data, { row: Math.min(old.row || 0, d.h) });
   else myPats.push(Object.assign({ id: "d" + Date.now().toString(36), row: 0, created: Date.now() }, data));
-  mySave(); closeSheets(); state.tab = "patterns"; state.mode = "mine"; saveLocal(); render(); toast(old ? "도트 도안을 고쳤어요" : "도트 도안을 저장했어요");
+  if (!mySave()) return;   // 저장 공간 부족 — 그림은 그대로 두고 알림만
+  dotDraft(false); d.base = null; closeSheets(); state.tab = "patterns"; state.mode = "mine"; saveLocal(); render(); toast(old ? "도트 도안을 고쳤어요" : "도트 도안을 저장했어요");
 }
 
 // ----- 보면서 뜨기 -----
@@ -147,17 +165,20 @@ document.addEventListener("click", e => {
   const pc = t.closest("[data-dot-pc]"); if (pc) { dotEd.cur = +pc.dataset.dotPc; dotPop(true); return; }
   const c = t.closest("[data-dot-c]"); if (c) { if (dotEd.cur === +c.dataset.dotC && dotEd.tool !== "erase") { dotPop(true); return; } dotEd.cur = +c.dataset.dotC; if (dotEd.tool === "erase") dotEd.tool = "pen"; dotRenderEditor(); return; }
   const tl = t.closest("[data-dot-tool]"); if (tl) { dotEd.tool = tl.dataset.dotTool; dotRenderEditor(); return; }
-  if (t.closest("[data-dot-undo]")) { const h = dotEd.hist.pop(); if (h) dotEd.cells = h; dotRenderEditor(); return; }
-  if (t.closest("[data-dot-clear]")) { if (!confirm("그린 칸을 모두 지울까요?")) return; dotEd.hist.push(dotEd.cells.slice()); dotEd.cells.fill(0); dotRenderEditor(); return; }
+  if (t.closest("[data-dot-undo]")) { const h = dotEd.hist.pop(); if (h) { dotEd.name = $("dot-name").value; Object.assign(dotEd, h); dotEd.cur = Math.min(dotEd.cur, dotEd.pal.length - 1); } dotRenderEditor(); return; }
+  if (t.closest("[data-dot-clear]")) { if (!confirm("그린 칸을 모두 지울까요?")) return; dotPush(); dotEd.cells.fill(0); dotRenderEditor(); return; }
   if (t.closest("[data-dot-resize]")) {
     const w = Math.max(4, Math.min(80, parseInt($("dot-w").value, 10) || dotEd.w)), h = Math.max(4, Math.min(80, parseInt($("dot-h").value, 10) || dotEd.h));
-    dotEd.name = $("dot-name").value; dotEd.hist.push(dotEd.cells.slice()); dotResize(w, h); dotRenderEditor(); return;
+    if (w === dotEd.w && h === dotEd.h) return;
+    const lost = dotEd.cells.some((v, i) => v && ((i % dotEd.w) >= w || (dotEd.h - 1 - Math.floor(i / dotEd.w)) >= h));
+    if (lost && !confirm("크기를 줄이면 오른쪽·위쪽에 칠한 칸이 잘려요. 바꿀까요? (되돌리기로 되살릴 수 있어요)")) return;
+    dotEd.name = $("dot-name").value; dotPush(); dotResize(w, h); dotRenderEditor(); return;
   }
   if (t.closest("[data-dot-save]")) { dotSave(); return; }
   if (t.closest("[data-dot-cdel]")) {   // 색 삭제: 그 색 칸은 바탕색으로, 뒤 번호는 한 칸씩 당김
     const d = dotEd, k = d.cur, used = d.cells.filter(v => v === k).length;
     if (k === 0 || (used && !confirm(`이 색으로 칠한 칸 ${used}개는 바탕색이 돼요. 삭제할까요?`))) return;
-    d.name = $("dot-name").value; d.hist.push(d.cells.slice());
+    d.name = $("dot-name").value; dotPush();
     d.cells = d.cells.map(v => v === k ? 0 : v > k ? v - 1 : v); d.pal.splice(k, 1); d.cur = Math.min(k, d.pal.length - 1);
     dotRenderEditor(); dotPop(true); return;
   }
@@ -167,8 +188,9 @@ document.addEventListener("click", e => {
   const rw = t.closest("[data-dot-row]"); if (rw) { const p = myPats.find(x => x.id === myView.id); if (p) { p.row = Math.max(0, Math.min(p.h, (p.row || 0) + (+rw.dataset.dotRow))); mySave(); dotOpenView(p); } return; }
 });
 document.addEventListener("input", e => {
-  if (e.target.id === "dot-name") dotEd.name = e.target.value;
-  if (e.target.id === "dot-editc") {   // 색 바꾸기: 고르는 동안 바로 반영
+  if (e.target.id === "dot-name") { dotEd.name = e.target.value; dotDraft(true); }
+  if (e.target.id === "dot-editc") {   // 색 바꾸기: 고르는 동안 바로 반영 (처음 한 번만 되돌리기 지점 저장)
+    if (!e.target.dataset.pushed) { e.target.dataset.pushed = "1"; dotPush(); }
     const c = e.target.value.toUpperCase(); dotEd.pal[dotEd.cur] = c;
     const pick = e.target.closest(".dot-cpick"); if (pick) pick.style.background = c;
     document.querySelectorAll(`[data-dot-c="${dotEd.cur}"],[data-dot-pc="${dotEd.cur}"]`).forEach(sw => sw.style.background = c);
@@ -178,19 +200,19 @@ document.addEventListener("input", e => {
 document.addEventListener("change", e => {
   if (e.target.id === "dot-editc") { dotEd.name = $("dot-name").value; dotRenderEditor(); dotPop(true); return; }
   if (e.target.id !== "dot-addc") return;
-  dotEd.name = $("dot-name").value; dotEd.pal.push(e.target.value.toUpperCase()); dotEd.cur = dotEd.pal.length - 1; dotEd.tool = "pen"; dotRenderEditor();
+  dotEd.name = $("dot-name").value; dotPush(); dotEd.pal.push(e.target.value.toUpperCase()); dotEd.cur = dotEd.pal.length - 1; dotEd.tool = "pen"; dotRenderEditor();
 });
 (function () {   // 칸 칠하기 (누르고 끌기)
   let painting = false;
   document.addEventListener("pointerdown", e => {
     if (e.target.id !== "dot-cv") return;
     painting = true; e.target.setPointerCapture(e.pointerId); e.preventDefault();
-    dotEd.hist.push(dotEd.cells.slice()); if (dotEd.hist.length > 40) dotEd.hist.shift();
+    dotPush();
     dotDraw.last = dotDraw.last || { cs: 20, L: 26 };
     dotPaint(dotCellAt(e)); const u = document.querySelector("[data-dot-undo]"); if (u) u.disabled = false;
   });
   document.addEventListener("pointermove", e => { if (painting && dotEd.tool !== "fill") dotPaint(dotCellAt(e)); });
-  document.addEventListener("pointerup", () => { painting = false; });
+  document.addEventListener("pointerup", () => { if (painting) dotDraft(true); painting = false; });
 })();
 document.addEventListener("keydown", e => {   // Esc는 색 편집 팝업부터 닫기
   if (e.key === "Escape" && $("dot-pop")) { e.stopImmediatePropagation(); dotPop(false); dotRenderEditor(); }
