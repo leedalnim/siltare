@@ -145,33 +145,7 @@ function radialRound(pid, row) {
 }
 
 // 무늬 상세 '기호 도안' 보기. 그릴 수 있는 도안이 없으면 null.
-// 똑딱이 카드지갑: 띠를 4구역으로 나눈 구성도. cur = 지금 뜨는 구역(0~3)
-function cardwalletSVG(cur = -1) {
-  const x = 70, w = 140, h = 72, top = 24, names = ["④ 위 주머니 앞판 · 37~48단", "③ 안쪽 · 25~36단", "② 안쪽 · 13~24단", "① 아래 주머니 앞판 · 1~12단"];
-  let s = `<text x="${x + w / 2}" y="16" text-anchor="middle" class="cc-n" fill="currentColor" stroke="none">16코 (약 10cm)</text>`;
-  for (let k = 0; k < 4; k++) {
-    const y = top + k * h, idx = 3 - k, st = cur < 0 ? "" : idx < cur ? "done" : idx === cur ? "now" : "todo";
-    const fill = st === "done" ? "#BFE3CF" : st === "now" ? "#D9CBFF" : "#ffffff", op = st === "todo" ? .45 : 1;
-    s += `<g opacity="${op}"><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" stroke="#1d1a24" stroke-width="1.6"/>`;
-    for (let i = 0; i < 6; i++) for (let j = 0; j < 3; j++) { const cx = x + 14 + i * 22.5, cy = y + 16 + j * 20; s += `<path d="M${cx - 4} ${cy - 4}l8 8M${cx + 4} ${cy - 4}l-8 8" stroke="#1d1a24" stroke-opacity=".22" stroke-width="1.4"/>`; }
-    s += `<text x="${x + w / 2}" y="${y + 17}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1d1a24" stroke="none">${names[k]}</text></g>`;
-  }
-  [[top + h, "① 위로 접기 ↑", 1], [top + 3 * h, "④ 아래로 접기 ↓", 0], [top + 2 * h, "반으로 접어 닫기", 2]].forEach(([y, t]) => {});
-  s += `<path d="M${x - 8} ${top + 3 * h}H${x + w + 8}M${x - 8} ${top + h}H${x + w + 8}" stroke="#7B5CE0" stroke-width="2" stroke-dasharray="5 4"/>`;
-  s += `<path d="M${x - 8} ${top + 2 * h}H${x + w + 8}" stroke="#1F8A5A" stroke-width="2" stroke-dasharray="2 4"/>`;
-  s += `<text x="${x + w + 12}" y="${top + h + 4}" font-size="10" fill="#7B5CE0" stroke="none">④ 아래로 접기</text><text x="${x + w + 12}" y="${top + 3 * h + 4}" font-size="10" fill="#7B5CE0" stroke="none">① 위로 접기</text>`;
-  s += `<text x="${x + w + 12}" y="${top + 2 * h + 4}" font-size="10" fill="#1F8A5A" stroke="none">반 접어 닫기</text>`;
-  // 단추 자리
-  for (const y of [top + h / 2 + 6, top + 3 * h + h / 2 + 6]) s += `<circle cx="${x + w / 2}" cy="${y}" r="6" fill="#B9B4C2" stroke="#1d1a24" stroke-width="1.4"/>`;
-  s += `<text x="${x - 10}" y="${top + 3 * h + h / 2 + 4}" text-anchor="end" font-size="10" fill="currentColor" stroke="none">12단</text>`;
-  return `<svg class="cchart-svg" viewBox="0 0 300 ${top + 4 * h + 12}" role="img" aria-label="똑딱이 카드지갑 구성도" fill="none" stroke="currentColor" stroke-linecap="round">${s}</svg>`;
-}
-
 function crochetChartHTML(pid, cols, hiRow = -1) {
-  if (pid === "pt_cardwallet") {
-    const cur = hiRow < 0 ? -1 : Math.min(4, Math.floor(hiRow / 12));
-    return `<div class="cchart"><div class="cchart-card">${cardwalletSVG(cur)}</div><p class="cc-cap">${cur >= 0 && cur < 4 ? `지금은 ${cur + 1}번 구역을 뜨고 있어요. 초록 = 다 뜬 구역, 보라 = 지금, 흐림 = 아직. ` : cur === 4 ? "띠를 다 떴어요. 이제 접고 이어요. " : ""}짧은뜨기 띠 하나를 떠서 점선대로 접어요. 회색 동그라미는 자석 단추 자리예요.</p></div>`;
-  }
   const hexes = chartHexes(cols);
   if (["flower", "amigu", "granny"].includes(pid)) {
     const rr = hiRow >= 0 ? radialRound(pid, hiRow) : { i: -1 }, r = cchartRadialSVG(pid, rr.i);
