@@ -4,12 +4,13 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;",
 const swStyle = key => { if (key === "multi") return `background:${RAINBOW}`; const c = cinfo(key); return c.hex ? `background:${c.hex}` : ""; };
 const dotsFor = ys => `<span class="dots">${[...new Set(ys.map(y => y.color))].slice(0, 4).map(k => `<i class="${cinfo(k).hex ? "" : "unknown-sw"}" style="${swStyle(k)}"></i>`).join("")}</span>`;
 const stLabel = { ok: "충분해요", tight: "빠듯해요", risk: "조금 모자랄 수도" };
+const ro = w => { const c = String(w).charCodeAt(String(w).length - 1) - 0xAC00; const j = c >= 0 && c <= 11171 ? c % 28 : 0; return w + (j && j !== 8 ? "으로" : "로"); };   // 받침에 따라 '으로/로'
 const tool = () => state.craft === "knit" ? "바늘" : "코바늘";
 const craftName = c => (c || state.craft) === "knit" ? "대바늘" : "코바늘";
 const PH = { key: "ph", w: "mid", use: "mid", yarns: [], title: "", mpg: 2, ph: true };
 
 const CATS = [["all", "전체"], ["small", "소품"], ["wear", "모자·워머"], ["big", "목도리·담요"], ["garment", "옷"], ["bag", "가방"], ["toy", "인형"]];
-const CAT_OF = { catcoaster: "small", catround: "small", catbag: "small", coaster: "small", scrunchie: "small", sleeve: "small", flower: "small", scrubby: "small", granny1: "small",
+const CAT_OF = { breadcat: "small", cardwallet: "small", cakewallet: "small", catpurse: "small", tomatowallet: "small", catcoaster: "small", catround: "small", catbag: "small", coaster: "small", scrunchie: "small", sleeve: "small", flower: "small", scrubby: "small", granny1: "small",
   beanie: "wear", babyhat: "wear", bucket: "wear", headband: "wear", wrist: "wear", mitten: "wear", socks: "wear", cowl: "wear",
   scarf: "big", shawl: "big", blanket: "big", sweater: "garment", vest: "garment", pouch: "bag", netbag: "bag", keyring: "toy", amigurumi: "toy" };
 
@@ -87,7 +88,7 @@ function renderPatterns() {
     else {
       if (A.best) {
         html += `<button type="button" class="pick" data-p="${A.best.p.id}" data-pv="${A.best.x.pr.id}"><canvas data-sw="${A.best.p.id}" aria-hidden="true" style="background:var(--surface)"></canvas>
-          <span><span class="label">가장 알뜰한 조합</span><strong>${A.best.p.name}로 뜬 ${A.best.x.pr.name}</strong>
+          <span><span class="label">가장 알뜰한 조합</span><strong>${ro(A.best.p.name)} 뜬 ${A.best.x.pr.name}</strong>
           <span class="s">필요 약 ${A.best.x.need}g · 가진 실 ${A.best.r.have}g · ${tool()} ${g.doubled ? WEIGHTS.mid.needle : WEIGHTS[g.w].needle}</span></span></button>`;
       }
       if (A.ok.length) html += `<div class="pgrid">${pinSort(A.ok, keyOf, act).map(({ p, r }) => patCard(p, r, G, act)).join("")}</div>`;
@@ -119,9 +120,13 @@ function projRow(row, act) {
   const b = row.best, needs = row.good.map(i => i.x.need), lo = Math.min(...needs), hi = Math.max(...needs);
   const left = b.have - b.x.need, openP = state.openProj.has(row.pr.id);
   const k = starKey("j", row.pr.id), ing = act.has(k);
-  return `<li class="prow"><button type="button" class="thumb" data-p="${b.p.id}" data-pv="${row.pr.id}" aria-label="${row.pr.name} 완성 미리보기"><canvas data-sw="${b.p.id}" data-prod="${row.pr.id}"></canvas></button>
+  const thumb = row.pr.photo
+    ? `<button type="button" class="thumb photo" data-photo="${row.pr.photo}" data-photo-name="${esc(row.pr.name)}" aria-label="${row.pr.name} 참고 사진 크게 보기"><img src="${row.pr.photo}" alt="" loading="lazy"></button>`
+    : `<button type="button" class="thumb" data-p="${b.p.id}" data-pv="${row.pr.id}" aria-label="${row.pr.name} 완성 미리보기"><canvas data-sw="${b.p.id}" data-prod="${row.pr.id}"></canvas></button>`;
+  return `<li class="prow">${thumb}
     <div class="hd"><span class="nm">${row.pr.name}</span>${ing ? `<span class="ing inline">뜨는 중</span>` : ""}<span class="sp"></span><span class="st-pill ${b.x.st}">${stLabel[b.x.st]}</span>${starBtn(k, row.pr.name, true)}</div>
-    <span class="sub">${lo === hi ? lo : lo + "~" + hi}g ·${left >= 0 ? `${b.p.name}로 뜨면 ${left}g 남아요` : `${b.p.name}로도 ${-left}g 모자라요`}</span>
+    <span class="sub">${lo === hi ? lo : lo + "~" + hi}g ·${left >= 0 ? `${ro(b.p.name)} 뜨면 ${left}g 남아요` : `${ro(b.p.name)}도 ${-left}g 모자라요`}</span>
+    ${row.pr.how ? `<p class="howto">${row.pr.how}</p>` : ""}
     <button type="button" class="fold" data-tp="${row.pr.id}" aria-expanded="${openP}" aria-controls="mini-${row.pr.id}">
       <span class="stack" aria-hidden="true">${row.good.slice(0, 4).map(it => `<canvas data-sw="${it.p.id}"></canvas>`).join("")}</span>
       <span class="fl">어울리는 무늬 ${row.good.length}개</span>
@@ -226,3 +231,14 @@ function renderDetail() {
     <p class="note">소요량과 크기는 일반적인 굵기와 손땀으로 잡은 대략값이에요. 실이나 손땀에 따라 10~20% 차이가 날 수 있어요.</p>`;
   requestAnimationFrame(() => paintAll($("pat-body"), g));
 }
+
+// 참고 사진 크게 보기
+document.addEventListener("click", e => {
+  const ph = e.target.closest("[data-photo]");
+  if (ph) {
+    const box = document.createElement("div"); box.className = "lightbox"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "참고 사진");
+    box.innerHTML = `<figure><img src="${ph.dataset.photo}" alt="${ph.dataset.photoName} 참고 사진"><figcaption>${ph.dataset.photoName} · 참고 사진 <span>눌러서 닫기</span></figcaption></figure>`;
+    document.body.appendChild(box); return;
+  }
+  const lb = e.target.closest(".lightbox"); if (lb) lb.remove();
+});
