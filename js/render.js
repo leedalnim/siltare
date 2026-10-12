@@ -35,10 +35,8 @@ const strandFor = x => x.doubled
   ? `<span class="gstrand" aria-hidden="true"><i style="height:${WEIGHTS.thin.line}px"></i><i style="height:${WEIGHTS.thin.line}px"></i></span>`
   : `<span class="gstrand" aria-hidden="true"><i style="height:${WEIGHTS[x.w].line}px"></i></span>`;
 function groupBar(gs, g) {
-  const hasThin = state.yarns.some(y => y.weight === "thin");
   return `<div class="chiprow" role="group" aria-label="어떤 실로 뜰까요">${gs.map(x =>
-    `<button type="button" class="gchip" id="g-${x.key}" data-g="${x.key}" aria-pressed="${x.key === g.key}">${strandFor(x)}${x.title}<span class="n">${sum(x.yarns)}g</span></button>`).join("")}</div>
-    ${hasThin ? `<label class="toggle"><input type="checkbox" class="dbl" ${state.doubled ? "checked" : ""}> 가는 실을 두 가닥 합쳐 보통 굵기로 뜨는 것도 보기</label>` : ""}`;
+    `<button type="button" class="gchip" id="g-${x.key}" data-g="${x.key}" aria-pressed="${x.key === g.key}">${strandFor(x)}${x.title}<span class="n">${sum(x.yarns)}g</span></button>`).join("")}</div>`;
 }
 const emptyBox = msg => `<div class="empty">${msg}<button type="button" class="primary" data-open-add>+ 실 담기</button></div>`;
 function syncLine() {
@@ -50,7 +48,6 @@ function syncLine() {
 function renderBasket() {
   const ys = state.yarns, total = sum(ys);
   let html = `<div class="view-title"><h2 id="h-basket">내 실 바구니</h2><span class="meta">${ys.length ? `${ys.length}뭉치 · 약 ${total}g` : ""}</span></div>`;
-  html += `<div class="weights">${WKEYS.map(k => { const g = sum(ys.filter(y => y.weight === k)); return `<div class="wt ${g ? "" : "zero"}"><span>${WEIGHTS[k].name}</span><b>${g}g</b><span>약 ${Math.round(g * WEIGHTS[k].mpg)}m</span></div>`; }).join("")}</div>`;
   html += `<button type="button" class="primary wide" data-open-add>+ 실 담기</button>`;
   if (!ys.length) html += `<div class="empty">바구니가 비었어요. 남은 실을 하나씩 담아 주세요.</div>`;
   else html += `<ul class="basket">${ys.map(y => {

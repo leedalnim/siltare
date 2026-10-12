@@ -13,7 +13,7 @@ try {
   const saved = JSON.parse(localStorage.getItem(STORE) || "null");
   if (saved && Array.isArray(saved.yarns)) {
     state.craft = saved.craft === "crochet" ? "crochet" : "knit";
-    state.yarns = saved.yarns; state.example = !!saved.example; state.doubled = !!saved.doubled;
+    state.yarns = saved.yarns; state.example = !!saved.example; state.doubled = false;
     if (["basket", "patterns", "projects", "counter", "guide"].includes(saved.tab)) state.tab = saved.tab;
     state.stars = saved.stars && typeof saved.stars === "object" ? saved.stars : {};
     state.sessions = Array.isArray(saved.sessions) ? saved.sessions : [];
@@ -49,10 +49,6 @@ function groups() {
     const ys = state.yarns.filter(y => y.weight === w);
     if (ys.length) out.push({ key: w, w, use: w, yarns: ys, title: WEIGHTS[w].name, mpg: WEIGHTS[w].mpg });
   });
-  if (state.doubled) {
-    const ys = state.yarns.filter(y => y.weight === "thin");
-    if (ys.length) out.push({ key: "thin2", w: "thin", use: "mid", yarns: ys, title: "가는 실 두 가닥", mpg: WEIGHTS.thin.mpg / 2, doubled: true });
-  }
   return out;
 }
 function currentGroup() {
