@@ -59,7 +59,9 @@ function recipe(craft, pid, cols, mode) {
       tip: "바늘비우기는 실을 바늘에 한 번 걸어 구멍을 내는 것, 2코 모아 겉뜨기는 2코에 한 번에 바늘을 넣어 겉뜨기하는 것이에요. 구멍 단이 끝날 때마다 콧수가 그대로인지 세어 보세요.",
       chart: { rows: ["ko/kko/kkkk", "kkkkkkkkkkk", "kkko/kkkkkk", "kkkkkkkkkkk"] } }),
     brioche: () => ({ m: [2, 0], cast: "짝수 코 (예: 30코)", setup: [R("기초단 (안면)", "*바늘비우기 하며 1코 걸러뜨기, 겉1* 반복")],
-      rows: [R("매 단", "*바늘비우기 하며 1코 걸러뜨기, 걸러 둔 코와 걸친 실을 함께 겉뜨기* 반복")],
+      rows: [R("홀수 단", "*바늘비우기 하며 1코 걸러뜨기, 걸러 둔 코와 걸친 실을 함께 겉뜨기* 반복"),
+             R("짝수 단", "*바늘비우기 하며 1코 걸러뜨기, 걸러 둔 코와 걸친 실을 함께 겉뜨기* 반복 (겉면에서 보면 앞 단과 한 칸씩 엇갈려요)")],
+      chart: { rows: ["ybybybyb", "bybybyby"] },
       tip: "'바늘비우기 하며 걸러뜨기'는 실을 앞에 두고 1코를 안뜨기 방향으로 옮긴 뒤, 실을 바늘 위로 넘겨 뒤로 보내는 동작이에요. 기초단 다음부터는 매 단 똑같이 반복해요." }),
     stripe: () => {
       const s = []; for (let c = 0; c < n; c++) for (let k = 0; k < (c === 0 ? 4 : 2); k++) s.push(c);
@@ -162,8 +164,8 @@ function rowInfo(rx, n) {
   return { row: rx.rows[k % L], phase: `무늬 ${k % L + 1}/${L}단째 · ${Math.floor(k / L) + 1}번째 반복`, hi: k % L };
 }
 
-const SYM = { k: "│", p: "─", o: "○", "/": "⟋", v: "V", " ": "" };
-const SYM_DESC = { k: "겉면에서 겉뜨기 (안면 단에서는 안뜨기)", p: "겉면에서 안뜨기 (안면 단에서는 겉뜨기)", o: "바늘비우기", "/": "2코 모아 겉뜨기", v: "1코 걸러뜨기", x: "꽈배기 6코 교차" };
+const SYM = { k: "│", p: "─", o: "○", "/": "⟋", v: "V", y: "V°", b: "Λ", " ": "" };
+const SYM_DESC = { k: "겉면에서 겉뜨기 (안면 단에서는 안뜨기)", p: "겉면에서 안뜨기 (안면 단에서는 겉뜨기)", o: "바늘비우기", "/": "2코 모아 겉뜨기", v: "1코 걸러뜨기", x: "꽈배기 6코 교차", y: "바늘비우기 하며 1코 걸러뜨기 (sl1yo)", b: "걸러 둔 코와 걸친 실을 함께 겉뜨기 (brk)" };
 function inkOn(hex) { const a = toArr(hex); return (.3 * a[0] + .59 * a[1] + .11 * a[2]) > 150 ? "#1D1A24" : "#FFFFFF"; }
 function chartHTML(ch, hexes, hi, cn) {
   const w = ch.rows[0].length, used = new Set();
