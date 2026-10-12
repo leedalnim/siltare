@@ -86,10 +86,16 @@
 .dot-vtools button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .dot-vtools .my-hint { font-size: 12px; }
 
-.dot-cedit { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; }
-.dot-cedit .label { margin: 0; }
-.dot-cpick { position: relative; width: 44px; height: 44px; border-radius: 12px; border: 2px solid var(--accent); display: grid; place-items: center; font-size: 17px; cursor: pointer; }
-.dot-cpick input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-.dot-chint { font-size: 12.5px; color: var(--muted); }
-.dot-cedit .ghost-btn { margin-left: auto; padding: 7px 12px; font-size: 13px; }
-.dot-cedit .danger { color: var(--risk); }
+.dot-cedit-btn { margin-left: auto; height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-weight: 700; font-size: 13px; cursor: pointer; }
+.dot-pop-bg { position: fixed; inset: 0; z-index: 40; background: rgba(10, 8, 14, .6); display: grid; place-items: center; padding: 16px; }
+.dot-pop { width: min(360px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px; display: grid; gap: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.5); }
+.dot-pop-hd { display: flex; justify-content: space-between; align-items: center; }
+.dot-pop-hd h4 { margin: 0; font-size: 17px; }
+.dot-pop-x { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; }
+.dot-pop-sub { margin: 0; font-size: 13px; color: var(--muted); }
+.dot-cpick { position: relative; height: 84px; border-radius: 14px; border: 2px solid var(--accent); display: grid; place-items: center; align-content: center; gap: 4px; font-size: 24px; cursor: pointer; }
+.dot-cpick b { font-size: 13px; }
+.dot-cpick input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.dot-pop-ft { display: flex; gap: 8px; justify-content: flex-end; }
+.dot-pop-ft .primary { padding: 9px 22px; }
+.dot-pop-ft .danger { color: var(--risk); margin-right: auto; }
