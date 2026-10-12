@@ -1,5 +1,11 @@
 // ---------- State ----------
-let state = { craft: "knit", tab: "patterns", yarns: [], example: false, doubled: false, group: null, detail: null, pv: null, main: {}, openProj: new Set(),
+const EXAMPLE = [
+  { id: "e1", weight: "mid", grams: 100, color: "gray", texture: "smooth", label: "주먹 ×2" },
+  { id: "e2", weight: "mid", grams: 30, color: "navy", texture: "smooth", label: "귤 ×1" },
+  { id: "e3", weight: "mid", grams: 15, color: "mustard", texture: "smooth", label: "탁구공 ×1" },
+  { id: "e4", weight: "thin", grams: 60, color: "pink", texture: "fluffy", label: "귤 ×2" }
+];
+let state = { craft: "knit", tab: "patterns", yarns: EXAMPLE.slice(), example: true, doubled: false, group: null, detail: null, pv: null, main: {}, openProj: new Set(),
   stars: {}, sessions: [], sess: null, mode: "rec", cat: "all", wake: false, updatedAt: 0, openMaybe: false };
 const form = { weight: "mid", size: "fist", count: 1, color: "unknown", texture: "smooth" };
 
@@ -7,7 +13,7 @@ try {
   const saved = JSON.parse(localStorage.getItem(STORE) || "null");
   if (saved && Array.isArray(saved.yarns)) {
     state.craft = saved.craft === "crochet" ? "crochet" : "knit";
-    state.yarns = saved.example ? [] : saved.yarns; state.example = false; state.doubled = !!saved.doubled;
+    state.yarns = saved.yarns; state.example = !!saved.example; state.doubled = !!saved.doubled;
     if (["basket", "patterns", "projects", "counter", "guide"].includes(saved.tab)) state.tab = saved.tab;
     state.stars = saved.stars && typeof saved.stars === "object" ? saved.stars : {};
     state.sessions = Array.isArray(saved.sessions) ? saved.sessions : [];

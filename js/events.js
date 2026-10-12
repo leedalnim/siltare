@@ -70,6 +70,12 @@ document.addEventListener("click", e => {
     toast(`${WEIGHTS[y.weight].name}${c.hex ? " · " + c.name : ""} ${y.grams}g을 삭제했어요`, true);
     return;
   }
+  if ("clearExample" in d) {
+    undoData = { yarns: state.yarns.slice(), example: state.example };
+    state.yarns = []; state.example = false; save(); render();
+    toast("예시 실을 모두 지웠어요", true);
+    return;
+  }
   if ("undo" in d) {
     if (undoData) { state.yarns = undoData.yarns; state.example = undoData.example; undoData = null; save(); render(); }
     $("toast").hidden = true;
@@ -113,10 +119,12 @@ $("add-form").addEventListener("submit", e => {
     save(); closeSheets(); render(); toast("수정했어요"); return;
   }
   const label = gIn > 0 ? "저울로 잼" : `${s.name} ×${form.count}`;
+  const wasExample = state.example;
+  if (state.example) { state.yarns = []; state.example = false; }
   state.yarns.push({ id: "y" + Date.now().toString(36), weight: form.weight, grams, color: form.color, texture: form.texture, label });
   state.group = form.weight;
   form.count = 1; $("gram-input").value = "";
   save(); closeSheets(); render();
   const ci = cinfo(form.color), cn = ci.hex ? ci.name + " " : "";
-  toast(`${cn}${WEIGHTS[form.weight].name} ${grams}g을 담았어요`);
+  toast(`${cn}${WEIGHTS[form.weight].name} ${grams}g을 담았어요${wasExample ? " · 예시는 지웠어요" : ""}`);
 });
