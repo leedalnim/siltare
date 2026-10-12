@@ -11,6 +11,7 @@ document.addEventListener("click", e => {
     const on = !!state.stars[d.star];
     save(); render(); toast(on ? "별표했어요. 목록 맨 위에 보여요" : "별표를 뺐어요"); return;
   }
+  if (d.cv) { ctrUI.view = d.cv; renderCounter(); return; }
   if (d.mode) { state.mode = d.mode; saveLocal(); renderPatterns(); return; }
   if (d.cat) { state.cat = d.cat; saveLocal(); renderProjects(); return; }
   if ("openAdd" in d) { state.editId = null; $("add-h").textContent = "실 담기"; $("add-btn").textContent = "바구니에 담기"; $("gram-input").value = ""; renderForm(); openSheet("sheet-add"); return; }

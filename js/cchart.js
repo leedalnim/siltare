@@ -46,7 +46,7 @@ const CCHART = {
     { l: "4단", it: [["sc", 6], ["fan7", 10, 3], ["sc", 14]] }] })
 };
 
-function cchartGridSVG(spec, hexes) {
+function cchartGridSVG(spec, hexes, hi = -1) {
   const { C, cw, rows } = spec, ch = Math.round(cw * 1.3), pad = 8, lab = 34;
   const W = (spec.C2 || C) * cw + pad * 2 + lab, H = rows.length * ch + pad * 2;
   let s = `<svg class="cchart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="기호 도안, 아래에서 위로 1단부터" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">`;
@@ -54,7 +54,9 @@ function cchartGridSVG(spec, hexes) {
     const y = pad + (rows.length - 1 - ri) * ch;
     if (row.bg != null && hexes[row.bg]) s += `<rect x="${pad}" y="${y}" width="${C * cw}" height="${ch}" fill="${hexes[row.bg]}" stroke="none" opacity=".92"/>`;
     const ink = row.bg != null && hexes[row.bg] ? inkOn(hexes[row.bg]) : null;
-    s += `<g${ink ? ` style="color:${ink}"` : ""}>`;
+    const cur = ri === hi, upc = hi >= 0 && ri > hi, dn = hi >= 0 && ri < hi;
+    if (cur) s += `<rect x="${pad - 4}" y="${y}" width="${C * cw + 8}" height="${ch}" rx="6" fill="#B9A0FF" fill-opacity=".38" stroke="#7B5CE0" stroke-width="1.6"/>`;
+    s += `<g${ink ? ` style="color:${ink}"` : ""}${upc ? ' opacity=".3"' : ""}>`;
     row.it.forEach(([g, x, span = 1]) => {
       if (g === "arc") {
         const x1 = pad + (x + .5) * cw + cw * .42, x2 = pad + (x + span + .5) * cw - cw * .42, yb = y + ch * .78, mid = (x1 + x2) / 2, top = y + ch * .18;
@@ -65,7 +67,7 @@ function cchartGridSVG(spec, hexes) {
       const gw = span * cw, gx = pad + x * cw + (span > 1 ? 0 : 0);
       s += `<svg x="${gx.toFixed(1)}" y="${(y + 2).toFixed(1)}" width="${gw.toFixed(1)}" height="${ch - 4}" viewBox="0 0 48 56" preserveAspectRatio="xMidYMid meet" overflow="visible" stroke-width="${(2.6 * 48 / Math.max(gw, 20)).toFixed(2)}">${cg(g)}</svg>`;
     });
-    s += `</g><text x="${W - lab + 4}" y="${y + ch / 2 + 4}" class="cc-n" stroke="none" fill="currentColor">${row.l}</text>`;
+    s += `</g><text x="${W - lab + 4}" y="${y + ch / 2 + 4}" class="cc-n" stroke="none" fill="currentColor"${upc ? ' opacity=".3"' : ""}>${dn ? "✓" : row.l}</text>`;
   });
   return s + `</svg>`;
 }
@@ -111,15 +113,15 @@ function cchartRadialSVG(pid) {
 }
 
 // 무늬 상세 '기호 도안' 보기. 그릴 수 있는 도안이 없으면 null.
-function crochetChartHTML(pid, cols) {
+function crochetChartHTML(pid, cols, hiRow = -1) {
   const hexes = chartHexes(cols);
   if (["flower", "amigu", "granny"].includes(pid)) {
     const r = cchartRadialSVG(pid);
     return `<div class="cchart"><div class="cchart-card">${r.svg}</div><p class="cc-cap">${r.cap}</p></div>`;
   }
   if (CCHART[pid]) {
-    const spec = CCHART[pid](cols);
-    return `<div class="cchart"><div class="cchart-card scroll">${cchartGridSVG(spec, hexes)}</div><p class="cc-cap">겉면에서 본 모양, 아래에서 위로 읽어요. 왕복으로 뜨면 단마다 읽는 방향이 바뀌어요.</p></div>`;
+    const spec = CCHART[pid](cols), hi = hiRow >= 0 ? hiRow % spec.rows.length : -1;
+    return `<div class="cchart"><div class="cchart-card scroll">${cchartGridSVG(spec, hexes, hi)}</div><p class="cc-cap">${hi >= 0 ? `지금은 ${hi + 1}번 줄이에요(보라색 띠). 지나간 줄은 ✓, 남은 줄은 흐려요. ` : ""}겉면에서 본 모양, 아래에서 위로 읽어요. 왕복으로 뜨면 단마다 읽는 방향이 바뀌어요.</p></div>`;
   }
   return null;
 }

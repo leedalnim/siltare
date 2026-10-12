@@ -44,7 +44,7 @@ function renderCounter() {
   let html = `<div class="ctr-top"><button type="button" class="link" data-sess-back>‹ 단수 세기 목록</button>
     <button type="button" class="link danger" data-sess-del="${s.id}">${delC ? "한 번 더 누르면 삭제" : "카운터 삭제"}</button></div>
     <div class="ctr-head"><canvas data-ss="${s.id}" aria-hidden="true"></canvas><div><h2 id="h-counter">${p ? p.name : ""}</h2><span>${pr ? pr.name + " · " : ""}${craftName(s.craft)}</span></div>${starBtn(kP, p ? p.name : "", true)}</div>
-    ${progressHTML(s, rx)}`;
+    ${progressHTML(s, rx, info)}`;
   if (info.done) {
     html += `<div class="ctr-card done" aria-live="polite"><span class="label">${s.row}단 완료</span><div class="big">완성!</div><p class="inst">도안의 마지막 단까지 다 떴어요. 마무리하고 실 끝을 정리해 주세요.</p></div>
       <div class="ctr-sub"><button type="button" data-row="-1">− 1단 되돌리기</button><button type="button" data-reset class="${resetC ? "warn" : ""}">${resetC ? "한 번 더 누르면 0단으로" : "처음부터 다시"}</button></div>`;
@@ -63,13 +63,9 @@ function renderCounter() {
       <div class="st-row"><button type="button" data-st="-1" aria-label="코 하나 빼기">−</button><output aria-live="polite">${s.st}<small>코</small></output><button type="button" data-st="1" aria-label="코 하나 더하기">+</button></div>
       <label class="toggle"><input type="checkbox" id="st-auto" ${s.stAuto ? "checked" : ""}> 다음 단으로 넘어가면 0으로 돌리기</label></div>
     <label class="toggle"><input type="checkbox" id="wake" ${state.wake ? "checked" : ""}> 뜨는 동안 화면이 꺼지지 않게</label>`;
-  if (rx.chart) {
-    const hi = info.done ? -1 : info.hi;
-    html += `<div class="ctr-chart"><p class="label">기호 도안${hi >= 0 ? ` · 지금 뜰 줄은 ${hi + 1}번 줄` : ""}</p>${chartHTML(rx.chart, chartHexes(s.cols), hi, labelsFor(s.cols))}</div>`;
-  }
   html += `<details class="rx-fold"><summary>도안 전체 보기</summary>${recipeHTML(rx, s.cols, { noChart: true, hi: info.done ? -1 : info.hi })}</details>` + syncLine();
   box.innerHTML = html;
-  requestAnimationFrame(() => { paintSess(box); box.querySelectorAll("canvas[data-prog]").forEach(cv => drawProgress(cv, s)); });
+  requestAnimationFrame(() => { paintSess(box); box.querySelectorAll("canvas[data-prog]").forEach(cv => drawProgress(cv, s)); box.querySelectorAll("canvas[data-pw]").forEach(cv => drawPatWindow(cv, s)); });
 }
 
 let wakeLock = null;

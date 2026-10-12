@@ -83,3 +83,11 @@
 .cat-fold { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 12px; }
 .cat-fold summary { cursor: pointer; font-weight: 600; }
 .cat-fold ul { margin-top: 10px; }
+
+/* 위쪽(높이 비교 · 검색 · 종류)을 눌린 어두운 상자로 묶어 아래 격자와 구분 */
+.sym-top { background: #0F0D15; border: 1px solid #07060B; border-radius: 18px; padding: 12px; margin-bottom: 14px; box-shadow: inset 0 3px 10px rgba(0, 0, 0, .55), 0 1px 0 rgba(255, 255, 255, .05); display: grid; gap: 10px; }
+.sym-top .hchart { background: transparent; border: 0; padding: 2px 4px 0; margin: 0; }
+.sym-top .sym-search input { margin: 0; background: #1B1726; border-color: #2E2842; }
+.sym-top .g-chips { margin: 0; padding-bottom: 2px; }
+.sym-top .g-chip { background: #1B1726; border-color: #2E2842; }
+.sym-top .g-chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); }

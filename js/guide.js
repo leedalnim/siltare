@@ -78,9 +78,10 @@ function renderGuide() {
   const crochet = state.craft === "crochet", cats = SYM_CATS[state.craft];
   if (!cats.some(c => c[0] === guideUI.cat)) guideUI.cat = "all";
   let h = `<div class="view-title"><h2 id="h-guide">기호 사전</h2><span class="meta">${craftName()} 기준 · <span id="sym-count"></span></span></div>`;
+  h += `<div class="sym-top">`;
   if (crochet) h += heightChartHTML();
   h += `<label class="sym-search"><span class="sr">기호 검색</span><input id="sym-q" type="search" placeholder="이름·약어로 찾기 (예: 한길, dc, 늘림)" value="${esc(guideUI.q)}" autocomplete="off"></label>
-    <div class="g-chips" role="group" aria-label="종류">${cats.map(([id, nm]) => `<button type="button" class="g-chip" data-gcat="${id}" aria-pressed="${guideUI.cat === id}">${nm}</button>`).join("")}</div>
+    <div class="g-chips" role="group" aria-label="종류">${cats.map(([id, nm]) => `<button type="button" class="g-chip" data-gcat="${id}" aria-pressed="${guideUI.cat === id}">${nm}</button>`).join("")}</div></div>
     <div class="sym-grid" id="sym-grid"></div>`;
   if (crochet) h += `<details class="rules"><summary>도안 읽는 법</summary><dl>${CHART_RULES.map(([t, d]) => `<dt>${t}</dt><dd>${d}</dd>`).join("")}</dl></details>`;
   $("v-guide").innerHTML = h;

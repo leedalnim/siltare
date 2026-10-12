@@ -86,3 +86,10 @@
 .rowlist li.todo { opacity: .4; }
 .crow.dn { opacity: 1; }
 .crow.up { opacity: .35; filter: grayscale(.5); }
+
+/* 단수 세기: 뜨는 모습 보기 전환 */
+.cv-seg { display: flex; width: 100%; }
+.cv-seg button { flex: 1; }
+.prog-cv.pw { background: transparent; }
+.prog .cchart, .prog .kchart { margin: 0; }
+.cat-mini { display: block; width: 100%; height: auto; border-radius: 6px; }
