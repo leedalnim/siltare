@@ -151,6 +151,35 @@ function renderProjects() {
   requestAnimationFrame(() => paintAll($("v-projects"), g));
 }
 
+// ---------- 무늬 상세: 무늬 크게 / 기호 도안 / 완성품 ----------
+const detailUI = { view: "swatch", zoom: 1, pid: null };
+function detailChartHTML(p, rx, cols) {
+  if (p.id === "cat") return catBlockHTML();
+  if (rx.chart) return `<div class="kchart"><div class="chart-scroll">${chartHTML(rx.chart, chartHexes(cols), -1, labelsFor(cols))}</div><p class="cc-cap">겉면에서 본 모양, 아래에서 위로 읽어요.</p></div>`;
+  if (state.craft === "crochet") { const h = crochetChartHTML(p.id, cols); if (h) return h; }
+  return `<div class="empty-chart">이 무늬는 기호 도안이 없어요. 아래 '도안'의 단별 설명을 따라 떠 주세요.</div>`;
+}
+function stageHTML(p, sel, cols, rx) {
+  if (detailUI.pid !== p.id) { detailUI.pid = p.id; detailUI.view = p.id === "cat" ? "chart" : "swatch"; detailUI.zoom = 1; }
+  const views = [["swatch", "무늬 크게"], ["chart", "기호 도안"]]; if (sel) views.push(["product", "완성품"]);
+  if (!views.some(v => v[0] === detailUI.view)) detailUI.view = "swatch";
+  const seg = `<div class="seg dv-seg" role="group" aria-label="무늬 보기 방식">${views.map(([k, n]) => `<button type="button" data-dv="${k}" aria-pressed="${detailUI.view === k}">${n}</button>`).join("")}</div>`;
+  let body;
+  if (detailUI.view === "chart") body = detailChartHTML(p, rx, cols);
+  else if (detailUI.view === "product" && sel) body = `<div class="stage">
+      <canvas class="big" data-sw="${p.id}" data-prod="${sel.pr.id}" role="img" aria-label="${p.name}로 뜬 ${sel.pr.name} 완성 미리보기"></canvas><span class="cap">${p.name}로 뜬 ${sel.pr.name}</span>
+      <span class="inset"><canvas data-sw="${p.id}" aria-hidden="true"></canvas>무늬 확대</span></div>`;
+  else body = `<div class="stage"><canvas class="big swbig" data-sw="${p.id}" data-zoom="${detailUI.zoom}" role="img" aria-label="${p.name} 무늬 크게 보기"></canvas>
+      <span class="zoomer"><button type="button" data-dz="-1" aria-label="작게">−</button><button type="button" data-dz="1" aria-label="크게">＋</button></span></div>`;
+  return seg + body;
+}
+document.addEventListener("click", e => {
+  const v = e.target.closest("[data-dv]"), z = e.target.closest("[data-dz]");
+  if (!v && !z) return;
+  if (v) detailUI.view = v.dataset.dv; else detailUI.zoom = Math.max(.8, Math.min(2.8, +(detailUI.zoom + (+z.dataset.dz) * 0.4).toFixed(1)));
+  renderDetail();
+});
+
 function renderDetail() {
   const g = currentGroup().g || PH;
   const p = PATTERNS[state.craft].find(x => x.id === state.detail);
@@ -164,9 +193,9 @@ function renderDetail() {
     ? `<button type="button" class="primary wide" data-sess="${sess.id}">이어서 뜨기 · ${sess.row + 1}단째부터</button><button type="button" class="ghost-btn" data-start>새 카운터 만들기</button>`
     : `<button type="button" class="primary wide" data-start>이 무늬로 뜨기 시작 · 단수 세기</button>`}</div>`;
   if (r.skip || !r.doable.length) {
-    $("pat-body").innerHTML = `<div class="stage"><canvas class="big" data-sw="${p.id}" role="img" aria-label="${p.name} 무늬 미리보기"></canvas></div>
+    $("pat-body").innerHTML = `${stageHTML(p, null, cols, rx)}
       <div class="size-line">${esc(r.skip || "지금 가진 실로는 가장 작은 작품도 뜨기엔 양이 적어요. 다른 실을 더 담으면 다시 계산해요.")}</div>
-      <p class="how">${p.how}</p>${startBtns}${p.id === "cat" ? catBlockHTML() : ""}${recipeHTML(rx, cols)}`;
+      <p class="how">${p.how}</p>${startBtns}${recipeHTML(rx, cols)}`;
     requestAnimationFrame(() => paintAll($("pat-body"), g));
     return;
   }
@@ -183,10 +212,7 @@ function renderDetail() {
   const cchips = ckeys.length > 1 ? `<div class="field"><span class="label">${r.multi ? "메인 색 고르기 · 나머지 색은 배색으로 들어가요" : "어떤 색으로 뜰까요"}</span>
     <div class="cchips">${ckeys.map(k => `<button type="button" class="cchip" data-main="${esc(k)}" aria-pressed="${k === r.mainKey}"><i style="background:${hexFor(k)}"></i>${cinfo(k).name}<span class="x">${r.byColor[k]}g</span></button>`).join("")}</div></div>` : "";
   const z = sizeOf(p, g, r.have);
-  $("pat-body").innerHTML = `<div class="stage">
-      ${sel ? `<canvas class="big" data-sw="${p.id}" data-prod="${sel.pr.id}" role="img" aria-label="${p.name}로 뜬 ${sel.pr.name} 완성 미리보기"></canvas><span class="cap">${p.name}로 뜬 ${sel.pr.name}</span>` : ""}
-      <span class="inset"><canvas data-sw="${p.id}" aria-hidden="true"></canvas>무늬 확대</span>
-    </div>
+  $("pat-body").innerHTML = `${stageHTML(p, sel, cols, rx)}
     ${cchips}
     <div class="size-line">쓸 수 있는 실 <b>${r.have}g</b>으로 이 무늬를 <b>약 ${z.side}cm × ${z.side}cm</b>만큼 뜰 수 있어요. 폭 20cm로 뜨면 길이 약 ${z.len}cm예요.</div>
     <div class="chips">${chips.map(c => `<span class="chip">${c}</span>`).join("")}</div>
@@ -198,7 +224,6 @@ function renderDetail() {
       return `<li><button type="button" class="proj ${x.st}" data-pv="${x.pr.id}" aria-pressed="${sel && x.pr.id === sel.pr.id}"><span class="nm">${x.pr.name}</span><span class="st">${stLabel[x.st]}</span><span class="nt">${nt}</span><span class="g">${x.need}g 필요</span></button></li>`;
     }).join("")}</ul>
     ${r.later.length ? `<p class="more">실이 더 있으면: ${r.later.slice(0, 4).map(x => `${x.pr.name} ${x.need}g`).join(" · ")}</p>` : ""}
-    ${p.id === "cat" ? catBlockHTML() : ""}
     ${recipeHTML(rx, cols)}
     <p class="note">소요량과 크기는 일반적인 굵기와 손땀으로 잡은 대략값이에요. 실이나 손땀에 따라 10~20% 차이가 날 수 있어요.</p>`;
   requestAnimationFrame(() => paintAll($("pat-body"), g));

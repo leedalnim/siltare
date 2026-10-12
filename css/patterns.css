@@ -52,3 +52,20 @@
 .legend span { display: inline-flex; align-items: center; gap: 6px; }
 .lg { font-family: var(--font-mono); width: 22px; height: 22px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 4px; color: var(--ink); font-weight: 500; }
 .lgc { width: 16px; height: 16px; border-radius: 4px; border: 1px solid var(--line); }
+
+/* 무늬 상세: 보기 전환 */
+.dv-seg { display: flex; width: 100%; margin-bottom: 10px; }
+.dv-seg button { flex: 1; }
+.stage canvas.big.swbig { aspect-ratio: 4 / 3; }
+.zoomer { position: absolute; right: 10px; bottom: 10px; display: flex; gap: 6px; }
+.zoomer button { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: rgba(23, 20, 31, .8); color: var(--ink); font-size: 20px; line-height: 1; }
+.kchart, .cchart { display: grid; gap: 6px; margin-bottom: 4px; }
+.chart-scroll { overflow-x: auto; padding-bottom: 4px; }
+.kchart .chart { --cell: 30px; }
+.cchart-card { background: #f3efe6; color: #1d1a24; border-radius: var(--radius); padding: 8px; }
+.cchart-card.scroll { overflow-x: auto; }
+.cchart-svg { width: 100%; height: auto; display: block; min-width: 300px; }
+.cchart-svg.radial { max-width: 340px; margin: 0 auto; }
+.cc-n { font-size: 12px; font-weight: 600; font-family: var(--font-mono); }
+.cc-cap { margin: 0; font-size: 13px; color: var(--muted); }
+.empty-chart { background: var(--surface); border-radius: var(--radius); padding: 28px 16px; text-align: center; color: var(--muted); }

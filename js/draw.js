@@ -296,7 +296,7 @@ function paintSwatch(cv, pid, C, fluffy, craft) {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   cv.width = Math.round(rect.width * dpr); cv.height = Math.round(rect.height * dpr);
   const ctx = cv.getContext("2d");
-  const k = rect.width < 60 ? 0.6 : 1;
+  const k = cv.dataset.zoom ? +cv.dataset.zoom : (rect.width < 60 ? 0.6 : 1);
   ctx.setTransform(dpr * k, 0, 0, dpr * k, 0, 0);
   const W = rect.width / k, H = rect.height / k;
   ctx.fillStyle = css(C[0], -0.58); ctx.fillRect(0, 0, W, H);
