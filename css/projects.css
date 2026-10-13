@@ -33,3 +33,4 @@
 .lightbox figcaption span { color: var(--muted); font-size: 12px; margin-left: 6px; }
 .src-btn { display: inline-flex; align-items: center; gap: 6px; margin: 2px 0 8px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--accent); font-size: 13px; font-weight: 600; cursor: pointer; }
 .src-btn::before { content: "🖼"; font-size: 13px; }
+.prow .src-btn { grid-column: 2; justify-self: start; margin: 0 0 4px; }
