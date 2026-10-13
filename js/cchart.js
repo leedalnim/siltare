@@ -169,7 +169,26 @@ function radialRound(pid, row) {
 }
 
 // 무늬 상세 '기호 도안' 보기. 그릴 수 있는 도안이 없으면 null.
+// 필레 담요: 받은 모눈 도안 이미지 위에 단을 표시해요 (이미지에서 잰 도안 위치·칸 수)
+const FILETCAT = { src: "images/ref/catfiletblanket.png", x0: 33.5, x1: 327.5, y0: 23.5, y1: 451.5, cols: 55, rows: 82 };
+function filetChartHTML(hiRow) {
+  const F = FILETCAT, ph = (F.y1 - F.y0) / F.rows, cur = hiRow >= 0 ? Math.min(hiRow, F.rows) : -1;
+  const yOf = k => F.y1 - k * ph;   // k단 아래쪽 선 (0 = 1단 아래)
+  let ov = "";
+  if (cur >= 0) {
+    if (cur > 0) ov += `<rect x="${F.x0}" y="${yOf(cur)}" width="${F.x1 - F.x0}" height="${cur * ph}" fill="#2FA36E" fill-opacity=".28"/>`;
+    if (cur < F.rows) {
+      ov += `<rect x="${F.x0}" y="${F.y0}" width="${F.x1 - F.x0}" height="${yOf(cur + 1) - F.y0}" fill="#17141F" fill-opacity=".45"/>`;
+      ov += `<rect class="filet-band" x="${F.x0 - 2}" y="${yOf(cur + 1)}" width="${F.x1 - F.x0 + 4}" height="${ph}" fill="#B9A0FF" fill-opacity=".35" stroke="#7B5CE0" stroke-width="1.4"/>`;
+      ov += `<text x="${F.x1 + 4}" y="${yOf(cur + 1) + ph * .8}" font-size="7" font-weight="700" fill="#7B5CE0">${cur + 1}단</text>`;
+    }
+  }
+  for (let k = 5; k <= F.rows; k += 5) ov += `<text x="${F.x0 - 3}" y="${yOf(k) + ph * .8}" font-size="5.5" text-anchor="end" fill="#6F6A7E">${k}</text>`;
+  const cap = cur < 0 ? "받은 모눈 도안 원본이에요. 맨 아래 줄이 1단이에요." : cur >= F.rows ? "모든 단을 다 떴어요!" : `지금 ${cur + 1}단 (아래에서 ${cur + 1}번째 줄) · 초록 = 다 뜬 단, 보라 띠 = 지금 단, 어두운 곳 = 아직이에요. ${cur % 2 ? "왼쪽 → 오른쪽" : "오른쪽 → 왼쪽"}으로 읽어요.`;
+  return `<div class="cchart"><div class="cchart-card filet-scroll" data-filet-scroll><svg class="filet-svg" viewBox="14 14 340 445" role="img" aria-label="고양이 필레 담요 모눈 도안"><image href="${F.src}" x="0" y="0" width="367" height="617"/>${ov}</svg></div><p class="cc-cap">${cap} 칸이 작으면 두 손가락으로 확대해 보세요.</p></div>`;
+}
 function crochetChartHTML(pid, cols, hiRow = -1) {
+  if (pid === "filetcat") return filetChartHTML(hiRow);
   const hexes = chartHexes(cols);
   if (["flower", "amigu", "granny"].includes(pid)) {
     const rr = hiRow >= 0 ? radialRound(pid, hiRow) : { i: -1 }, r = cchartRadialSVG(pid, rr.i);

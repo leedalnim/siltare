@@ -183,6 +183,14 @@ const DRAW = {
         for (const o of [-2.4, 2.4]) { ctx.beginPath(); ctx.moveTo(cx + o * 0.5, cy - 7); ctx.quadraticCurveTo(cx + o * 1.6, cy, cx + o * 0.5, cy + 7); ctx.stroke(); }
       }
     },
+    filetcat: (ctx, W, H, C) => {   // 필레: 한길긴 기둥 사이 빈 칸과 채운 칸
+      const s = 14, cat = ["0000000000", "0010001000", "0011111000", "0010101000", "0011111000", "0001110000", "0111111100", "0111111100", "0100100100", "0000000000"];
+      for (let j = Math.ceil(H / s); j >= -1; j--) for (let i = -1; i * s < W + s; i++) {
+        const on = cat[md(j, 10)][md(i, 10)] === "1", x = i * s, y = j * s;
+        for (let k = 0; k < (on ? 4 : 1); k++) dcSt(ctx, x + k * (s / 4) - 1.5, y, 5, s, C[0]);
+        if (!on) chain(ctx, x + s * 0.62, y + 2.5, s * 0.3, 0, mix(C[0], -0.08));
+      }
+    },
     moss: (ctx, W, H, C) => cgrid(W, H, CH, (i, j, px, py) => { if (md(i + j, 2)) scSt(ctx, px, py, CW, CH, C[0]); else chain(ctx, px + CW / 2, py + CH * 0.45, CW * 0.42, 0, mix(C[0], -0.1)); }),
     granny: (ctx, W, H, C) => {
       const T = 92, ox = (W - T * Math.ceil(W / T)) / 2, oy = (H - T * Math.ceil(H / T)) / 2;

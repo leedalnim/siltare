@@ -20,7 +20,7 @@ function progressHTML(s, rx, info) {
   const meta = `<div class="prog-meta"><span>${s.n ? `${s.n}코 · ` : ""}${s.mode === "round" ? "원통" : "왕복"} · 목표 ${s.target}단</span><button type="button" class="link" data-su-edit="${s.id}">뜨는 방법 바꾸기</button></div>`;
   const bar = `<div class="pbar" role="progressbar" aria-valuemin="0" aria-valuemax="${s.target}" aria-valuenow="${Math.min(s.row, s.target)}" aria-label="진행률"><i style="width:${pct}%"></i></div>`;
   const { kind, list } = ctrViews(s, rx);
-  const defView = s.pid === "cat" ? "chart" : "pat";
+  const defView = s.pid === "cat" || s.pid === "filetcat" ? "chart" : "pat";
   const view = list.some(v => v[0] === ctrUI.view) ? ctrUI.view : defView;
   const seg = `<div class="seg cv-seg" role="group" aria-label="보기 방식">${list.map(([k, n]) => `<button type="button" data-cv="${k}" aria-pressed="${view === k}">${n}</button>`).join("")}</div>`;
   const total = kind === "once" ? (rx.setup || []).length + rx.rows.length : s.target;

@@ -65,7 +65,9 @@ function renderCounter() {
     <label class="toggle"><input type="checkbox" id="wake" ${state.wake ? "checked" : ""}> 뜨는 동안 화면이 꺼지지 않게</label>`;
   html += `<details class="rx-fold"><summary>도안 전체 보기</summary>${recipeHTML(rx, s.cols, { noChart: true, hi: info.done ? -1 : info.hi })}</details>` + syncLine();
   box.innerHTML = html;
-  requestAnimationFrame(() => { paintSess(box); box.querySelectorAll("canvas[data-prog]").forEach(cv => drawProgress(cv, s)); box.querySelectorAll("canvas[data-pw]").forEach(cv => drawPatWindow(cv, s)); });
+  requestAnimationFrame(() => { paintSess(box); box.querySelectorAll("canvas[data-prog]").forEach(cv => drawProgress(cv, s)); box.querySelectorAll("canvas[data-pw]").forEach(cv => drawPatWindow(cv, s));
+    const fs = box.querySelector("[data-filet-scroll]"), fb = fs && fs.querySelector(".filet-band");   // 필레 도안: 지금 단이 보이게 스크롤
+    if (fb) fs.scrollTop = Math.max(0, fb.getBoundingClientRect().top - fs.getBoundingClientRect().top + fs.scrollTop - fs.clientHeight / 2); });
 }
 
 let wakeLock = null;
