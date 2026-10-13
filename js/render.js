@@ -128,7 +128,7 @@ function projRow(row, act) {
   return `<li class="prow">${thumb}
     <div class="hd"><span class="nm">${row.pr.name}</span>${ing ? `<span class="ing inline">뜨는 중</span>` : ""}<span class="sp"></span><span class="st-pill ${b.x.st}">${stLabel[b.x.st]}</span>${starBtn(k, row.pr.name, true)}</div>
     <span class="sub">${lo === hi ? lo : lo + "~" + hi}g ·${left >= 0 ? `${ro(b.p.name)} 뜨면 ${left}g 남아요` : `${ro(b.p.name)}도 ${-left}g 모자라요`}</span>
-    ${row.pr.how ? `<p class="howto">${row.pr.how}</p>` : ""}${srcBtn(row.pr.orig, row.pr.name)}
+    ${row.pr.how ? `<p class="howto">${row.pr.how}</p>` : ""}${srcBtn(row.pr.orig, row.pr.name)}${(row.pr.refs || []).map(([src, kind]) => `<button type="button" class="src-btn" data-photo="${src}" data-photo-name="${esc(row.pr.name)}" data-photo-kind="${kind}">${kind} 보기</button>`).join("")}
     <button type="button" class="fold" data-tp="${row.pr.id}" aria-expanded="${openP}" aria-controls="mini-${row.pr.id}">
       <span class="stack" aria-hidden="true">${row.good.slice(0, 4).map(it => `<canvas data-sw="${it.p.id}"></canvas>`).join("")}</span>
       <span class="fl">어울리는 무늬 ${row.good.length}개</span>
