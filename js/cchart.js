@@ -169,24 +169,163 @@ function radialRound(pid, row) {
 }
 
 // 무늬 상세 '기호 도안' 보기. 그릴 수 있는 도안이 없으면 null.
-// 필레 담요: 받은 모눈 도안 이미지 위에 단을 표시해요 (이미지에서 잰 도안 위치·칸 수)
-const FILETCAT = { src: "images/ref/catfiletblanket.png", x0: 33.5, x1: 327.5, y0: 23.5, y1: 451.5, cols: 55, rows: 82 };
-function filetChartHTML(hiRow) {
-  const F = FILETCAT, ph = (F.y1 - F.y0) / F.rows, cur = hiRow >= 0 ? Math.min(hiRow, F.rows) : -1;
-  const yOf = k => F.y1 - k * ph;   // k단 아래쪽 선 (0 = 1단 아래)
+// 필레 담요: 받은 모눈 도안을 칸 단위로 옮긴 도트 도안 + 원본 이미지
+// grid는 위쪽 줄부터. # 채운 칸 · . 빈 칸 · v 레이스(2칸) · = 넓은 빈 칸(2칸)
+// (원본 이미지에서 칸 위치를 맞춰 읽고, 겹쳐 그려 진한 칸 1,240개가 모두 맞는지 확인했어요)
+const FILETCAT = { src: "images/ref/catfiletblanket.png", x0: 33.33, x1: 326.36, y0: 22.92, y1: 450.0, cols: 55, rows: 82,
+  grid: [
+    ".......................................................",
+    ".##########################.##########################.",
+    ".#========================#.#========================#.",
+    ".#vvvvvvvvvvvvvvvvvvvvvvvv#.#vvvvvvvvvvvvvvvvvvvvvvvv#.",
+    ".#==....................==#.#==....................==#.",
+    ".#vv....................vv#.#vv....................vv#.",
+    ".#==..#.................==#.#==....................==#.",
+    ".#vv...#................vv#.#vv...#...#............vv#.",
+    ".#==....#........#...#..==#.#==...#####.######.....==#.",
+    ".#vv....#........#####..vv#.#vv...#############....vv#.",
+    ".#==....#........#####..==#.#==...#.#.#########....==#.",
+    ".#vv....#........#.#.#..vv#.#vv...##############...vv#.",
+    ".#==....##.......#####..==#.#==....#############...==#.",
+    ".#vv.....###......###...vv#.#vv...##############...vv#.",
+    ".#==......###########...==#.#==...##.##.########...==#.",
+    ".#vv......###########...vv#.#vv...............##...vv#.",
+    ".#==......###########...==#.#==...............##...==#.",
+    ".#vv......###########...vv#.#vv...............##...vv#.",
+    ".#==......#########.##..==#.#==..............##....==#.",
+    ".#vv......#.#....##..#..vv#.#vv.............##.....vv#.",
+    ".#==......#.#.....#.##..==#.#==............##......==#.",
+    ".#vv......#.##....#.....vv#.#vv....................vv#.",
+    ".#==......##.##...##....==#.#==....................==#.",
+    ".#vv....................vv#.#vv....................vv#.",
+    ".#========================#.#========================#.",
+    ".#vvvvvvvvvvvvvvvvvvvvvvvv#.#vvvvvvvvvvvvvvvvvvvvvvvv#.",
+    ".##########################.##########################.",
+    ".......................................................",
+    ".##########################.##########################.",
+    ".#========================#.#========================#.",
+    ".#vvvvvvvvvvvvvvvvvvvvvvvv#.#vvvvvvvvvvvvvvvvvvvvvvvv#.",
+    ".#==....................==#.#==....................==#.",
+    ".#vv....#...............vv#.#vv....................vv#.",
+    ".#==...#................==#.#==.................#..==#.",
+    ".#vv...#................vv#.#vv................#...vv#.",
+    ".#==...#.........#...#..==#.#==..#...#........#....==#.",
+    ".#vv...#.........#####..vv#.#vv..#####........#....vv#.",
+    ".#==...#...#####.#####..==#.#==..#####........#....==#.",
+    ".#vv...#..########.#.#..vv#.#vv..#.#.#........#....vv#.",
+    ".#==...#.#############..==#.#==..#####.......##....==#.",
+    ".#vv....#############...vv#.#vv...###......###.....vv#.",
+    ".#==....#############...==#.#==...###########......==#.",
+    ".#vv....#####.######....vv#.#vv...###########......vv#.",
+    ".#==....####...####.....==#.#==...###########......==#.",
+    ".#vv.....###...####.....vv#.#vv...###########......vv#.",
+    ".#==.....##.....###.....==#.#==..##.#########......==#.",
+    ".#vv.....##.....##......vv#.#vv..#..##....#.#......vv#.",
+    ".#==.....##.....##......==#.#==..##.#.....#.#......==#.",
+    ".#vv.....##.....##......vv#.#vv.....#....##.#......vv#.",
+    ".#==......##.....##.....==#.#==....##...##.##......==#.",
+    ".#vv....................vv#.#vv....................vv#.",
+    ".#========================#.#========================#.",
+    ".#vvvvvvvvvvvvvvvvvvvvvvvv#.#vvvvvvvvvvvvvvvvvvvvvvvv#.",
+    ".##########################.##########################.",
+    ".......................................................",
+    ".##########################.##########################.",
+    ".#========================#.#========================#.",
+    ".#vvvvvvvvvvvvvvvvvvvvvvvv#.#vvvvvvvvvvvvvvvvvvvvvvvv#.",
+    ".#==....................==#.#==....................==#.",
+    ".#vv....................vv#.#vv....................vv#.",
+    ".#==....................==#.#==....................==#.",
+    ".#vv............#...#...vv#.#vv....#...#...........vv#.",
+    ".#==.....######.#####...==#.#==....#####......#....==#.",
+    ".#vv....#############...vv#.#vv....#####.....#.....vv#.",
+    ".#==....#########.#.#...==#.#==....#.#.#....#......==#.",
+    ".#vv...##############...vv#.#vv....#####....#......vv#.",
+    ".#==...#############....==#.#==.....###.....#......==#.",
+    ".#vv...##############...vv#.#vv.....####....#......vv#.",
+    ".#==...########.##.##...==#.#==.....#######..#.....==#.",
+    ".#vv...##...............vv#.#vv.....########..#....vv#.",
+    ".#==...##...............==#.#==.....#########.#....==#.",
+    ".#vv...##...............vv#.#vv.....#########.#....vv#.",
+    ".#==....##..............==#.#==.....###########....==#.",
+    ".#vv.....##.............vv#.#vv.....##..#####......vv#.",
+    ".#==......##............==#.#==....###.######......==#.",
+    ".#vv....................vv#.#vv....................vv#.",
+    ".#==....................==#.#==....................==#.",
+    ".#vv....................vv#.#vv....................vv#.",
+    ".#========================#.#========================#.",
+    ".#vvvvvvvvvvvvvvvvvvvvvvvv#.#vvvvvvvvvvvvvvvvvvvvvvvv#.",
+    ".##########################.##########################.",
+    "......................................................."
+  ] };
+const filetUI = { v: "dot", zoom: false };
+const FILET_NAME = { "#": "채움", ".": "빈칸", v: "레이스", "=": "넓은 빈칸" }, FILET_MARK = { "#": "■", ".": "□", v: "V", "=": "═" };
+// k단(1부터, 아래에서)의 칸을 뜨는 순서대로 묶어요. 레이스·넓은 빈 칸은 2칸이 한 묶음이에요.
+function filetUnits(k) {
+  const s = FILETCAT.grid[FILETCAT.rows - k], u = [];
+  for (let c = 0; c < s.length; c++) { const ch = s[c]; if (ch === "v" || ch === "=") { u.push(ch); c++; } else u.push(ch); }
+  return k % 2 ? u.reverse() : u;   // 홀수 단은 오른쪽부터
+}
+function filetRowText(k) {
+  const u = filetUnits(k), out = []; let i = 0;
+  while (i < u.length) { let j = i; while (u[j] === u[i]) j++; out.push(`${FILET_MARK[u[i]]}${j - i}`); i = j; }
+  return `${k % 2 ? "← 오른쪽부터" : "왼쪽부터 →"}  ${out.join(" · ")}  (■ 채움 · □ 빈칸 · ═ 넓은 빈칸 · V 레이스, 2칸짜리는 1묶음으로 셈)`;
+}
+function filetDotSVG(cur) {
+  const F = FILETCAT, cs = 10, L = 22, T = 4, Rm = 30, W = L + F.cols * cs + Rm, H = T + F.rows * cs + 6;
+  let s = `<rect x="${L}" y="${T}" width="${F.cols * cs}" height="${F.rows * cs}" fill="#fff"/>`;
+  F.grid.forEach((row, r) => {
+    const y = T + r * cs;
+    for (let c = 0; c < row.length; c++) {
+      const ch = row[c], x = L + c * cs;
+      if (ch === "#") s += `<rect x="${x}" y="${y}" width="${cs}" height="${cs}" fill="#3A3346"/>`;
+      else if (ch === "v") { s += `<path d="M${x + 1} ${y + 1.5}L${x + cs} ${y + cs - 1.5}L${x + 2 * cs - 1} ${y + 1.5}" fill="none" stroke="#C0563B" stroke-width="1.4"/>`; c++; }
+      else if (ch === "=") { s += `<rect x="${x + .6}" y="${y + .6}" width="${2 * cs - 1.2}" height="${cs - 1.2}" fill="#EFE7D6"/><path d="M${x + 3} ${y + cs / 2}H${x + 2 * cs - 3}" stroke="#8C7A5B" stroke-width="1"/>`; c++; }
+    }
+  });
+  for (let c = 0; c <= F.cols; c++) s += `<path d="M${L + c * cs} ${T}V${T + F.rows * cs}" stroke="#000" stroke-opacity="${c % 5 ? .14 : .4}" stroke-width="${c % 5 ? .5 : .9}"/>`;
+  for (let r = 0; r <= F.rows; r++) s += `<path d="M${L} ${T + r * cs}H${L + F.cols * cs}" stroke="#000" stroke-opacity="${(F.rows - r) % 5 ? .14 : .4}" stroke-width="${(F.rows - r) % 5 ? .5 : .9}"/>`;
+  const yTop = k => T + (F.rows - k) * cs;   // k단 칸의 위쪽 선
+  if (cur >= 0) {
+    if (cur > 0) s += `<rect x="${L}" y="${yTop(cur)}" width="${F.cols * cs}" height="${cur * cs}" fill="#2FA36E" fill-opacity=".3"/>`;
+    if (cur < F.rows) {
+      s += `<rect x="${L}" y="${T}" width="${F.cols * cs}" height="${yTop(cur + 1) - T}" fill="#fff" fill-opacity=".55"/>`;
+      s += `<rect class="filet-band" x="${L - 2}" y="${yTop(cur + 1) - 1}" width="${F.cols * cs + 4}" height="${cs + 2}" fill="#B9A0FF" fill-opacity=".3" stroke="#7B5CE0" stroke-width="2"/>`;
+      s += `<text x="${L + F.cols * cs + 4}" y="${yTop(cur + 1) + cs - 1.5}" font-size="9" font-weight="700" fill="#7B5CE0">${(cur + 1) % 2 ? "◀" : "▶"}${cur + 1}</text>`;
+    }
+  }
+  for (let k = 1; k <= F.rows; k++) if (k === 1 || k % 5 === 0) s += `<text x="${L - 3}" y="${yTop(k) + cs - 2}" font-size="7.5" text-anchor="end" fill="${cur >= 0 && k <= cur ? "#1F8A5A" : "#6F6A7E"}">${k}</text>`;
+  return `<svg class="filet-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="고양이 필레 담요 도트 도안 ${F.cols}칸 × ${F.rows}단">${s}</svg>`;
+}
+function filetImgSVG(cur) {
+  const F = FILETCAT, ph = (F.y1 - F.y0) / F.rows, yOf = k => F.y1 - k * ph;
   let ov = "";
   if (cur >= 0) {
     if (cur > 0) ov += `<rect x="${F.x0}" y="${yOf(cur)}" width="${F.x1 - F.x0}" height="${cur * ph}" fill="#2FA36E" fill-opacity=".28"/>`;
     if (cur < F.rows) {
-      ov += `<rect x="${F.x0}" y="${F.y0}" width="${F.x1 - F.x0}" height="${yOf(cur + 1) - F.y0}" fill="#17141F" fill-opacity=".45"/>`;
-      ov += `<rect class="filet-band" x="${F.x0 - 2}" y="${yOf(cur + 1)}" width="${F.x1 - F.x0 + 4}" height="${ph}" fill="#B9A0FF" fill-opacity=".35" stroke="#7B5CE0" stroke-width="1.4"/>`;
-      ov += `<text x="${F.x1 + 4}" y="${yOf(cur + 1) + ph * .8}" font-size="7" font-weight="700" fill="#7B5CE0">${cur + 1}단</text>`;
+      ov += `<rect x="${F.x0}" y="${F.y0}" width="${F.x1 - F.x0}" height="${yOf(cur + 1) - F.y0}" fill="#17141F" fill-opacity=".4"/>`;
+      ov += `<rect class="filet-band" x="${F.x0 - 2}" y="${yOf(cur + 1)}" width="${F.x1 - F.x0 + 4}" height="${ph}" fill="#B9A0FF" fill-opacity=".35" stroke="#7B5CE0" stroke-width="1.2"/>`;
     }
   }
   for (let k = 5; k <= F.rows; k += 5) ov += `<text x="${F.x0 - 3}" y="${yOf(k) + ph * .8}" font-size="5.5" text-anchor="end" fill="#6F6A7E">${k}</text>`;
-  const cap = cur < 0 ? "받은 모눈 도안 원본이에요. 맨 아래 줄이 1단이에요." : cur >= F.rows ? "모든 단을 다 떴어요!" : `지금 ${cur + 1}단 (아래에서 ${cur + 1}번째 줄) · 초록 = 다 뜬 단, 보라 띠 = 지금 단, 어두운 곳 = 아직이에요. ${cur % 2 ? "왼쪽 → 오른쪽" : "오른쪽 → 왼쪽"}으로 읽어요.`;
-  return `<div class="cchart"><div class="cchart-card filet-scroll" data-filet-scroll><svg class="filet-svg" viewBox="14 14 340 445" role="img" aria-label="고양이 필레 담요 모눈 도안"><image href="${F.src}" x="0" y="0" width="367" height="617"/>${ov}</svg></div><p class="cc-cap">${cap} 칸이 작으면 두 손가락으로 확대해 보세요.</p></div>`;
+  return `<svg class="filet-svg" viewBox="14 14 340 445" role="img" aria-label="고양이 필레 담요 원본 모눈 도안"><image href="${F.src}" x="0" y="0" width="367" height="617"/>${ov}</svg>`;
 }
+function filetChartHTML(hiRow) {
+  const F = FILETCAT, cur = hiRow >= 0 ? Math.min(hiRow, F.rows) : -1, dot = filetUI.v !== "img";
+  const tools = `<div class="filet-tools"><div class="seg" role="group" aria-label="도안 보기"><button type="button" data-filet-v="dot" aria-pressed="${dot}">도트 도안</button><button type="button" data-filet-v="img" aria-pressed="${!dot}">원본 이미지</button></div>
+    <button type="button" class="ghost-btn" data-filet-z aria-pressed="${filetUI.zoom}">${filetUI.zoom ? "− 화면에 맞추기" : "＋ 크게 보기"}</button></div>`;
+  const now = cur >= 0 && cur < F.rows ? `<div class="filet-now"><b>${cur + 1}단</b> <span>${filetRowText(cur + 1)}</span></div>` : "";
+  const legend = dot ? `<p class="cc-cap">■ 채운 칸 · □ 빈 칸 · <b style="color:#C0563B">V</b> 레이스(2칸) · ═ 넓은 빈 칸(2칸). 맨 아래 줄이 1단이고, 홀수 단은 오른쪽부터 읽어요.</p>` : `<p class="cc-cap">받은 원본 모눈 도안이에요. 맨 아래 줄이 1단이에요.</p>`;
+  const cap = cur < 0 ? "" : cur >= F.rows ? `<p class="cc-cap">모든 단을 다 떴어요!</p>` : `<p class="cc-cap">초록 = 다 뜬 단 · 보라 띠 = 지금 단 · 흐림 = 아직이에요.</p>`;
+  return `<div class="cchart filet">${tools}${now}<div class="cchart-card filet-scroll${filetUI.zoom ? " zoom" : ""}" data-filet-scroll>${dot ? filetDotSVG(cur) : filetImgSVG(cur)}</div>${cap}${legend}</div>`;
+}
+document.addEventListener("click", e => {
+  const v = e.target.closest("[data-filet-v]"), z = e.target.closest("[data-filet-z]");
+  if (!v && !z) return;
+  if (v) filetUI.v = v.dataset.filetV; else filetUI.zoom = !filetUI.zoom;
+  const y = window.scrollY, inSheet = !$("sheet-pat").hidden, panel = inSheet && $("sheet-pat").querySelector(".sheet-panel"), py = panel ? panel.scrollTop : 0;
+  if (inSheet) { renderDetail(); panel.scrollTop = py; } else { renderCounter(); window.scrollTo(0, y); }
+  requestAnimationFrame(() => { const box = document.querySelector(".cchart.filet"); if (box) box.scrollIntoView({ block: "nearest" }); });
+});
 function crochetChartHTML(pid, cols, hiRow = -1) {
   if (pid === "filetcat") return filetChartHTML(hiRow);
   const hexes = chartHexes(cols);

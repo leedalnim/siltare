@@ -67,7 +67,8 @@ function renderCounter() {
   box.innerHTML = html;
   requestAnimationFrame(() => { paintSess(box); box.querySelectorAll("canvas[data-prog]").forEach(cv => drawProgress(cv, s)); box.querySelectorAll("canvas[data-pw]").forEach(cv => drawPatWindow(cv, s));
     const fs = box.querySelector("[data-filet-scroll]"), fb = fs && fs.querySelector(".filet-band");   // 필레 도안: 지금 단이 보이게 스크롤
-    if (fb) fs.scrollTop = Math.max(0, fb.getBoundingClientRect().top - fs.getBoundingClientRect().top + fs.scrollTop - fs.clientHeight / 2); });
+    if (fb) { fs.scrollTop = Math.max(0, fb.getBoundingClientRect().top - fs.getBoundingClientRect().top + fs.scrollTop - fs.clientHeight / 2);
+      if (fs.scrollWidth > fs.clientWidth) fs.scrollLeft = (s.row + 1) % 2 ? fs.scrollWidth : 0; } });   // 크게 볼 땐 그 단을 시작하는 쪽으로
 }
 
 let wakeLock = null;
