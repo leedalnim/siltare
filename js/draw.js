@@ -145,6 +145,44 @@ const DRAW = {
   crochet: {
     sc: (ctx, W, H, C) => cgrid(W, H, CH, (i, j, px, py) => scSt(ctx, px, py, CW, CH, C[0])),
     dc: (ctx, W, H, C) => cgrid(W, H, 18, (i, j, px, py) => dcSt(ctx, px, py, CW, 18, C[0], md(j, 2) ? 0.06 : -0.06)),
+    hdc: (ctx, W, H, C) => cgrid(W, H, 13, (i, j, px, py) => dcSt(ctx, px, py, CW, 13, C[0], md(j, 2) ? 0.05 : -0.05)),
+    tr: (ctx, W, H, C) => cgrid(W, H, 24, (i, j, px, py) => { dcSt(ctx, px, py, CW, 24, C[0], md(j, 2) ? 0.07 : -0.07); }),
+    blohdc: (ctx, W, H, C) => cgrid(W, H, 13, (i, j, px, py) => { dcSt(ctx, px, py + 3, CW, 10, C[0]); ctx.strokeStyle = css(C[0], -0.22); ctx.lineWidth = 2.6; ctx.beginPath(); ctx.moveTo(px - 1, py + 2); ctx.lineTo(px + CW + 1, py + 2); ctx.stroke(); }),
+    blodc: (ctx, W, H, C) => cgrid(W, H, 18, (i, j, px, py) => { dcSt(ctx, px, py + 3, CW, 15, C[0]); ctx.strokeStyle = css(C[0], -0.25); ctx.lineWidth = 2.8; ctx.beginPath(); ctx.moveTo(px - 1, py + 2); ctx.lineTo(px + CW + 1, py + 2); ctx.stroke(); }),
+    vst: (ctx, W, H, C) => {
+      const s = 18, h = 18;
+      for (let j = Math.ceil(H / h) + 1; j >= -1; j--) for (let i = -1; i * s < W + s; i++) {
+        const bx = i * s + (md(j, 2) ? s / 2 : 0), by = j * h;
+        dcSt(ctx, bx + 1, by, 7, h, C[0], -0.32); dcSt(ctx, bx + 6, by, 7, h, C[0], 0.32);
+      }
+    },
+    cluster: (ctx, W, H, C) => {
+      const s = 21, h = 26;
+      for (let j = Math.ceil(H / h) + 1; j >= -1; j--) {
+        for (let i = -1; i * CW < W + CW; i++) scSt(ctx, i * CW, j * h + 17, CW, CH, C[0]);
+        for (let i = -1; i * s < W + s; i++) { const bx = i * s + s / 2, by = j * h + 17;
+          for (const a of [-0.42, 0, 0.42]) { ctx.save(); ctx.translate(bx + Math.sin(a) * 8, by); ctx.rotate(-a); dcSt(ctx, -2.5, -15, 5, 15, C[0]); ctx.restore(); }
+          chain(ctx, bx + s / 2, by - 13, 3.2, 0, mix(C[0], -0.1)); }
+      }
+    },
+    grannyst: (ctx, W, H, C) => {
+      const s = 18, h = 16;
+      for (let j = Math.ceil(H / h) + 1; j >= -1; j--) { const col = C[md(j, C.length)];
+        for (let i = -1; i * s < W + s; i++) { const bx = i * s + (md(j, 2) ? s / 2 : 0);
+          for (const q of [-4.5, 0, 4.5]) dcSt(ctx, bx + 6.5 + q, j * h, 5, h, col, q * 0.04); } }
+    },
+    puff: (ctx, W, H, C) => {
+      DRAW.crochet.sc(ctx, W, H, C);
+      const s = 18, h = 20;
+      for (let j = -1; j * h < H + h; j++) for (let i = -1; i * s < W + s; i++) {
+        const cx = i * s + (md(j, 2) ? s / 2 : 0) + s / 2, cy = j * h + h / 2;
+        ctx.fillStyle = "rgba(0,0,0,.25)"; ctx.beginPath(); ctx.ellipse(cx + 1, cy + 2, 5.5, 8, 0, 0, Math.PI * 2); ctx.fill();
+        const g = ctx.createLinearGradient(cx - 6, 0, cx + 6, 0); g.addColorStop(0, css(C[0], 0.22)); g.addColorStop(1, css(C[0], -0.32));
+        ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(cx, cy, 5.5, 8, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = css(C[0], -0.4); ctx.lineWidth = 0.8;
+        for (const o of [-2.4, 2.4]) { ctx.beginPath(); ctx.moveTo(cx + o * 0.5, cy - 7); ctx.quadraticCurveTo(cx + o * 1.6, cy, cx + o * 0.5, cy + 7); ctx.stroke(); }
+      }
+    },
     moss: (ctx, W, H, C) => cgrid(W, H, CH, (i, j, px, py) => { if (md(i + j, 2)) scSt(ctx, px, py, CW, CH, C[0]); else chain(ctx, px + CW / 2, py + CH * 0.45, CW * 0.42, 0, mix(C[0], -0.1)); }),
     granny: (ctx, W, H, C) => {
       const T = 92, ox = (W - T * Math.ceil(W / T)) / 2, oy = (H - T * Math.ceil(H / T)) / 2;

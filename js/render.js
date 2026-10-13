@@ -116,6 +116,8 @@ function projectRows(g) {
   const later = rows.filter(r => !r.good.length).sort((a, b) => a.minNeed - b.minNeed);
   return { doable, later };
 }
+// 받은 원본 이미지(도안·사진) 크게 보기 버튼
+const srcBtn = (src, name) => src ? `<button type="button" class="src-btn" data-photo="${src}" data-photo-name="${esc(name)}" data-photo-kind="원본 이미지">원본 이미지 보기</button>` : "";
 function projRow(row, act) {
   const b = row.best, needs = row.good.map(i => i.x.need), lo = Math.min(...needs), hi = Math.max(...needs);
   const left = b.have - b.x.need, openP = state.openProj.has(row.pr.id);
@@ -126,7 +128,7 @@ function projRow(row, act) {
   return `<li class="prow">${thumb}
     <div class="hd"><span class="nm">${row.pr.name}</span>${ing ? `<span class="ing inline">뜨는 중</span>` : ""}<span class="sp"></span><span class="st-pill ${b.x.st}">${stLabel[b.x.st]}</span>${starBtn(k, row.pr.name, true)}</div>
     <span class="sub">${lo === hi ? lo : lo + "~" + hi}g ·${left >= 0 ? `${ro(b.p.name)} 뜨면 ${left}g 남아요` : `${ro(b.p.name)}도 ${-left}g 모자라요`}</span>
-    ${row.pr.how ? `<p class="howto">${row.pr.how}</p>` : ""}
+    ${row.pr.how ? `<p class="howto">${row.pr.how}</p>` : ""}${srcBtn(row.pr.orig, row.pr.name)}
     <button type="button" class="fold" data-tp="${row.pr.id}" aria-expanded="${openP}" aria-controls="mini-${row.pr.id}">
       <span class="stack" aria-hidden="true">${row.good.slice(0, 4).map(it => `<canvas data-sw="${it.p.id}"></canvas>`).join("")}</span>
       <span class="fl">어울리는 무늬 ${row.good.length}개</span>
@@ -198,7 +200,7 @@ function renderDetail() {
   if (r.skip || !r.doable.length) {
     $("pat-body").innerHTML = `${stageHTML(p, null, cols, rx)}
       <div class="size-line">${esc(r.skip || "지금 가진 실로는 가장 작은 작품도 뜨기엔 양이 적어요. 다른 실을 더 담으면 다시 계산해요.")}</div>
-      <p class="how">${p.how}</p>${startBtns}${recipeHTML(rx, cols)}`;
+      <p class="how">${p.how}</p>${srcBtn(p.src, p.name)}${startBtns}${recipeHTML(rx, cols)}`;
     requestAnimationFrame(() => paintAll($("pat-body"), g));
     return;
   }
@@ -219,7 +221,7 @@ function renderDetail() {
     ${cchips}
     <div class="size-line">쓸 수 있는 실 <b>${r.have}g</b>으로 이 무늬를 <b>약 ${z.side}cm × ${z.side}cm</b>만큼 뜰 수 있어요. 폭 20cm로 뜨면 길이 약 ${z.len}cm예요.</div>
     <div class="chips">${chips.map(c => `<span class="chip">${c}</span>`).join("")}</div>
-    <p class="how">${p.how}</p>
+    <p class="how">${p.how}</p>${srcBtn(p.src, p.name)}
     ${startBtns}
     <p class="sub-h">이 무늬로 뜰 수 있는 것</p>
     <ul class="pgrid3">${r.doable.map(x => {

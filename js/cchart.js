@@ -6,6 +6,12 @@
 const CGLYPH_EXTRA = {
   o3: `<ellipse cx="24" cy="10" rx="12" ry="6"/><ellipse cx="24" cy="28" rx="12" ry="6"/><ellipse cx="24" cy="46" rx="12" ry="6"/>`,
   fan7: [-48, -32, -16, 0, 16, 32, 48].map(a => `<g transform="rotate(${a} 24 52)">${tee(1)}</g>`).join(""),
+  o4: `<ellipse cx="24" cy="6" rx="11" ry="5"/><ellipse cx="24" cy="20" rx="11" ry="5"/><ellipse cx="24" cy="34" rx="11" ry="5"/><ellipse cx="24" cy="48" rx="11" ry="5"/>`,
+  blohdc: tee(0) + `<path d="M14 55H34"/>`,
+  blodc: tee(1) + `<path d="M14 55H34"/>`,
+  vst: `<g transform="rotate(-18 24 52)">${tee(1)}</g><g transform="rotate(18 24 52)">${tee(1)}</g><ellipse cx="24" cy="12" rx="5" ry="3"/>`,
+  dc3tog: `<path d="M8 52L24 10M24 52V10M40 52L24 10M16 10H32M10 34l10-3M19 32h10M28 31l10 3"/>`,
+  puff: `<path d="M24 52C10 40 12 10 24 8C36 10 38 40 24 52Z"/><path d="M24 50V12"/>`,
   fan4: [-24, -8, 8, 24].map(a => `<g transform="rotate(${a} 24 52)">${tee(1)}</g>`).join("")
 };
 const cg = k => GLYPH[k] || CGLYPH_EXTRA[k] || "";
@@ -14,6 +20,24 @@ const cg = k => GLYPH[k] || CGLYPH_EXTRA[k] || "";
 const CCHART = {
   sc: () => ({ C: 8, cw: 30, rows: [1, 2, 3, 4].map(i => ({ l: `${i}단`, it: Array.from({ length: 8 }, (_, c) => ["sc", c]) })) }),
   dc: () => ({ C: 8, cw: 30, rows: [1, 2, 3, 4].map(i => ({ l: `${i}단`, it: [["o3", 0], ...Array.from({ length: 7 }, (_, c) => ["dc", c + 1])] })) }),
+  hdc: () => ({ C: 8, cw: 30, rows: [1, 2, 3, 4].map(i => ({ l: `${i}단`, it: Array.from({ length: 8 }, (_, c) => ["hdc", c]) })) }),
+  tr: () => ({ C: 8, cw: 30, rows: [1, 2, 3].map(i => ({ l: `${i}단`, it: [["o4", 0], ...Array.from({ length: 7 }, (_, c) => ["tr", c + 1])] })) }),
+  blohdc: () => ({ C: 8, cw: 30, rows: [1, 2, 3, 4].map(i => ({ l: `${i}단`, it: Array.from({ length: 8 }, (_, c) => [i === 1 ? "hdc" : "blohdc", c]) })) }),
+  blodc: () => ({ C: 8, cw: 30, rows: [1, 2, 3, 4].map(i => ({ l: `${i}단`, it: [["o3", 0], ...Array.from({ length: 7 }, (_, c) => [i === 1 ? "dc" : "blodc", c + 1])] })) }),
+  vst: () => ({ C: 14, cw: 24, rows: [1, 2, 3, 4].map(i => ({ l: `${i}단`, it: [["dc", 0], ...[0, 1, 2, 3].map(k => ["vst", 1.5 + k * 3, 2]), ["dc", 13]] })) }),
+  cluster: () => {
+    const A = [["o3", 0], ...[0, 1, 2].map(k => ["dc3tog", 1 + k * 3, 3]), ["dc", 10]], B = Array.from({ length: 11 }, (_, c) => ["sc", c]);
+    return { C: 11, cw: 26, rows: [B, A, B, A].map((it, i) => ({ l: `${i + 1}단`, it })) };
+  },
+  grannyst: (cols) => {
+    const n = Math.max(1, Math.min(4, cols.length));
+    const A = [["cl3", 0, 2], ...[0, 1, 2].map(k => ["cl3", 3 + k * 3, 2]), ["dc", 12]], B = [["dc", 0], ...[0, 1, 2, 3].map(k => ["cl3", 1.5 + k * 3, 2]), ["dc", 13]];
+    return { C: 14, cw: 24, rows: [A, B, A, B].map((it, i) => ({ l: `${i + 1}단`, bg: n > 1 ? i % n : null, it })) };
+  },
+  puff: () => {
+    const P = [["sc", 0], ...[0, 1, 2, 3, 4].map(k => ["puff", 1 + k * 2]), ...[0, 1, 2, 3, 4].map(k => ["ch", 2 + k * 2]), ["sc", 11]], S = Array.from({ length: 12 }, (_, c) => ["sc", c]);
+    return { C: 12, cw: 26, rows: [S, P, S, P].map((it, i) => ({ l: `${i + 1}단`, it })) };
+  },
   moss: () => ({ C: 9, cw: 30, rows: [1, 2, 3, 4].map(i => ({ l: `${i}단`, it: Array.from({ length: 9 }, (_, c) => [(c + i) % 2 ? "ch" : "sc", c]) })) }),
   stripe: (cols) => {
     const n = Math.max(1, Math.min(4, cols.length)), s = []; for (let c = 0; c < n; c++) s.push(c, c);

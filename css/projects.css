@@ -31,3 +31,5 @@
 .lightbox img { width: 100%; max-height: 78vh; object-fit: contain; border-radius: 14px; display: block; }
 .lightbox figcaption { margin-top: 8px; color: var(--ink); font-size: 14px; text-align: center; }
 .lightbox figcaption span { color: var(--muted); font-size: 12px; margin-left: 6px; }
+.src-btn { display: inline-flex; align-items: center; gap: 6px; margin: 2px 0 8px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--accent); font-size: 13px; font-weight: 600; cursor: pointer; }
+.src-btn::before { content: "🖼"; font-size: 13px; }
