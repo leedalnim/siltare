@@ -81,7 +81,8 @@
 .pc3.tight { border-top-color: var(--tight); } .pc3.tight .st { color: var(--tight); }
 .pc3.risk { border-top-color: var(--risk); } .pc3.risk .st { color: var(--risk); }
 .filet-tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.filet-tools .seg { flex: 1; min-width: 200px; }
+.filet-tools .seg { flex: 1; min-width: 200px; display: flex; }
+.filet-tools .seg button { flex: 1; }
 .filet-tools .ghost-btn { padding: 7px 12px; font-size: 13px; }
 .filet-now { background: var(--surface-2); border: 1px solid var(--accent); border-radius: 12px; padding: 8px 10px; font-size: 13.5px; line-height: 1.5; }
 .filet-now b { color: var(--accent); margin-right: 4px; }
