@@ -121,7 +121,7 @@ function projRow(row, act) {
   const left = b.have - b.x.need, openP = state.openProj.has(row.pr.id);
   const k = starKey("j", row.pr.id), ing = act.has(k);
   const thumb = row.pr.photo
-    ? `<button type="button" class="thumb photo" data-photo="${row.pr.photo}" data-photo-name="${esc(row.pr.name)}" aria-label="${row.pr.name} 참고 사진 크게 보기"><img src="${row.pr.photo}" alt="" loading="lazy"></button>`
+    ? `<button type="button" class="thumb photo" data-photo="${row.pr.photo}" data-photo-name="${esc(row.pr.name)}" data-photo-kind="${row.pr.photoKind || "참고 사진"}" aria-label="${row.pr.name} ${row.pr.photoKind || "참고 사진"} 크게 보기"><img src="${row.pr.photo}" alt="" loading="lazy"></button>`
     : `<button type="button" class="thumb" data-p="${b.p.id}" data-pv="${row.pr.id}" aria-label="${row.pr.name} 완성 미리보기"><canvas data-sw="${b.p.id}" data-prod="${row.pr.id}"></canvas></button>`;
   return `<li class="prow">${thumb}
     <div class="hd"><span class="nm">${row.pr.name}</span>${ing ? `<span class="ing inline">뜨는 중</span>` : ""}<span class="sp"></span><span class="st-pill ${b.x.st}">${stLabel[b.x.st]}</span>${starBtn(k, row.pr.name, true)}</div>
@@ -237,7 +237,7 @@ document.addEventListener("click", e => {
   const ph = e.target.closest("[data-photo]");
   if (ph) {
     const box = document.createElement("div"); box.className = "lightbox"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "참고 사진");
-    box.innerHTML = `<figure><img src="${ph.dataset.photo}" alt="${ph.dataset.photoName} 참고 사진"><figcaption>${ph.dataset.photoName} · 참고 사진 <span>눌러서 닫기</span></figcaption></figure>`;
+    box.innerHTML = `<figure><img src="${ph.dataset.photo}" alt="${ph.dataset.photoName} ${ph.dataset.photoKind || "참고 사진"}"><figcaption>${ph.dataset.photoName} · ${ph.dataset.photoKind || "참고 사진"} <span>눌러서 닫기</span></figcaption></figure>`;
     document.body.appendChild(box); return;
   }
   const lb = e.target.closest(".lightbox"); if (lb) lb.remove();

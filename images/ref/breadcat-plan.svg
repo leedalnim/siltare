@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 560" font-family="Pretendard, 'Noto Sans KR', system-ui, sans-serif">
+  <rect width="940" height="560" fill="#F6F2EA"/>
+  <g font-size="19" font-weight="700" fill="#3A3346" text-anchor="middle">
+    <text x="350" y="50">본체 안쪽</text><text x="580" y="50">본체 바깥쪽</text><text x="805" y="50">바깥 주머니</text><text x="125" y="430">안주머니</text>
+  </g>
+  <g fill="#FFFFFF" stroke="#8E8698" stroke-width="2">
+    <rect x="245" y="70" width="210" height="340" rx="4"/>
+    <rect x="475" y="70" width="210" height="167" rx="4"/>
+    <rect x="475" y="243" width="210" height="167" rx="4"/>
+    <rect x="700" y="70" width="210" height="115" rx="4"/>
+    <rect x="20" y="295" width="210" height="115" rx="4"/>
+  </g>
+  <line x1="245" y1="240" x2="455" y2="240" stroke="#8E8698" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="350" y="232" font-size="13" fill="#6F6A7E" text-anchor="middle">접는 선</text>
+  <g fill="#B0302A"><circle cx="262" cy="88" r="8"/><circle cx="438" cy="88" r="8"/><circle cx="37" cy="393" r="8"/><circle cx="213" cy="393" r="8"/></g>
+  <g fill="#1D1A24"><circle cx="492" cy="220" r="8"/><circle cx="668" cy="220" r="8"/><circle cx="492" cy="260" r="8"/><circle cx="668" cy="260" r="8"/></g>
+  <!-- 고양이 무늬 자리 -->
+  <g transform="translate(580 330)">
+    <path d="M-52 34 V-14 Q-52 -30 -36 -30 L-30 -46 L-18 -30 H10 L22 -46 L30 -30 Q48 -30 48 -14 V34 Z" fill="#D9A866" stroke="#8C5A2B" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M-52 34 V8 Q-34 -2 -18 14 Q-8 26 -4 34 Z" fill="#FFFFFF" stroke="#8C5A2B" stroke-width="2"/>
+    <path d="M48 -10 Q68 -14 70 -34" fill="none" stroke="#8C5A2B" stroke-width="5" stroke-linecap="round"/>
+    <text y="58" font-size="14" fill="#6F6A7E" text-anchor="middle">고양이 무늬 자리</text>
+  </g>
+  <g font-size="15" fill="#3A3346">
+    <circle cx="30" cy="470" r="8" fill="#B0302A"/><text x="46" y="475">빨간 점: 똑딱이 한 쌍 — 본체 안쪽 위 모서리 ↔ 안주머니 아래 모서리</text>
+    <circle cx="30" cy="500" r="8" fill="#1D1A24"/><text x="46" y="505">검은 점: 똑딱이 한 쌍 — 본체 바깥쪽 가운데(접는 자리) 양쪽</text>
+    <line x1="20" y1="530" x2="42" y2="530" stroke="#8E8698" stroke-width="2" stroke-dasharray="6 4"/><text x="50" y="535">점선: 접는 선 · 받은 구성도를 그대로 옮겨 그렸어요 (크기 비율은 그림 기준)</text>
+  </g>
+</svg>
