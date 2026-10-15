@@ -17,7 +17,7 @@ try {
     if (["basket", "patterns", "projects", "counter", "guide"].includes(saved.tab)) state.tab = saved.tab;
     state.stars = saved.stars && typeof saved.stars === "object" ? saved.stars : {};
     state.sessions = Array.isArray(saved.sessions) ? saved.sessions : [];
-    state.sess = saved.sess || null; state.mode = ["all", "mine"].includes(saved.mode) ? saved.mode : "rec"; state.cat = saved.cat || "all";
+    state.sess = saved.sess || null; state.mode = ["all", "mine", "star"].includes(saved.mode) ? saved.mode : "rec"; state.cat = saved.cat || "all";
     state.wake = !!saved.wake; state.updatedAt = saved.updatedAt || 0;
   }
 } catch (e) {}

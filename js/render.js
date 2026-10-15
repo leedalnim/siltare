@@ -21,7 +21,7 @@ function activeSet() { const s = new Set(); state.sessions.forEach(x => { s.add(
 const pinRank = (k, act) => act.has(k) ? 0 : isStar(k) ? 1 : 2;
 function pinSort(arr, keyOf, act) { return arr.map((x, i) => [x, i]).sort((a, b) => pinRank(keyOf(a[0]), act) - pinRank(keyOf(b[0]), act) || a[1] - b[1]).map(x => x[0]); }
 const STAR_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9z"/></svg>`;
-const starBtn = (k, name, inline) => `<button type="button" class="star${inline ? " inline" : ""}" data-star="${k}" aria-pressed="${isStar(k)}" aria-label="${esc(name)} ${isStar(k) ? "별표 빼기" : "별표하기"}">${STAR_SVG}</button>`;
+const starBtn = (k, name, inline) => `<button type="button" class="star${inline ? " inline" : ""}" data-star="${k}" aria-pressed="${isStar(k)}" aria-label="${esc(name)} ${isStar(k) ? "즐겨찾기 빼기" : "즐겨찾기"}">${STAR_SVG}</button>`;
 
 function colsFor(p, r, g) {
   const ys = r.ys || g.yarns, by = {};
@@ -77,13 +77,18 @@ function patCard(p, r, g, act) {
 
 function renderPatterns() {
   const { gs, g } = currentGroup();
-  const G = g || PH, A = analyse(G), act = activeSet(), mode = ["all", "mine"].includes(state.mode) ? state.mode : "rec";
+  const G = g || PH, A = analyse(G), act = activeSet(), mode = ["all", "mine", "star"].includes(state.mode) ? state.mode : "rec";
   let html = `<div class="view-title"><h2 id="h-patterns">무늬</h2><span class="meta">${craftName()} 기준</span></div>`;
   if (g) html += groupBar(gs, g);
-  html += `<div class="seg2" role="group" aria-label="무늬 보기"><button type="button" data-mode="rec" aria-pressed="${mode === "rec"}">추천 무늬<span class="n">${g ? A.ok.length : 0}</span></button><button type="button" data-mode="all" aria-pressed="${mode === "all"}">전체 무늬<span class="n">${A.pats.length}</span></button><button type="button" data-mode="mine" aria-pressed="${mode === "mine"}">내 도안<span class="n">${myPats.length}</span></button></div>`;
+  html += `<div class="seg2" role="group" aria-label="무늬 보기"><button type="button" data-mode="rec" aria-pressed="${mode === "rec"}">추천 무늬<span class="n">${g ? A.ok.length : 0}</span></button><button type="button" data-mode="all" aria-pressed="${mode === "all"}">전체 무늬<span class="n">${A.pats.length}</span></button><button type="button" data-mode="mine" aria-pressed="${mode === "mine"}">내 도안<span class="n">${myPats.length}</span></button><button type="button" data-mode="star" aria-pressed="${mode === "star"}" aria-label="즐겨찾기">★<span class="n">${A.pats.filter(x => isStar(starKey("p", x.p.id))).length}</span></button></div>`;
   if (mode === "mine") { $("v-patterns").innerHTML = html + myListHTML(); return; }
   const keyOf = x => starKey("p", x.p.id);
-  if (mode === "rec") {
+  if (mode === "star") {
+    const st = A.pats.filter(x => isStar(keyOf(x))).sort((a, b) => state.stars[keyOf(b)] - state.stars[keyOf(a)]);
+    html += st.length ? `<div class="pgrid">${st.map(({ p, r }) => patCard(p, r, G, act)).join("")}</div>` : `<div class="empty">즐겨찾기한 무늬가 없어요. 무늬나 작품의 ☆를 누르면 여기에 모여요.</div>`;
+    const nj = PROJECTS[state.craft].filter(pr => isStar(starKey("j", pr.id))).length;
+    if (nj) html += `<p class="note">즐겨찾기한 작품 ${nj}개는 작품 탭의 ★ 즐겨찾기에서 볼 수 있어요.</p>`;
+  } else if (mode === "rec") {
     if (!g) html += emptyBox("실을 담으면 뜰 수 있는 무늬를 골라 드려요. 실 없이 둘러보려면 '전체 무늬'를 눌러 보세요.");
     else {
       if (A.best) {
@@ -124,7 +129,7 @@ function laterRow(row) {
   const b = row.best, pr = row.pr;
   const thumb = pr.photo ? `<button type="button" class="thumb photo" data-photo="${pr.photo}" data-photo-name="${esc(pr.name)}" data-photo-kind="${pr.photoKind || "참고 사진"}" aria-label="${pr.name} 사진 크게 보기"><img src="${pr.photo}" alt="" loading="lazy"></button>`
     : `<button type="button" class="thumb" data-p="${b.p.id}" data-pv="${pr.id}" aria-label="${pr.name} 무늬 보기"><canvas data-sw="${b.p.id}"></canvas></button>`;
-  return `<li class="prow later">${thumb}<div class="hd"><span class="nm">${pr.name}</span><span class="sp"></span><span class="st-pill no">실 부족</span></div>
+  return `<li class="prow later">${thumb}<div class="hd"><span class="nm">${pr.name}</span><span class="sp"></span><span class="st-pill no">실 부족</span>${starBtn(starKey("j", pr.id), pr.name, true)}</div>
     <span class="sub">최소 ${row.minNeed}g · 지금 ${b.have}g (${row.minNeed - b.have}g 더 필요)</span>
     ${pr.how ? `<p class="howto">${pr.how}</p>` : ""}${refBtns(pr)}<button type="button" class="src-btn go" data-p="${b.p.id}" data-pv="${pr.id}">${b.p.name} 무늬 보기 · 단수 세기</button></li>`;
 }
@@ -134,7 +139,7 @@ function otherRow(pr) {
   const ws = WKEYS.filter(w => pr.g[WKEYS.indexOf(w)] != null && pats.some(q => q.w.includes(w)));
   const thumb = pr.photo ? `<button type="button" class="thumb photo" data-photo="${pr.photo}" data-photo-name="${esc(pr.name)}" data-photo-kind="${pr.photoKind || "참고 사진"}" aria-label="${pr.name} 사진 크게 보기"><img src="${pr.photo}" alt="" loading="lazy"></button>`
     : `<button type="button" class="thumb" data-p="${p.id}" data-pv="${pr.id}" aria-label="${pr.name} 무늬 보기"><canvas data-sw="${p.id}"></canvas></button>`;
-  return `<li class="prow later">${thumb}<div class="hd"><span class="nm">${pr.name}</span></div>
+  return `<li class="prow later">${thumb}<div class="hd"><span class="nm">${pr.name}</span><span class="sp"></span>${starBtn(starKey("j", pr.id), pr.name, true)}</div>
     <span class="sub">${ws.map(w => WEIGHTS[w].name).join(" · ")}로 떠요 · ${ws.map(w => `${WEIGHTS[w].name} ${pr.g[WKEYS.indexOf(w)]}g`).join(" / ")}</span>
     ${pr.how ? `<p class="howto">${pr.how}</p>` : ""}${refBtns(pr)}<button type="button" class="src-btn go" data-p="${p.id}" data-pv="${pr.id}">${p.name} 무늬 보기 · 단수 세기</button></li>`;
 }
@@ -163,10 +168,18 @@ function renderProjects() {
   if (!g) { $("v-projects").innerHTML = html + emptyBox("실을 담으면 만들 수 있는 작품이 나와요."); return; }
   const { doable, later } = projectRows(g), act = activeSet();
   const counts = {}; doable.forEach(r => { counts[r.cat] = (counts[r.cat] || 0) + 1; });
-  if (state.cat !== "all" && !counts[state.cat]) state.cat = "all";
+  const seen = new Set([...doable, ...later].map(r => r.pr.id));
+  const other = PROJECTS[state.craft].filter(pr => !seen.has(pr.id) && PATTERNS[state.craft].some(p => pr.tags.some(t => p.suits.includes(t)) && WKEYS.some((w, i) => pr.g[i] != null && p.w.includes(w))));
+  const starJ = r => isStar(starKey("j", r.id || r.pr.id)), nStar = doable.filter(starJ).length + later.filter(starJ).length + other.filter(starJ).length;
+  if (state.cat === "star" && !nStar) state.cat = "all";
+  if (state.cat !== "all" && state.cat !== "star" && !counts[state.cat]) state.cat = "all";
   html += groupBar(gs, g);
   html += `<div class="chiprow cats" role="group" aria-label="작품 종류">${CATS.filter(([k]) => k === "all" || counts[k]).map(([k, nm]) =>
-    `<button type="button" class="gchip" data-cat="${k}" aria-pressed="${state.cat === k}">${nm}<span class="n">${k === "all" ? doable.length : counts[k]}</span></button>`).join("")}</div>`;
+    `<button type="button" class="gchip" data-cat="${k}" aria-pressed="${state.cat === k}">${nm}<span class="n">${k === "all" ? doable.length : counts[k]}</span></button>`).join("")}${nStar ? `<button type="button" class="gchip" data-cat="star" aria-pressed="${state.cat === "star"}">★ 즐겨찾기<span class="n">${nStar}</span></button>` : ""}</div>`;
+  if (state.cat === "star") {   // 즐겨찾기: 지금 실로 뜰 수 있는지와 상관없이 모두
+    html += `<ul class="plist">${[...doable.filter(starJ).map(r => projRow(r, act)), ...later.filter(starJ).map(laterRow), ...other.filter(starJ).map(otherRow)].join("")}</ul>`;
+    $("v-projects").innerHTML = html; requestAnimationFrame(() => paintAll($("v-projects"), g)); return;
+  }
   const shown = pinSort(doable.filter(r => state.cat === "all" || r.cat === state.cat), r => starKey("j", r.pr.id), act);
   const sure = shown.filter(r => r.best.x.st !== "risk" || act.has(starKey("j", r.pr.id)) || isStar(starKey("j", r.pr.id)));
   const maybe = shown.filter(r => !sure.includes(r));
@@ -175,8 +188,6 @@ function renderProjects() {
   if (maybe.length) html += `<details class="skipped"${state.openMaybe ? " open" : ""} data-maybe><summary>작게 뜨면 될 수도 있는 것 ${maybe.length}개</summary><ul class="plist">${maybe.map(r => projRow(r, act)).join("")}</ul></details>`;
   const laterF = later.filter(r => state.cat === "all" || r.cat === state.cat);
   if (laterF.length) html += `<details class="skipped"><summary>실이 더 있으면 뜰 수 있는 것 ${laterF.length}개</summary><ul class="plist">${laterF.map(laterRow).join("")}</ul></details>`;
-  const seen = new Set([...doable, ...later].map(r => r.pr.id));
-  const other = PROJECTS[state.craft].filter(pr => !seen.has(pr.id) && PATTERNS[state.craft].some(p => pr.tags.some(t => p.suits.includes(t)) && WKEYS.some((w, i) => pr.g[i] != null && p.w.includes(w))));
   const otherF = other.filter(pr => state.cat === "all" || (CAT_OF[pr.id] || "small") === state.cat);
   if (otherF.length) html += `<details class="skipped"><summary>다른 굵기 실로 뜨는 것 ${otherF.length}개</summary><ul class="plist">${otherF.map(otherRow).join("")}</ul></details>`;
   $("v-projects").innerHTML = html;

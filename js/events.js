@@ -9,7 +9,7 @@ document.addEventListener("click", e => {
   if (d.star) {
     if (state.stars[d.star]) delete state.stars[d.star]; else state.stars[d.star] = Date.now();
     const on = !!state.stars[d.star];
-    save(); render(); toast(on ? "별표했어요. 목록 맨 위에 보여요" : "별표를 뺐어요"); return;
+    save(); render(); toast(on ? "즐겨찾기에 넣었어요. ★ 즐겨찾기에서 모아 볼 수 있어요" : "즐겨찾기에서 뺐어요"); return;
   }
   if (d.cv) { ctrUI.view = d.cv; renderCounter(); return; }
   if (d.mode) { state.mode = d.mode; saveLocal(); renderPatterns(); return; }
