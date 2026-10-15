@@ -169,7 +169,7 @@ function radialRound(pid, row) {
 }
 
 // 무늬 상세 '기호 도안' 보기. 그릴 수 있는 도안이 없으면 null.
-// 필레 담요: 받은 모눈 도안을 칸 단위로 옮긴 도트 도안 + 원본 이미지
+// 필레 커튼: 받은 모눈 도안을 칸 단위로 옮긴 도트 도안 + 원본 이미지
 // grid는 위쪽 줄부터. # 채운 칸 · . 빈 칸 · v 레이스(2칸) · = 넓은 빈 칸(2칸)
 // (원본 이미지에서 칸 위치를 맞춰 읽고, 겹쳐 그려 진한 칸 1,240개가 모두 맞는지 확인했어요)
 const FILETCAT = { src: "images/ref/catfiletblanket.png", x0: 33.33, x1: 326.36, y0: 22.92, y1: 450.0, cols: 55, rows: 82,
@@ -294,7 +294,7 @@ function filetDotSVG(cur) {
     }
   }
   for (let k = 1; k <= F.rows; k++) if (k === 1 || k % 5 === 0) s += `<text x="${L - 3}" y="${yTop(k) + cs - 2}" font-size="7.5" text-anchor="end" fill="${cur >= 0 && k <= cur ? "#1F8A5A" : "#6F6A7E"}">${k}</text>`;
-  return `<svg class="filet-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="고양이 필레 담요 도트 도안 ${F.cols}칸 × ${F.rows}단">${s}</svg>`;
+  return `<svg class="filet-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="고양이 필레 커튼 도트 도안 ${F.cols}칸 × ${F.rows}단">${s}</svg>`;
 }
 function filetImgSVG(cur) {
   const F = FILETCAT, ph = (F.y1 - F.y0) / F.rows, yOf = k => F.y1 - k * ph;
@@ -307,7 +307,7 @@ function filetImgSVG(cur) {
     }
   }
   for (let k = 5; k <= F.rows; k += 5) ov += `<text x="${F.x0 - 3}" y="${yOf(k) + ph * .8}" font-size="5.5" text-anchor="end" fill="#6F6A7E">${k}</text>`;
-  return `<svg class="filet-svg" viewBox="14 14 340 445" role="img" aria-label="고양이 필레 담요 원본 모눈 도안"><image href="${F.src}" x="0" y="0" width="367" height="617"/>${ov}</svg>`;
+  return `<svg class="filet-svg" viewBox="14 14 340 445" role="img" aria-label="고양이 필레 커튼 원본 모눈 도안"><image href="${F.src}" x="0" y="0" width="367" height="617"/>${ov}</svg>`;
 }
 function filetChartHTML(hiRow) {
   const F = FILETCAT, cur = hiRow >= 0 ? Math.min(hiRow, F.rows) : -1, dot = filetUI.v !== "img";
