@@ -118,6 +118,26 @@ function projectRows(g) {
 }
 // 받은 원본 이미지(도안·사진) 크게 보기 버튼
 const srcBtn = (src, name) => src ? `<button type="button" class="src-btn" data-photo="${src}" data-photo-name="${esc(name)}" data-photo-kind="원본 이미지">원본 이미지 보기</button>` : "";
+const refBtns = pr => srcBtn(pr.orig, pr.name) + (pr.refs || []).map(([src, kind]) => `<button type="button" class="src-btn" data-photo="${src}" data-photo-name="${esc(pr.name)}" data-photo-kind="${kind}">${kind} 보기</button>`).join("");
+// 실이 모자란 작품도 사진·설명·무늬까지 볼 수 있게 (단수 세기는 무늬에서 시작)
+function laterRow(row) {
+  const b = row.best, pr = row.pr;
+  const thumb = pr.photo ? `<button type="button" class="thumb photo" data-photo="${pr.photo}" data-photo-name="${esc(pr.name)}" data-photo-kind="${pr.photoKind || "참고 사진"}" aria-label="${pr.name} 사진 크게 보기"><img src="${pr.photo}" alt="" loading="lazy"></button>`
+    : `<button type="button" class="thumb" data-p="${b.p.id}" data-pv="${pr.id}" aria-label="${pr.name} 무늬 보기"><canvas data-sw="${b.p.id}"></canvas></button>`;
+  return `<li class="prow later">${thumb}<div class="hd"><span class="nm">${pr.name}</span><span class="sp"></span><span class="st-pill no">실 부족</span></div>
+    <span class="sub">최소 ${row.minNeed}g · 지금 ${b.have}g (${row.minNeed - b.have}g 더 필요)</span>
+    ${pr.how ? `<p class="howto">${pr.how}</p>` : ""}${refBtns(pr)}<button type="button" class="src-btn go" data-p="${b.p.id}" data-pv="${pr.id}">${b.p.name} 무늬 보기 · 단수 세기</button></li>`;
+}
+// 지금 고른 실 굵기로는 맞는 무늬가 없는 작품 (예: 가는 실 전용 필레 커튼)
+function otherRow(pr) {
+  const pats = PATTERNS[state.craft].filter(p => pr.tags.some(t => p.suits.includes(t))), p = pats[0];
+  const ws = WKEYS.filter(w => pr.g[WKEYS.indexOf(w)] != null && pats.some(q => q.w.includes(w)));
+  const thumb = pr.photo ? `<button type="button" class="thumb photo" data-photo="${pr.photo}" data-photo-name="${esc(pr.name)}" data-photo-kind="${pr.photoKind || "참고 사진"}" aria-label="${pr.name} 사진 크게 보기"><img src="${pr.photo}" alt="" loading="lazy"></button>`
+    : `<button type="button" class="thumb" data-p="${p.id}" data-pv="${pr.id}" aria-label="${pr.name} 무늬 보기"><canvas data-sw="${p.id}"></canvas></button>`;
+  return `<li class="prow later">${thumb}<div class="hd"><span class="nm">${pr.name}</span></div>
+    <span class="sub">${ws.map(w => WEIGHTS[w].name).join(" · ")}로 떠요 · ${ws.map(w => `${WEIGHTS[w].name} ${pr.g[WKEYS.indexOf(w)]}g`).join(" / ")}</span>
+    ${pr.how ? `<p class="howto">${pr.how}</p>` : ""}${refBtns(pr)}<button type="button" class="src-btn go" data-p="${p.id}" data-pv="${pr.id}">${p.name} 무늬 보기 · 단수 세기</button></li>`;
+}
 function projRow(row, act) {
   const b = row.best, needs = row.good.map(i => i.x.need), lo = Math.min(...needs), hi = Math.max(...needs);
   const left = b.have - b.x.need, openP = state.openProj.has(row.pr.id);
@@ -128,7 +148,7 @@ function projRow(row, act) {
   return `<li class="prow">${thumb}
     <div class="hd"><span class="nm">${row.pr.name}</span>${ing ? `<span class="ing inline">뜨는 중</span>` : ""}<span class="sp"></span><span class="st-pill ${b.x.st}">${stLabel[b.x.st]}</span>${starBtn(k, row.pr.name, true)}</div>
     <span class="sub">${lo === hi ? lo : lo + "~" + hi}g ·${left >= 0 ? `${ro(b.p.name)} 뜨면 ${left}g 남아요` : `${ro(b.p.name)}도 ${-left}g 모자라요`}</span>
-    ${row.pr.how ? `<p class="howto">${row.pr.how}</p>` : ""}${srcBtn(row.pr.orig, row.pr.name)}${(row.pr.refs || []).map(([src, kind]) => `<button type="button" class="src-btn" data-photo="${src}" data-photo-name="${esc(row.pr.name)}" data-photo-kind="${kind}">${kind} 보기</button>`).join("")}
+    ${row.pr.how ? `<p class="howto">${row.pr.how}</p>` : ""}${refBtns(row.pr)}
     <button type="button" class="fold" data-tp="${row.pr.id}" aria-expanded="${openP}" aria-controls="mini-${row.pr.id}">
       <span class="stack" aria-hidden="true">${row.good.slice(0, 4).map(it => `<canvas data-sw="${it.p.id}"></canvas>`).join("")}</span>
       <span class="fl">어울리는 무늬 ${row.good.length}개</span>
@@ -154,7 +174,11 @@ function renderProjects() {
   else html += `<div class="empty">이 종류에서 지금 실로 넉넉히 뜰 수 있는 작품은 없어요.</div>`;
   if (maybe.length) html += `<details class="skipped"${state.openMaybe ? " open" : ""} data-maybe><summary>작게 뜨면 될 수도 있는 것 ${maybe.length}개</summary><ul class="plist">${maybe.map(r => projRow(r, act)).join("")}</ul></details>`;
   const laterF = later.filter(r => state.cat === "all" || r.cat === state.cat);
-  if (laterF.length) html += `<details class="skipped"><summary>실이 더 있으면 뜰 수 있는 것 ${laterF.length}개</summary><ul>${laterF.map(r => `<li><b>${r.pr.name}</b>: 최소 ${r.minNeed}g</li>`).join("")}</ul></details>`;
+  if (laterF.length) html += `<details class="skipped"><summary>실이 더 있으면 뜰 수 있는 것 ${laterF.length}개</summary><ul class="plist">${laterF.map(laterRow).join("")}</ul></details>`;
+  const seen = new Set([...doable, ...later].map(r => r.pr.id));
+  const other = PROJECTS[state.craft].filter(pr => !seen.has(pr.id) && PATTERNS[state.craft].some(p => pr.tags.some(t => p.suits.includes(t)) && WKEYS.some((w, i) => pr.g[i] != null && p.w.includes(w))));
+  const otherF = other.filter(pr => state.cat === "all" || (CAT_OF[pr.id] || "small") === state.cat);
+  if (otherF.length) html += `<details class="skipped"><summary>다른 굵기 실로 뜨는 것 ${otherF.length}개</summary><ul class="plist">${otherF.map(otherRow).join("")}</ul></details>`;
   $("v-projects").innerHTML = html;
   requestAnimationFrame(() => paintAll($("v-projects"), g));
 }
