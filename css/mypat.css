@@ -3,9 +3,9 @@
 .my-note { margin: 4px 0 12px; }
 .my-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .my-card { display: flex; gap: 12px; width: 100%; padding: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); text-align: left; align-items: center; }
-.my-th { position: relative; flex: none; width: 64px; height: 64px; border-radius: 10px; background: #f3efe6; overflow: hidden; display: grid; place-items: center; }
+.my-th { position: relative; flex: none; width: 64px; height: 64px; border-radius: 10px; background: var(--chart-bg); overflow: hidden; display: grid; place-items: center; }
 .my-th img { width: 100%; height: 100%; object-fit: cover; }
-.my-th i { position: absolute; right: 3px; bottom: 3px; font-style: normal; font-size: 11px; background: rgba(23,20,31,.8); color: var(--ink); border-radius: 6px; padding: 0 5px; }
+.my-th i { position: absolute; right: 3px; bottom: 3px; font-style: normal; font-size: 11px; background: var(--overlay); color: var(--overlay-ink); border-radius: 6px; padding: 0 5px; }
 .my-pdf { font-family: var(--font-mono); font-weight: 700; color: #b3402a; font-size: 14px; }
 .my-pdf.big { font-size: 28px; }
 .my-tx { display: grid; gap: 3px; min-width: 0; flex: 1; }
@@ -23,7 +23,7 @@
 .my-craft button { flex: 1; }
 .sheet-panel.tall { max-height: 94vh; }
 .my-viewer { display: grid; gap: 8px; }
-.my-scroll { overflow: auto; max-height: 56vh; background: #f3efe6; border-radius: var(--radius); -webkit-overflow-scrolling: touch; }
+.my-scroll { overflow: auto; max-height: 56vh; background: var(--chart-bg); border-radius: var(--radius); -webkit-overflow-scrolling: touch; }
 .my-stage { position: relative; min-width: 100%; }
 .my-stage img { display: block; width: 100%; height: auto; user-select: none; -webkit-user-select: none; }
 .my-band { position: absolute; left: 0; right: 0; border-top: 2px solid var(--accent); border-bottom: 2px solid var(--accent); box-shadow: 0 0 0 100vmax rgba(23, 20, 31, .62); touch-action: none; cursor: grab; }
@@ -67,7 +67,7 @@
 .dot-tools button { height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-weight: 600; font-size: 13.5px; }
 .dot-tools button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .dot-tools button:disabled { opacity: .4; }
-.dot-wrap { overflow: auto; background: #f3efe6; border-radius: var(--radius); padding: 8px; max-height: 60vh; }
+.dot-wrap { overflow: auto; background: var(--chart-bg); border-radius: var(--radius); padding: 8px; max-height: 60vh; }
 .dot-wrap canvas { display: block; touch-action: none; margin: 0 auto; }
 .dot-wrap.view canvas { touch-action: auto; }
 .dot-now { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; margin-top: 10px; display: grid; gap: 8px; }

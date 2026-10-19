@@ -36,7 +36,7 @@ const strandFor = x => x.doubled
   ? `<span class="gstrand" aria-hidden="true"><i style="height:${WEIGHTS.thin.line}px"></i><i style="height:${WEIGHTS.thin.line}px"></i></span>`
   : `<span class="gstrand" aria-hidden="true"><i style="height:${WEIGHTS[x.w].line}px"></i></span>`;
 function groupBar(gs, g) {
-  return `<div class="chiprow" role="group" aria-label="어떤 실로 뜰까요">${gs.map(x =>
+  return `<div class="chiprow gbar" role="group" aria-label="어떤 실로 뜰까요">${gs.map(x =>
     `<button type="button" class="gchip" id="g-${x.key}" data-g="${x.key}" aria-pressed="${x.key === g.key}">${strandFor(x)}${x.title}<span class="n">${sum(x.yarns)}g</span></button>`).join("")}</div>`;
 }
 const emptyBox = msg => `<div class="empty">${msg}<button type="button" class="primary" data-open-add>+ 실 담기</button></div>`;

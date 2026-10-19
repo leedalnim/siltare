@@ -9,7 +9,7 @@
 .pcard .mt { display: flex; justify-content: space-between; gap: 6px; align-items: center; padding-inline: 4px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
 .pcard.off .pmain > *:not(.mt) { opacity: .55; }
 .pcard.off canvas { filter: grayscale(.7); }
-.star { position: absolute; top: 10px; right: 10px; width: 34px; height: 34px; border-radius: 50%; border: 0; background: rgba(20,16,32,.45); color: #fff; display: grid; place-items: center; padding: 0; }
+.star { position: absolute; top: 10px; right: 10px; width: 34px; height: 34px; border-radius: 50%; border: 0; background: var(--overlay); color: var(--overlay-ink); box-shadow: 0 1px 3px rgba(0,0,0,.08); display: grid; place-items: center; padding: 0; }
 .star svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
 .star[aria-pressed="true"] { color: #F4B942; }
 .star[aria-pressed="true"] svg { fill: currentColor; }
@@ -58,11 +58,11 @@
 .dv-seg button { flex: 1; }
 .stage canvas.big.swbig { aspect-ratio: 4 / 3; }
 .zoomer { position: absolute; right: 10px; bottom: 10px; display: flex; gap: 6px; }
-.zoomer button { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: rgba(23, 20, 31, .8); color: var(--ink); font-size: 20px; line-height: 1; }
+.zoomer button { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: var(--overlay); color: var(--overlay-ink); font-size: 20px; line-height: 1; }
 .kchart, .cchart { display: grid; gap: 6px; margin-bottom: 4px; }
 .chart-scroll { overflow-x: auto; padding-bottom: 4px; }
 .kchart .chart { --cell: 30px; }
-.cchart-card { background: #f3efe6; color: #1d1a24; border-radius: var(--radius); padding: 8px; }
+.cchart-card { background: var(--chart-bg); color: #1d1a24; border-radius: var(--radius); padding: 8px; }
 .cchart-card.scroll { overflow-x: auto; }
 .cchart-svg { width: 100%; height: auto; display: block; min-width: 300px; }
 .cchart-svg.radial { max-width: 340px; margin: 0 auto; }

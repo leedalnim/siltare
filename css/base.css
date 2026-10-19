@@ -2,27 +2,55 @@
 body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 
 /* Layout: phone-style app column; sticky top bar with knit band, three views switched by a fixed bottom tab bar, bottom sheets for adding yarn and pattern detail. */
-/* Dark only: the page keeps one dark look whatever the device or viewer theme is. */
+/* Soft Linen: 밝게가 기본, 기기 설정이 어둡게면 자동으로 어둡게. 라벤더는 pill 선택·추천·주요 버튼에만 써요. */
 :root {
-  --bg: #17141F;
-  --surface: #211D2C;
-  --surface-2: #2B2639;
-  --ink: #ECE9F5;
-  --muted: #A8A2BD;
-  --line: #3A3450;
-  --accent: #B9A0FF;
-  --accent-ink: #1A1426;
-  --yarn: #F0B65A;
-  --ok: #6CCB9C;
-  --tight: #E6B45C;
-  --risk: #F28CA0;
-  --scrim: rgba(0, 0, 0, .6);
+  --bg: #F7F5F2;
+  --surface: #FFFFFF;
+  --surface-2: #F2EFEC;
+  --ink: #2F2B33;
+  --muted: #8E8891;
+  --line: #ECE8E4;
+  --accent: #8F769B;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #EFE9F3;
+  --accent-deep: #4E3D57;
+  --raised: #FFFFFF;
+  --raised-sh: 0 1px 3px rgba(60, 40, 70, .14);
+  --card-sh: 0 1px 2px rgba(60, 40, 70, .05), 0 4px 14px rgba(60, 40, 70, .04);
+  --pill-bg: #E9E5E1;
+  --pill-on: rgba(255, 255, 255, .28);
+  --yarn: #7A6386;
+  --badge-bg: #EFE9F3;
+  --badge-ink: #5E4A68;
+  --toast-link: #CDB8D8;
+  --ok: #4F8A6C;
+  --tight: #A27D3E;
+  --risk: #B36474;
+  --scrim: rgba(30, 24, 36, .45);
+  --toast-bg: #2F2B33;
+  --toast-ink: #FFFFFF;
+  --overlay: rgba(255, 255, 255, .85);
+  --overlay-ink: #8F769B;
+  --chart-bg: #FFFFFF;
+  --sunken: #EEEAE6;
   --font-display: "Hahmlet", "Nanum Myeongjo", "Apple SD Gothic Neo", serif;
   --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
   --radius: 12px;
   --tabbar: 64px;
-  color-scheme: dark;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1E1C21; --surface: #28252C; --surface-2: #322E36; --ink: #EDE9EE; --muted: #A39CA6; --line: #38333C;
+    --accent: #B9A3C6; --accent-ink: #1E1C21; --accent-soft: #3A3342; --accent-deep: #F1E8F6;
+    --raised: #45404A; --raised-sh: 0 1px 3px rgba(0, 0, 0, .35); --card-sh: none;
+    --pill-bg: #3A353E; --pill-on: rgba(30, 28, 33, .18); --yarn: #D9C6E3; --badge-bg: #3A3342; --badge-ink: #E4D8EC; --toast-link: #6B5478;
+    --ok: #8DBBA2; --tight: #D4B47E; --risk: #D99AA6; --scrim: rgba(0, 0, 0, .6);
+    --toast-bg: #EDE9EE; --toast-ink: #1E1C21; --overlay: rgba(30, 28, 33, .55); --overlay-ink: #E4D8EC;
+    --chart-bg: #F4F1F5; --sunken: #17151A;
+    color-scheme: dark;
+  }
 }
 
 * { box-sizing: border-box; }

@@ -1,0 +1,44 @@
+/* ---------- Soft Linen 공통 모양 (다른 CSS 뒤에 불러와요) ----------
+   · 탭 모양(칸이 나뉜 상자): 선택 = 흰색으로 살짝 떠 보이게, 강조색 없음
+   · pill 모양(떨어진 알약): 선택 = 라벤더 채움 — 화면에서 라벤더로 채워지는 건 이것뿐
+   · 카드: 테두리 대신 아주 옅은 그림자 */
+body { letter-spacing: -0.02em; }
+h1, h2, h3, h4, .brand, strong, .nm { letter-spacing: -0.035em; }
+.band { opacity: .35; }
+
+/* 카드 */
+.pcard, .prow, .pick, .sess, .ctr-card, .prog, .yarn, .my-card { border: 0; box-shadow: var(--card-sh); }
+.pcard canvas { background: var(--surface); }
+
+/* 탭 모양: 대바늘/코바늘, 단수 세기 보기 전환 등 */
+.seg button[aria-pressed="true"] { background: var(--raised); color: var(--ink); font-weight: 700; box-shadow: var(--raised-sh); }
+.seg button:not([aria-pressed="true"]) { color: var(--muted); }
+
+/* 탭 모양: 실 굵기 (가는 실 / 보통 실 / 굵은 실) */
+.chiprow.gbar { background: var(--surface-2); border-radius: 12px; padding: 3px; gap: 3px; }
+.chiprow.gbar .gchip { flex: 1; justify-content: center; border: 0; background: transparent; border-radius: 9px; padding: 9px 6px; color: var(--muted); }
+.chiprow.gbar .gchip[aria-pressed="true"] { background: var(--raised); color: var(--ink); font-weight: 700; box-shadow: var(--raised-sh); }
+.chiprow.gbar .gchip[aria-pressed="true"] .n { color: var(--muted); opacity: 1; }
+
+/* pill 모양: 추천 무늬 / 전체 무늬 / 내 도안 / ★ */
+.seg2 { background: transparent; padding: 0; gap: 5px; overflow-x: auto; scrollbar-width: none; }
+.seg2::-webkit-scrollbar { display: none; }
+.seg2 button { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); padding: 7px 9px; font-size: 13px; color: var(--muted); }
+.seg2 button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: transparent; font-weight: 700; box-shadow: none; }
+.seg2 .n { margin: 0; padding: 1px 7px; border-radius: 999px; font-size: 11px; line-height: 1.55; opacity: 1; font-weight: 700; background: var(--pill-bg); color: var(--muted); }
+.seg2 button[aria-pressed="true"] .n { background: var(--pill-on); color: var(--accent-ink); }
+
+/* pill 모양: 작품 종류 칩 */
+.gchip { border-color: var(--line); }
+.chiprow:not(.gbar) .gchip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
+.chiprow:not(.gbar) .gchip[aria-pressed="true"] .n { color: inherit; opacity: .85; }
+
+/* 추천 카드 · 상태 표시 · 탭바 */
+.pick .label { color: var(--accent); opacity: 1; font-weight: 700; }
+.pick strong { color: var(--accent-deep); }
+.st-pill.ok { background: color-mix(in srgb, var(--ok) 12%, var(--surface)); }
+.st-pill.tight { background: color-mix(in srgb, var(--tight) 13%, var(--surface)); }
+.st-pill.risk { background: color-mix(in srgb, var(--risk) 12%, var(--surface)); }
+.tabbar { background: var(--surface); }
+.filet-now { background: var(--accent-soft); border-color: transparent; }
+.filet-now b { color: var(--accent); }

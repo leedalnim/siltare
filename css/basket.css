@@ -46,7 +46,7 @@
 .toggle input { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; }
 
 /* Pick */
-.pick { display: grid; grid-template-columns: 92px minmax(0,1fr); gap: 14px; align-items: center; background: color-mix(in srgb, var(--accent) 16%, var(--surface)); color: var(--ink); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line)) !important; border-radius: 16px; padding: 12px; border: 0; text-align: left; width: 100%; }
+.pick { display: grid; grid-template-columns: 92px minmax(0,1fr); gap: 14px; align-items: center; background: var(--accent-soft); color: var(--ink); border: 0 !important; border-radius: 16px; padding: 12px; border: 0; text-align: left; width: 100%; }
 .pick canvas { width: 92px; height: 92px; border-radius: 10px; display: block; }
 .pick .label { color: inherit; opacity: .7; }
 .pick strong { display: block; font-family: var(--font-display); font-size: 19px; font-weight: 600; line-height: 1.3; margin-top: 2px; }

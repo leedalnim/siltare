@@ -337,16 +337,25 @@ function fuzz(ctx, W, H, c) {   // 보송한 실: 잔털 없이 살짝 부드러
   ctx.save(); ctx.globalAlpha = 0.1; ctx.fillStyle = css(c, 0.35); ctx.fillRect(0, 0, W, H); ctx.restore();
 }
 
+// Soft Linen: 무늬 그림은 실 색 그대로 두되, 밝은 화면에선 한 톤 부드럽게 (모든 무늬 그림에 똑같이 적용)
+const isDark = () => !!(window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
+const yarnTone = C => isDark() ? C : C.map(c => mix(c, 0.3));
+let toning = false;   // 무늬 그림이 다른 무늬 그림을 부를 때(팝콘 → 짧은뜨기) 두 번 부드럽게 하지 않게
+for (const cr of Object.keys(DRAW)) for (const k of Object.keys(DRAW[cr])) {
+  const f0 = DRAW[cr][k];
+  DRAW[cr][k] = (ctx, W, H, C) => { if (toning) return f0(ctx, W, H, C); toning = true; try { return f0(ctx, W, H, yarnTone(C)); } finally { toning = false; } };
+}
 function paintSwatch(cv, pid, C, fluffy, craft) {
   const fn = DRAW[craft || state.craft][pid]; if (!fn) return;
   const rect = cv.getBoundingClientRect(); if (!rect.width) return;
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   cv.width = Math.round(rect.width * dpr); cv.height = Math.round(rect.height * dpr);
   const ctx = cv.getContext("2d");
-  const k = cv.dataset.zoom ? +cv.dataset.zoom : (rect.width < 60 ? 0.6 : 1);
+  const k = cv.dataset.zoom ? +cv.dataset.zoom : (rect.width < 60 ? 1 : 1.7);   // 코를 크게 그려 덜 자글자글하게
   ctx.setTransform(dpr * k, 0, 0, dpr * k, 0, 0);
   const W = rect.width / k, H = rect.height / k;
-  ctx.fillStyle = css(C[0], -0.58); ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = isDark() ? css(mix(C[0], 0.1), -0.3) : css(mix(C[0], 0.3), 0.72);   // 바탕은 실 색의 연한(어둡게: 중간) 톤
+  ctx.fillRect(0, 0, W, H);
   try { fn(ctx, W, H, C); } catch (e) {}
   if (fluffy) fuzz(ctx, W, H, C[0]);
 }
