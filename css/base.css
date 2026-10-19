@@ -40,8 +40,9 @@ body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-t
   --tabbar: 64px;
   color-scheme: light;
 }
+/* 화면 밝기: 앱 안에서 고른 값(html[data-theme]) > 기기 설정 */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #1E1C21; --surface: #28252C; --surface-2: #322E36; --ink: #EDE9EE; --muted: #A39CA6; --line: #38333C;
     --accent: #B9A3C6; --accent-ink: #1E1C21; --accent-soft: #3A3342; --accent-deep: #F1E8F6;
     --raised: #45404A; --raised-sh: 0 1px 3px rgba(0, 0, 0, .35); --card-sh: none;
@@ -51,6 +52,16 @@ body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-t
     --chart-bg: #F4F1F5; --sunken: #17151A;
     color-scheme: dark;
   }
+}
+:root[data-theme="dark"] {
+    --bg: #1E1C21; --surface: #28252C; --surface-2: #322E36; --ink: #EDE9EE; --muted: #A39CA6; --line: #38333C;
+    --accent: #B9A3C6; --accent-ink: #1E1C21; --accent-soft: #3A3342; --accent-deep: #F1E8F6;
+    --raised: #45404A; --raised-sh: 0 1px 3px rgba(0, 0, 0, .35); --card-sh: none;
+    --pill-bg: #3A353E; --pill-on: rgba(30, 28, 33, .18); --yarn: #D9C6E3; --badge-bg: #3A3342; --badge-ink: #E4D8EC; --toast-link: #6B5478;
+    --ok: #8DBBA2; --tight: #D4B47E; --risk: #D99AA6; --scrim: rgba(0, 0, 0, .6);
+    --toast-bg: #EDE9EE; --toast-ink: #1E1C21; --overlay: rgba(30, 28, 33, .55); --overlay-ink: #E4D8EC;
+    --chart-bg: #F4F1F5; --sunken: #17151A;
+    color-scheme: dark;
 }
 
 * { box-sizing: border-box; }

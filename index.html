@@ -8,6 +8,7 @@
 <meta name="theme-color" content="#F7F5F2" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1E1C21" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
+<script>try{var t=localStorage.getItem("siltare-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;}catch(e){}</script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
@@ -35,10 +36,11 @@
     <div class="band" aria-hidden="true"></div>
     <div class="bar-row">
       <h1 class="brand">남은 실 처방전</h1>
+      <div class="bar-end"><button type="button" class="theme-btn" id="theme-btn" data-theme-cycle aria-label="화면 밝기: 자동"></button>
       <div class="seg" role="group" aria-label="뜨개 방식">
         <button id="craft-knit" data-craft="knit" aria-pressed="true">대바늘</button>
         <button id="craft-crochet" data-craft="crochet" aria-pressed="false">코바늘</button>
-      </div>
+      </div></div>
     </div>
   </header>
 

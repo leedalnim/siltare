@@ -338,7 +338,8 @@ function fuzz(ctx, W, H, c) {   // 보송한 실: 잔털 없이 살짝 부드러
 }
 
 // Soft Linen: 무늬 그림은 실 색 그대로 두되, 밝은 화면에선 한 톤 부드럽게 (모든 무늬 그림에 똑같이 적용)
-const isDark = () => !!(window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
+const themePref = () => { try { const t = localStorage.getItem("siltare-theme"); return t === "light" || t === "dark" ? t : "auto"; } catch (e) { return "auto"; } };
+const isDark = () => { const t = themePref(); return t === "auto" ? !!(window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches) : t === "dark"; };
 const yarnTone = C => isDark() ? C : C.map(c => mix(c, 0.3));
 let toning = false;   // 무늬 그림이 다른 무늬 그림을 부를 때(팝콘 → 짧은뜨기) 두 번 부드럽게 하지 않게
 for (const cr of Object.keys(DRAW)) for (const k of Object.keys(DRAW[cr])) {

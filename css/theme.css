@@ -42,3 +42,15 @@ h1, h2, h3, h4, .brand, strong, .nm { letter-spacing: -0.035em; }
 .tabbar { background: var(--surface); }
 .filet-now { background: var(--accent-soft); border-color: transparent; }
 .filet-now b { color: var(--accent); }
+
+/* 화면 밝기 버튼 (자동 → 밝게 → 어둡게) */
+.bar-end { display: flex; align-items: center; gap: 8px; }
+.theme-btn { width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--surface-2); color: var(--muted); display: grid; place-items: center; padding: 0; flex: none; }
+.theme-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.brand, .seg button { white-space: nowrap; }
+@media (max-width: 370px) {
+  .brand { font-size: 21px; }
+  .bar-end { gap: 6px; }
+  .theme-btn { width: 32px; height: 32px; }
+  .bar-row .seg button { padding: 6px 10px; }
+}
