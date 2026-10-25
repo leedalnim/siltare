@@ -36,6 +36,7 @@ const strandFor = x => x.doubled
   ? `<span class="gstrand" aria-hidden="true"><i style="height:${WEIGHTS.thin.line}px"></i><i style="height:${WEIGHTS.thin.line}px"></i></span>`
   : `<span class="gstrand" aria-hidden="true"><i style="height:${WEIGHTS[x.w].line}px"></i></span>`;
 function groupBar(gs, g) {
+  if (gs.length < 2) return "";   // 실 굵기가 한 가지뿐이면 고를 게 없으니 숨겨요
   return `<div class="chiprow gbar" role="group" aria-label="어떤 실로 뜰까요">${gs.map(x =>
     `<button type="button" class="gchip" id="g-${x.key}" data-g="${x.key}" aria-pressed="${x.key === g.key}">${strandFor(x)}${x.title}<span class="n">${sum(x.yarns)}g</span></button>`).join("")}</div>`;
 }

@@ -34,6 +34,7 @@ h1, h2, h3, h4, .brand, strong, .nm { letter-spacing: -0.035em; }
 .chiprow:not(.gbar) .gchip[aria-pressed="true"] .n { color: inherit; opacity: .85; }
 
 /* 추천 카드 · 상태 표시 · 탭바 */
+.pick { background: var(--surface); border: 1.5px solid var(--accent) !important; box-shadow: none; }
 .pick .label { color: var(--accent); opacity: 1; font-weight: 700; }
 .pick strong { color: var(--accent-deep); }
 .st-pill.ok { background: color-mix(in srgb, var(--ok) 12%, var(--surface)); }

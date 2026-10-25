@@ -64,14 +64,17 @@ function renderSetup() {
   const su = state.setup, b = setupBase(su.pid, su.craft, su.mode, su.proj);
   const projs = PROJECTS[su.craft].filter(pr => b.p.suits.some(t => pr.tags.includes(t)));
   let h = `<div class="su-head"><canvas data-sw="${su.pid}" aria-hidden="true"></canvas><div><b>${b.p.name}</b><span>${craftName(su.craft)} · ${WEIGHTS[su.use].name} 기준</span></div></div>`;
-  h += `<div class="field"><span class="label">무엇을 뜰까요</span><div class="chiprow wrap" role="group" aria-label="작품">
-    <button type="button" class="gchip" data-su-proj="" aria-pressed="${!su.proj}">정하지 않음</button>
-    ${projs.map(pr => `<button type="button" class="gchip" data-su-proj="${pr.id}" aria-pressed="${su.proj === pr.id}">${pr.name}</button>`).join("")}
-    ${state.myProj.filter(m => m.craft === su.craft).map(m => `<button type="button" class="gchip mine" data-su-proj="${m.id}" aria-pressed="${su.proj === m.id}">${esc(m.name)}</button>`).join("")}
-    <button type="button" class="gchip add" data-su-new aria-expanded="${!!su.newProj}">＋ 새 작품</button></div>
+  const mine = state.myProj.filter(m => m.craft === su.craft), isMine = mine.some(m => m.id === su.proj);
+  h += `<div class="field"><label class="label" for="su-proj">무엇을 뜰까요</label>
+    <div class="su-proj"><select id="su-proj" class="my-in">
+      <option value=""${!su.proj && !su.newProj ? " selected" : ""}>정하지 않음</option>
+      <optgroup label="이 무늬로 뜰 수 있는 것">${projs.map(pr => `<option value="${pr.id}"${su.proj === pr.id ? " selected" : ""}>${pr.name}</option>`).join("")}</optgroup>
+      ${mine.length ? `<optgroup label="내가 등록한 작품">${mine.map(m => `<option value="${m.id}"${su.proj === m.id ? " selected" : ""}>${esc(m.name)}</option>`).join("")}</optgroup>` : ""}
+      <option value="__new"${su.newProj ? " selected" : ""}>＋ 새 작품 등록…</option>
+    </select></div>
     ${su.newProj ? `<div class="su-new"><input id="su-pname" class="my-in" type="text" maxlength="30" placeholder="예: 고양이 담요, 조카 목도리" autocomplete="off"><button type="button" class="primary" data-su-add>등록</button>
       <p class="hint">이름만 정하면 돼요. 크기는 아래 폭·길이에 적으면 이 작품에 같이 저장돼요.</p></div>` : ""}
-    ${su.proj && state.myProj.some(m => m.id === su.proj) ? `<button type="button" class="link danger su-delp" data-su-delproj="${su.proj}">이 작품 내 목록에서 지우기</button>` : ""}</div>`;
+    ${isMine ? `<button type="button" class="link danger su-delp" data-su-delproj="${su.proj}">이 작품 내 목록에서 지우기</button>` : ""}</div>`;
   if (b.rx.rr || su.mode === "round") h += `<div class="field"><span class="label">뜨는 방식</span><div class="seg2" role="group" aria-label="뜨는 방식">
     <button type="button" data-su-mode="flat" aria-pressed="${su.mode === "flat"}">왕복으로 (평면)</button><button type="button" data-su-mode="round" aria-pressed="${su.mode === "round"}">원통으로 (둘레)</button></div></div>`;
   if (su.kind === "measured") {
@@ -128,3 +131,13 @@ function commitSetup() {
   save(); closeSheets(); render(); window.scrollTo(0, 0); toast("단수 카운터를 만들었어요");
 }
 document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id === "su-pname") { e.preventDefault(); addMyProj(); } });
+// 무엇을 뜰까요: 목록에서 고르거나 '＋ 새 작품 등록…'
+document.addEventListener("change", e => {
+  if (e.target.id !== "su-proj") return;
+  const su = state.setup; if (!su) return;
+  if (e.target.value === "__new") { su.newProj = true; renderSetup(); const i = $("su-pname"); if (i) i.focus(); return; }
+  su.newProj = false; su.proj = e.target.value || null;
+  const dm = projDims(su.proj); su.w = dm[0]; su.l = dm[1];
+  const probe = recipe(su.craft, su.pid, [], "flat"); if (!su.editId) su.mode = probe.rr && (dm[2] || probe.roundFirst) ? "round" : "flat";
+  su.n = null; su.r = null; recalcSetup(true); renderSetup();
+});
