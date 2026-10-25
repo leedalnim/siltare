@@ -80,3 +80,4 @@ details.help ul { margin: 6px 0 0; padding-left: 18px; }
 /* 내용이 짧을 때 iOS에서 탭바 아래가 떠 보이지 않게: 문서를 화면 높이만큼 채우고, 탭바 바탕을 아래로 이어 붙임 */
 html { box-sizing: border-box; min-height: 100vh; min-height: 100lvh; }
 .tabbar::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 200px; background: var(--surface); pointer-events: none; }
+.gram-hint { margin: 8px 0 0; }

@@ -43,8 +43,7 @@ function groupBar(gs, g) {
 const emptyBox = msg => `<div class="empty">${msg}<button type="button" class="primary" data-open-add>+ 실 담기</button></div>`;
 function syncLine() {
   if (sync.status === "synced") return `<p class="sync on"><i></i>계정에 저장돼요. 폰이나 다른 PC에서 같은 링크를 열면 그대로 보여요.</p>`;
-  if (sync.status === "offline") return `<p class="sync"><i></i>계정 저장에 연결하지 못해서 지금은 이 브라우저에만 저장돼요.</p>`;
-  return `<p class="sync"><i></i>이 브라우저에 저장돼요. 계정 저장에 연결하는 중이에요.</p>`;
+  return "";   // 연결 안 됨/연결 중 안내는 화면만 차지해서 띄우지 않아요
 }
 
 function renderBasket() {
@@ -59,7 +58,7 @@ function renderBasket() {
       <div class="s">${esc(y.label)} · 약 ${y.grams}g · ${y.texture === "fluffy" ? "보송" : "매끈"}</div></div>
       <span class="acts"><button type="button" class="edit" data-edit="${esc(y.id)}" aria-label="${nm} 수정"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg><span class="bt">수정</span></button><button type="button" class="del" data-del="${esc(y.id)}" aria-label="${nm} 삭제"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg><span class="bt">삭제</span></button></span></li>`;
   }).join("")}</ul>`;
-  html += `<p class="note">한 뭉치 크기로 고른 양은 대략값이에요. 주방 저울이 있으면 g으로 적어 주면 더 정확해요.</p>` + syncLine();
+
   $("v-basket").innerHTML = html;
 }
 
