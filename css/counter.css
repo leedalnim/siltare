@@ -98,3 +98,9 @@
 .crow.dn .cc { box-shadow: inset 0 0 0 100px rgba(108, 203, 156, .24); }
 .crow.dn .rn { color: var(--ok); font-weight: 700; }
 .st-pill.no { color: var(--muted); background: var(--surface-2); }
+.gchip.mine { border-style: dashed; }
+.gchip.add { color: var(--accent); border-style: dashed; font-weight: 600; }
+.su-new { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 8px; }
+.su-new .primary { padding: 10px 16px; }
+.su-new .hint { grid-column: 1 / -1; margin: 0; }
+.su-delp { display: block; text-align: left; margin-top: 4px; font-size: 13px; }

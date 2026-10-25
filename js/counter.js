@@ -25,7 +25,7 @@ function renderCounter() {
       html += `<div class="empty">아직 뜨는 중인 작품이 없어요. 무늬를 열고 '이 무늬로 뜨기 시작'을 누르면 여기에 단수 카운터가 생겨요.<button type="button" class="primary" data-tab="patterns">무늬 보러 가기</button></div>`;
     } else {
       html += `<ul class="sess-list">${state.sessions.map(x => {
-        const p = PATTERNS[x.craft].find(q => q.id === x.pid), pr = x.proj ? PROJECTS[x.craft].find(q => q.id === x.proj) : null;
+        const p = PATTERNS[x.craft].find(q => q.id === x.pid), pr = projFind(x.craft, x.proj);
         const rx = recipe(x.craft, x.pid, x.cols, x.mode), info = rowInfo(rx, x.row);
         return `<li><button type="button" class="sess" data-sess="${x.id}"><canvas data-ss="${x.id}" aria-hidden="true"></canvas>
           <span><b>${p ? p.name : ""}${pr ? ` · ${pr.name}` : ""}</b><span class="s">${craftName(x.craft)} · ${info.done ? "완성!" : `${x.row}단 완료${x.target ? ` / 목표 ${x.target}단` : ""}`}</span>${x.target ? `<span class="pbar sm"><i style="width:${Math.min(100, Math.round(x.row / x.target * 100))}%"></i></span>` : ""}</span><span class="go" aria-hidden="true">›</span></button></li>`;
@@ -36,7 +36,7 @@ function renderCounter() {
     requestAnimationFrame(() => paintSess(box));
     return;
   }
-  const p = PATTERNS[s.craft].find(q => q.id === s.pid), pr = s.proj ? PROJECTS[s.craft].find(q => q.id === s.proj) : null;
+  const p = PATTERNS[s.craft].find(q => q.id === s.pid), pr = projFind(s.craft, s.proj);
   const rx = recipe(s.craft, s.pid, s.cols, s.mode), info = rowInfo(rx, s.row), next = rowInfo(rx, s.row + 1);
   const reached = s.target && s.row >= s.target && !info.done;
   const kP = starKey("p", s.pid, s.craft);

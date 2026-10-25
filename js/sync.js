@@ -1,7 +1,7 @@
 // ---------- 계정 저장 (기기 간 동기화) ----------
 const sync = { ref: null, status: "local" };
 let pushT = null, pushing = false, pushAgain = false;
-const payload = () => ({ v: 2, updatedAt: state.updatedAt || Date.now(), yarns: state.yarns, example: state.example, doubled: state.doubled, stars: state.stars, sessions: state.sessions });
+const payload = () => ({ v: 2, updatedAt: state.updatedAt || Date.now(), yarns: state.yarns, example: state.example, doubled: state.doubled, stars: state.stars, sessions: state.sessions, myProj: state.myProj });
 function schedulePush() { if (!sync.ref) return; clearTimeout(pushT); pushT = setTimeout(pushNow, 700); }
 async function pushNow() {
   if (!sync.ref) return;
@@ -21,6 +21,7 @@ function applyRemote(d) {
   state.yarns = d.yarns; state.example = !!d.example; state.doubled = false;
   state.stars = d.stars && typeof d.stars === "object" ? { ...d.stars } : {};
   state.sessions = Array.isArray(d.sessions) ? d.sessions.map(s => ({ ...s, cols: Array.isArray(s.cols) ? s.cols : [] })) : [];
+  if (Array.isArray(d.myProj)) state.myProj = d.myProj;
   state.updatedAt = d.updatedAt || 0;
   cleanData(); saveLocal(); render();
 }

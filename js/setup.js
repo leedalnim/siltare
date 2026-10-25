@@ -32,7 +32,7 @@ function openSetup(opts) {
   const pid = edit ? edit.pid : opts.pid, craft = edit ? edit.craft : opts.craft;
   const proj = edit ? edit.proj : (opts.proj || null);
   const probe = recipe(craft, pid, [], "flat");
-  const dims = DIMS[proj] || [20, 20];
+  const dims = projDims(proj);
   const mode = edit ? (edit.mode || "flat") : (probe.rr && (dims[2] || probe.roundFirst) ? "round" : "flat");
   state.setup = { pid, craft, proj, mode, editId: edit ? edit.id : null, w: edit && edit.w ? edit.w : dims[0], l: edit && edit.l ? edit.l : dims[1], n: edit ? edit.n : null, r: edit ? edit.target : null };
   if (!edit && $("sheet-pat").hidden === false) { $("sheet-pat").hidden = true; }
@@ -66,7 +66,12 @@ function renderSetup() {
   let h = `<div class="su-head"><canvas data-sw="${su.pid}" aria-hidden="true"></canvas><div><b>${b.p.name}</b><span>${craftName(su.craft)} · ${WEIGHTS[su.use].name} 기준</span></div></div>`;
   h += `<div class="field"><span class="label">무엇을 뜰까요</span><div class="chiprow wrap" role="group" aria-label="작품">
     <button type="button" class="gchip" data-su-proj="" aria-pressed="${!su.proj}">정하지 않음</button>
-    ${projs.map(pr => `<button type="button" class="gchip" data-su-proj="${pr.id}" aria-pressed="${su.proj === pr.id}">${pr.name}</button>`).join("")}</div></div>`;
+    ${projs.map(pr => `<button type="button" class="gchip" data-su-proj="${pr.id}" aria-pressed="${su.proj === pr.id}">${pr.name}</button>`).join("")}
+    ${state.myProj.filter(m => m.craft === su.craft).map(m => `<button type="button" class="gchip mine" data-su-proj="${m.id}" aria-pressed="${su.proj === m.id}">${esc(m.name)}</button>`).join("")}
+    <button type="button" class="gchip add" data-su-new aria-expanded="${!!su.newProj}">＋ 새 작품</button></div>
+    ${su.newProj ? `<div class="su-new"><input id="su-pname" class="my-in" type="text" maxlength="30" placeholder="예: 고양이 담요, 조카 목도리" autocomplete="off"><button type="button" class="primary" data-su-add>등록</button>
+      <p class="hint">이름만 정하면 돼요. 크기는 아래 폭·길이에 적으면 이 작품에 같이 저장돼요.</p></div>` : ""}
+    ${su.proj && state.myProj.some(m => m.id === su.proj) ? `<button type="button" class="link danger su-delp" data-su-delproj="${su.proj}">이 작품 내 목록에서 지우기</button>` : ""}</div>`;
   if (b.rx.rr || su.mode === "round") h += `<div class="field"><span class="label">뜨는 방식</span><div class="seg2" role="group" aria-label="뜨는 방식">
     <button type="button" data-su-mode="flat" aria-pressed="${su.mode === "flat"}">왕복으로 (평면)</button><button type="button" data-su-mode="round" aria-pressed="${su.mode === "round"}">원통으로 (둘레)</button></div></div>`;
   if (su.kind === "measured") {
@@ -98,8 +103,19 @@ function setupInput(id, v) {
   if (id === "su-r") { su.r = Math.round(v); if (su.kind === "measured") su.l = lFromR(su, su.r); }
   const sum = $("su-sum"); if (sum && su.kind === "measured") sum.innerHTML = setupSummary();
 }
+// 무엇을 뜰까요: 목록에 없는 작품을 직접 이름 지어 등록
+function addMyProj() {
+  const su = state.setup, i = $("su-pname"), name = i ? i.value.trim() : "";
+  if (!su) return; if (!name) { toast("작품 이름을 적어 주세요"); if (i) i.focus(); return; }
+  const dup = state.myProj.find(m => m.craft === su.craft && m.name === name) || PROJECTS[su.craft].find(p => p.name === name);
+  if (dup) { su.proj = dup.id; su.newProj = false; renderSetup(); toast("이미 있는 작품이라 그걸 골랐어요"); return; }
+  const m = { id: "u" + Date.now().toString(36), name, craft: su.craft, w: Math.round(su.w) || 20, l: Math.round(su.l) || 20, round: su.mode === "round" };
+  state.myProj.push(m); su.proj = m.id; su.newProj = false; save(); renderSetup(); toast(`'${name}'을(를) 내 작품으로 등록했어요`);
+}
 function commitSetup() {
   const su = state.setup; if (!su) return;
+  const mine = state.myProj.find(m => m.id === su.proj);   // 내 작품이면 지금 정한 크기를 같이 기억
+  if (mine && su.kind === "measured") { mine.w = Math.round(su.w); mine.l = Math.round(su.l); mine.round = su.mode === "round"; }
   const W = su.kind === "measured" ? wFromN(su, su.n) : null, Lc = su.kind === "measured" ? lFromR(su, su.r) : null;
   const fields = { mode: su.mode, proj: su.proj || null, n: su.n, target: su.r, w: W, l: Lc, use: su.use };
   if (su.editId) {
@@ -111,3 +127,4 @@ function commitSetup() {
   state.sessions.unshift(s); state.sess = s.id; state.tab = "counter"; state.setup = null;
   save(); closeSheets(); render(); window.scrollTo(0, 0); toast("단수 카운터를 만들었어요");
 }
+document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id === "su-pname") { e.preventDefault(); addMyProj(); } });

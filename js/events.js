@@ -29,11 +29,16 @@ document.addEventListener("click", e => {
     openSetup({ pid: p.id, craft: state.craft, proj: (!r.skip && state.pv) || null }); return;
   }
   if (d.suEdit) { openSetup({ editId: d.suEdit }); return; }
-  if (d.suProj !== undefined) { const su = state.setup; if (!su) return; su.proj = d.suProj || null; const dm = DIMS[su.proj] || [20, 20]; su.w = dm[0]; su.l = dm[1];
+  if (d.suProj !== undefined) { const su = state.setup; if (!su) return; su.proj = d.suProj || null; su.newProj = false; const dm = projDims(su.proj); su.w = dm[0]; su.l = dm[1];
     const probe = recipe(su.craft, su.pid, [], "flat"); if (!su.editId) su.mode = probe.rr && (dm[2] || probe.roundFirst) ? "round" : "flat";
     su.n = null; su.r = null; recalcSetup(true); renderSetup(); return; }
   if (d.suMode) { const su = state.setup; if (!su) return; su.mode = d.suMode; su.n = null; recalcSetup(true); renderSetup(); return; }
   if ("suGo" in d) { commitSetup(); return; }
+  if ("suNew" in d) { const su = state.setup; if (!su) return; su.newProj = !su.newProj; renderSetup(); if (su.newProj) { const i = $("su-pname"); if (i) i.focus(); } return; }
+  if ("suAdd" in d) { addMyProj(); return; }
+  if (d.suDelproj) { const su = state.setup, m = state.myProj.find(q => q.id === d.suDelproj); if (!su || !m) return;
+    if (!confirm(`'${m.name}'을(를) 내 작품 목록에서 지울까요? 이미 만든 카운터는 그대로예요.`)) return;
+    state.myProj = state.myProj.filter(q => q.id !== m.id); if (su.proj === m.id) su.proj = null; save(); renderSetup(); toast("내 작품에서 지웠어요"); return; }
   if (d.sess) { state.sess = d.sess; state.tab = "counter"; saveLocal(); if (!$("sheet-pat").hidden) closeSheets(); render(); window.scrollTo(0, 0); return; }
   if ("sessBack" in d) { state.sess = null; saveLocal(); renderCounter(); window.scrollTo(0, 0); return; }
   if (d.sessDel) {

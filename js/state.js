@@ -6,7 +6,7 @@ const EXAMPLE = [
   { id: "e4", weight: "thin", grams: 60, color: "ivory", texture: "smooth", label: "귤 ×2" }
 ];
 let state = { craft: "knit", tab: "patterns", yarns: EXAMPLE.slice(), example: true, doubled: false, group: null, detail: null, pv: null, main: {}, openProj: new Set(),
-  stars: {}, sessions: [], sess: null, mode: "rec", cat: "all", wake: false, updatedAt: 0, openMaybe: false };
+  stars: {}, sessions: [], myProj: [], sess: null, mode: "rec", cat: "all", wake: false, updatedAt: 0, openMaybe: false };
 const form = { weight: "mid", size: "fist", count: 1, color: "unknown", texture: "smooth" };
 
 try {
@@ -17,6 +17,7 @@ try {
     if (["basket", "patterns", "projects", "counter", "guide"].includes(saved.tab)) state.tab = saved.tab;
     state.stars = saved.stars && typeof saved.stars === "object" ? saved.stars : {};
     state.sessions = Array.isArray(saved.sessions) ? saved.sessions : [];
+    state.myProj = Array.isArray(saved.myProj) ? saved.myProj : [];
     state.sess = saved.sess || null; state.mode = ["all", "mine", "star"].includes(saved.mode) ? saved.mode : "rec"; state.cat = saved.cat || "all";
     state.wake = !!saved.wake; state.updatedAt = saved.updatedAt || 0;
   }
@@ -30,6 +31,8 @@ function cleanData() {
     .map(s => ({ ...s, cols: Array.isArray(s.cols) ? s.cols : [], row: Math.max(0, parseInt(s.row, 10) || 0), st: Math.max(0, parseInt(s.st, 10) || 0) }));
   if (state.sess && !state.sessions.some(s => s.id === state.sess)) state.sess = null;
   if (!state.stars || typeof state.stars !== "object") state.stars = {};
+  state.myProj = (Array.isArray(state.myProj) ? state.myProj : []).filter(x => x && x.id && x.name && (x.craft === "knit" || x.craft === "crochet"))
+    .map(x => ({ id: String(x.id), name: String(x.name).slice(0, 30), craft: x.craft, w: +x.w > 0 ? +x.w : 20, l: +x.l > 0 ? +x.l : 20, round: !!x.round }));
 }
 cleanData();
 // 한 번만: 잠깐 배포됐던 버전이 예시 실을 비운 채 저장했을 수 있어서, 바구니가 비어 있으면 예시 실을 되살려요.
@@ -44,7 +47,7 @@ try {
 if (state.example && state.yarns.some(y => /^e\d$/.test(y.id) && y.color === "pink")) { state.yarns = EXAMPLE.slice(); setTimeout(saveLocal, 0); }
 function saveLocal() {
   try { localStorage.setItem(STORE, JSON.stringify({ craft: state.craft, tab: state.tab, sess: state.sess, mode: state.mode, cat: state.cat, wake: state.wake,
-    yarns: state.yarns, example: state.example, doubled: state.doubled, stars: state.stars, sessions: state.sessions, updatedAt: state.updatedAt })); } catch (e) {}
+    yarns: state.yarns, example: state.example, doubled: state.doubled, stars: state.stars, sessions: state.sessions, myProj: state.myProj, updatedAt: state.updatedAt })); } catch (e) {}
 }
 // synced data changed: stamp, keep locally, send to the account store
 function save() { state.updatedAt = Date.now(); saveLocal(); schedulePush(); }
@@ -54,6 +57,9 @@ const r5 = x => Math.max(5, Math.round(x / 5) * 5);
 const sum = ys => ys.reduce((a, y) => a + y.grams, 0);
 const colorKey = y => (y.color && y.color !== "unknown") ? y.color : "u-" + y.id;
 
+// 작품 찾기: 기본 작품 + 내가 등록한 작품
+const projFind = (craft, id) => id ? (PROJECTS[craft].find(q => q.id === id) || state.myProj.find(q => q.id === id && q.craft === craft) || null) : null;
+const projDims = id => DIMS[id] || (() => { const m = state.myProj.find(q => q.id === id); return m ? [m.w, m.l, m.round ? 1 : 0] : [20, 20]; })();
 function groups() {
   const out = [];
   WKEYS.forEach(w => {
