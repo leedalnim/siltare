@@ -34,7 +34,9 @@ function openSetup(opts) {
   const probe = recipe(craft, pid, [], "flat");
   const dims = projDims(proj);
   const mode = edit ? (edit.mode || "flat") : (probe.rr && (dims[2] || probe.roundFirst) ? "round" : "flat");
-  state.setup = { pid, craft, proj, mode, editId: edit ? edit.id : null, w: edit && edit.w ? edit.w : dims[0], l: edit && edit.l ? edit.l : dims[1], n: edit ? edit.n : null, r: edit ? edit.target : null };
+  const et = edit && triOk(edit.tri) ? edit.tri : null;
+  state.setup = { shape: et || (!edit && proj === "shawl" && mode !== "round") ? "tri" : "rect", tri: { ...(et || TRI_DEF), n0: et ? et.n0 : craft === "crochet" ? 2 : 3 },
+    pid, craft, proj, mode, editId: edit ? edit.id : null, w: edit && edit.w ? edit.w : dims[0], l: edit && edit.l ? edit.l : dims[1], n: edit ? edit.n : null, r: edit ? edit.target : null };
   if (!edit && $("sheet-pat").hidden === false) { $("sheet-pat").hidden = true; }
   recalcSetup(!edit);
   renderSetup();
@@ -50,14 +52,20 @@ function recalcSetup(fromMeasures) {
   if (su.kind === "tail") { su.r = su.r || TAIL_TARGET[su.pid] || 10; su.n = null; return; }
   if (fromMeasures || !su.n) su.n = nFromW(su, su.w);
   if (fromMeasures || !su.r) su.r = rFromL(su, su.l);
+  if (isTri(su)) { if (fromMeasures) su.n = Math.round(su.w / 10 * su.g[0]); triSync(su); }
 }
+const isTri = su => su.shape === "tri" && su.mode !== "round" && su.kind === "measured";
+function triSync(su) { su.n = triFit(su.tri, su.n); su.r = triRows(su.tri, su.n); su.w = wFromN(su, su.n); su.l = lFromR(su, su.r); }
 function setupSummary() {
   const su = state.setup;
   if (su.kind !== "measured") return "";
-  const W = wFromN(su, su.n), Lc = lFromR(su, su.r);
+  const W = wFromN(su, su.n), Lc = lFromR(su, su.r), tri = isTri(su);
   const gpa = GPA[su.use] * (su.craft === "crochet" ? 1.3 : 1) * su.f;
-  const need = Math.max(5, Math.round(W * Lc * gpa / 100 / 5) * 5);
+  const need = Math.max(5, Math.round(W * Lc * (tri ? .5 : 1) * gpa / 100 / 5) * 5);
   const enough = su.have == null ? "" : su.have >= need ? `<span class="okc">가진 실 ${su.have}g으로 충분해요</span>` : `<span class="warnc">가진 실 ${su.have}g보다 약 ${need - su.have}g 더 필요해요</span>`;
+  if (tri) { const t = su.tri, how = `${t.k === 1 ? "매 단" : "2단마다"} ${t.a === 2 ? "양 끝 1코씩" : "4코씩"}`;
+    return (t.dir === "inc" ? `<b>${t.n0}코</b>로 시작해 ${how} 늘려 <b>${su.n}코</b>까지` : `<b>${su.n}코</b>로 시작해 ${how} 줄여 <b>${t.n0}코</b>까지`)
+      + `, <b>${su.r}단</b> · 넓은 쪽 약 ${Math.round(W)}cm, 높이 약 ${Math.round(Lc)}cm · 실 약 ${need}g ${enough}`; }
   return `<b>${su.n}코</b>로 <b>${su.r}단</b> 뜨면 약 ${Math.round(W)}cm × ${Math.round(Lc)}cm${su.mode === "round" ? " (원통 둘레 × 길이)" : ""} · 실 약 ${need}g ${enough}`;
 }
 function renderSetup() {
@@ -77,7 +85,28 @@ function renderSetup() {
     ${isMine ? `<button type="button" class="link danger su-delp" data-su-delproj="${su.proj}">이 작품 내 목록에서 지우기</button>` : ""}</div>`;
   if (b.rx.rr || su.mode === "round") h += `<div class="field"><span class="label">뜨는 방식</span><div class="seg2" role="group" aria-label="뜨는 방식">
     <button type="button" data-su-mode="flat" aria-pressed="${su.mode === "flat"}">왕복으로 (평면)</button><button type="button" data-su-mode="round" aria-pressed="${su.mode === "round"}">원통으로 (둘레)</button></div></div>`;
-  if (su.kind === "measured") {
+  const tri = isTri(su), t = su.tri;
+  if (su.kind === "measured" && su.mode !== "round") {
+    const o = (key, v, label) => `<button type="button" data-su-tri="${key}:${v}" aria-pressed="${t[key] === v}">${label}</button>`;
+    h += `<div class="field"><span class="label">모양</span><div class="seg2" role="group" aria-label="모양">
+      <button type="button" data-su-shape="rect" aria-pressed="${!tri}">네모</button><button type="button" data-su-shape="tri" aria-pressed="${tri}">삼각형</button></div>
+      ${tri ? `<div class="tri-opts">
+        <div class="seg2" role="group" aria-label="어디서 시작">${o("dir", "inc", "꼭짓점부터 늘리기")}${o("dir", "dec", "넓은 쪽부터 줄이기")}</div>
+        <div class="seg2" role="group" aria-label="얼마나 자주">${o("k", 2, "2단마다")}${o("k", 1, "매 단")}</div>
+        <div class="seg2" role="group" aria-label="한 번에 몇 코">${o("a", 2, "양 끝 1코씩 (2코)")}${o("a", 4, "가운데까지 4코")}</div></div>` : ""}</div>`;
+  }
+  if (tri) {
+    h += `<div class="su-grid">
+        <label class="su-f" for="su-w"><span class="label">넓은 쪽 폭</span><span class="inp"><input id="su-w" type="number" inputmode="decimal" min="1" max="400" value="${Math.round(su.w)}"><em>cm</em></span></label>
+        <span class="arr" aria-hidden="true">→</span>
+        <label class="su-f" for="su-n"><span class="label">가장 넓을 때</span><span class="inp"><input id="su-n" type="number" inputmode="numeric" min="1" max="2000" value="${su.n}"><em>코</em></span></label>
+        <label class="su-f" for="su-n0"><span class="label">꼭짓점</span><span class="inp"><input id="su-n0" type="number" inputmode="numeric" min="1" max="50" value="${t.n0}"><em>코</em></span></label>
+        <span class="arr" aria-hidden="true">→</span>
+        <label class="su-f" for="su-r"><span class="label">목표</span><span class="inp"><input id="su-r" type="number" inputmode="numeric" min="1" max="5000" value="${su.r}"><em>단</em></span></label>
+      </div>
+      <p class="hint">삼각형은 단마다 콧수가 바뀌어요. 카운터가 <b>이번 단에 늘릴지(줄일지)</b>와 <b>몇 코가 되는지</b> 단마다 알려 줘요. 무늬는 늘어난 코까지 이어서 떠요. 게이지(10cm에 ${su.g[0]}코 ${Math.round(su.g[1])}단)는 어림값이에요.</p>
+      <div class="su-sum" id="su-sum">${setupSummary()}</div>`;
+  } else if (su.kind === "measured") {
     h += `<div class="su-grid">
         <label class="su-f" for="su-w"><span class="label">${su.mode === "round" ? "둘레" : "폭"}</span><span class="inp"><input id="su-w" type="number" inputmode="decimal" min="1" max="400" value="${Math.round(su.w)}"><em>cm</em></span></label>
         <span class="arr" aria-hidden="true">→</span>
@@ -100,6 +129,18 @@ function renderSetup() {
 }
 function setupInput(id, v) {
   const su = state.setup; if (!su || !(v > 0)) return;
+  if (isTri(su)) {
+    const t = su.tri;
+    if (id === "su-w") su.n = Math.round(v / 10 * su.g[0]);
+    if (id === "su-n") su.n = Math.round(v);
+    if (id === "su-n0") { t.n0 = Math.max(1, Math.min(50, Math.round(v))); if (su.n <= t.n0) su.n = t.n0 + t.a; }
+    if (id === "su-r") su.n = t.n0 + t.a * Math.ceil(Math.round(v) / t.k);
+    triSync(su);
+    if (id !== "su-n" && $("su-n")) $("su-n").value = su.n;
+    if (id !== "su-r" && $("su-r")) $("su-r").value = su.r;
+    if (id !== "su-w" && $("su-w")) $("su-w").value = Math.round(su.w);
+    const sm = $("su-sum"); if (sm) sm.innerHTML = setupSummary(); return;
+  }
   if (id === "su-w") { su.w = v; su.n = nFromW(su, v); $("su-n").value = su.n; }
   if (id === "su-n") { su.n = Math.round(v); su.w = wFromN(su, su.n); }
   if (id === "su-l") { su.l = v; su.r = rFromL(su, v); $("su-r").value = su.r; }
@@ -120,7 +161,7 @@ function commitSetup() {
   const mine = state.myProj.find(m => m.id === su.proj);   // 내 작품이면 지금 정한 크기를 같이 기억
   if (mine && su.kind === "measured") { mine.w = Math.round(su.w); mine.l = Math.round(su.l); mine.round = su.mode === "round"; }
   const W = su.kind === "measured" ? wFromN(su, su.n) : null, Lc = su.kind === "measured" ? lFromR(su, su.r) : null;
-  const fields = { mode: su.mode, proj: su.proj || null, n: su.n, target: su.r, w: W, l: Lc, use: su.use };
+  const fields = { mode: su.mode, proj: su.proj || null, n: su.n, target: su.r, w: W, l: Lc, use: su.use, tri: isTri(su) ? { ...su.tri } : null };
   if (su.editId) {
     const s = state.sessions.find(x => x.id === su.editId);
     if (s) Object.assign(s, fields, { at: Date.now() });
@@ -139,5 +180,13 @@ document.addEventListener("change", e => {
   su.newProj = false; su.proj = e.target.value || null;
   const dm = projDims(su.proj); su.w = dm[0]; su.l = dm[1];
   const probe = recipe(su.craft, su.pid, [], "flat"); if (!su.editId) su.mode = probe.rr && (dm[2] || probe.roundFirst) ? "round" : "flat";
+  if (su.proj === "shawl" && su.mode !== "round") su.shape = "tri";
   su.n = null; su.r = null; recalcSetup(true); renderSetup();
+});
+// 모양: 네모 / 삼각형, 삼각형 늘림 방식
+document.addEventListener("click", e => {
+  const b = e.target.closest && e.target.closest("[data-su-shape],[data-su-tri]"), su = state.setup; if (!b || !su) return;
+  if (b.dataset.suShape) { su.shape = b.dataset.suShape; recalcSetup(true); }
+  else { const [k, v] = b.dataset.suTri.split(":"); su.tri[k] = k === "dir" ? v : +v; if (isTri(su)) triSync(su); }
+  renderSetup();
 });

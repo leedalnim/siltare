@@ -15,6 +15,15 @@ function paintSess(root) {
     paintSwatch(cv, s.pid, C, false, s.craft);
   });
 }
+// 삼각형: 이번 단에 늘리는지(줄이는지), 다 뜨면 몇 코가 되는지
+function triLine(s) {
+  if (!triOk(s.tri) || !s.n) return "";
+  const t = s.tri, r = triRow(t, s.n, s.row), nx = triRow(t, s.n, s.row + 1), word = t.dir === "inc" ? "늘림" : "줄임";
+  const when = r.chg ? "" : nx.chg && s.row + 1 < s.target ? ` · 다음 단에서 ${word}` : "";
+  return `<div class="tri-now${r.chg ? " chg" : ""}"><span class="tri-ic" aria-hidden="true">${t.dir === "inc" ? "◢◣" : "◥◤"}</span>
+    <div>${r.chg ? `<b>${word} 단</b> · ${esc(triHow(t, s.craft))}<br><span>${r.from}코 → <b>${r.to}코</b>가 돼요</span>`
+      : `<b>${word} 없이</b> 떠요<br><span><b>${r.from}코</b> 그대로${when}</span>`}</div></div>`;
+}
 function renderCounter() {
   const box = $("v-counter");
   const s = state.sessions.find(x => x.id === state.sess);
@@ -53,6 +62,7 @@ function renderCounter() {
         <span class="label">지금 뜰 단</span>
         <div class="big">${s.row + 1}<small>단째</small></div>
         <span class="phase">${info.phase}${reached ? " · 목표 단수를 다 떴어요!" : ""}</span>
+        ${triLine(s)}
         <p class="inst"><b>${esc(info.row.t)}</b>${esc(info.row.d)}</p>
         ${next.done ? `<p class="next">이 단이 마지막이에요</p>` : `<p class="next">다음 단: ${esc(next.row.t)} · ${esc(next.row.d)}</p>`}
       </div>

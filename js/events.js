@@ -107,7 +107,7 @@ document.addEventListener("change", e => {
   }
 });
 document.addEventListener("input", e => {
-  if (/^su-[wnlr]$/.test(e.target.id)) { setupInput(e.target.id, parseFloat(e.target.value)); return; }
+  if (/^su-(w|n|l|r|n0)$/.test(e.target.id)) { setupInput(e.target.id, parseFloat(e.target.value)); return; }
   if (e.target.id !== "c-custom" || mixMode()) return;   // 섞인 색 고를 때는 다 고른 뒤(change)에 더해요
   form.color = e.target.value.toUpperCase();
   const w = $("c-custom-wrap"); w.classList.add("on"); $("c-custom-dot").style.background = form.color;

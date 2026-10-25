@@ -17,7 +17,8 @@ function ctrChartBody(s, rx, info) {
 function progressHTML(s, rx, info) {
   if (!s.target) return `<div class="prog prog-empty"><p>콧수와 목표 단수를 정하면 지금까지 뜬 편물이 그림으로 보여요.</p><button type="button" class="ghost-btn" data-su-edit="${s.id}">어떻게 뜰지 정하기</button></div>`;
   const pct = Math.min(100, Math.round(s.row / s.target * 100));
-  const meta = `<div class="prog-meta"><span>${s.n ? `${s.n}코 · ` : ""}${s.mode === "round" ? "원통" : "왕복"} · 목표 ${s.target}단</span><button type="button" class="link" data-su-edit="${s.id}">뜨는 방법 바꾸기</button></div>`;
+  const tri = triOk(s.tri) && s.n;
+  const meta = `<div class="prog-meta"><span>${tri ? `${triName(s.tri)} · ${s.tri.dir === "inc" ? `${s.tri.n0}→${s.n}코` : `${s.n}→${s.tri.n0}코`}` : `${s.n ? `${s.n}코 · ` : ""}${s.mode === "round" ? "원통" : "왕복"}`} · 목표 ${s.target}단</span><button type="button" class="link" data-su-edit="${s.id}">뜨는 방법 바꾸기</button></div>`;
   const bar = `<div class="pbar" role="progressbar" aria-valuemin="0" aria-valuemax="${s.target}" aria-valuenow="${Math.min(s.row, s.target)}" aria-label="진행률"><i style="width:${pct}%"></i></div>`;
   const { kind, list } = ctrViews(s, rx);
   const defView = s.pid === "cat" || s.pid === "filetcat" ? "chart" : "pat";
@@ -97,15 +98,20 @@ function drawProgress(cv, s) {
   const x0 = Math.round(left + (maxW - fw) / 2), y0 = Math.round(padT + (maxH - fh) / 2), yB = y0 + fh;
   const C = (s.cols.length ? s.cols : [{ hex: FALLBACK[0] }]).map(c => liftDark(c.hex || FALLBACK[0]));
   const muted = cssVar("--muted"), accent = cssVar("--accent"), ink = cssVar("--ink");
+  // 삼각형이면 1단(아래) 쪽이 꼭짓점(늘리기) 또는 넓은 쪽(줄이기)
+  const tri = triOk(s.tri) && s.n, apex = tri ? Math.max(.02, Math.min(.5, s.tri.n0 / s.n)) * fw : 0;
+  const shape = () => { ctx.beginPath(); if (!tri) { ctx.rect(x0, y0, fw, fh); return; }
+    const narrowY = s.tri.dir === "inc" ? yB : y0, wideY = s.tri.dir === "inc" ? y0 : yB, cx = x0 + fw / 2;
+    ctx.moveTo(x0, wideY); ctx.lineTo(x0 + fw, wideY); ctx.lineTo(cx + apex / 2, narrowY); ctx.lineTo(cx - apex / 2, narrowY); ctx.closePath(); };
+  const outline = () => { ctx.setLineDash([5, 4]); ctx.strokeStyle = muted; ctx.lineWidth = 1.2; if (tri) { shape(); ctx.stroke(); } else ctx.strokeRect(x0 + .5, y0 + .5, fw - 1, fh - 1); ctx.setLineDash([]); };
   // what is still to knit: a dashed outline of the finished size
+  ctx.save(); shape(); ctx.clip();
   ctx.fillStyle = cssVar("--surface-2"); ctx.fillRect(x0, y0, fw, fh);
-  ctx.setLineDash([5, 4]); ctx.strokeStyle = muted; ctx.lineWidth = 1.2; ctx.strokeRect(x0 + .5, y0 + .5, fw - 1, fh - 1); ctx.setLineDash([]);
   // 도안 전체를 그리고, 아직 안 뜬 윗부분은 흐리게 덮어요 (아래가 1단)
   const frac = Math.min(1, s.row / s.target), dh = fh * frac;
   const rowPx = fh / s.target, base = s.craft === "knit" ? ROWPX.knit : (ROWPX.crochet[s.pid] || 10);
   const k = Math.max(0.28, Math.min(2.4, rowPx / base));
-  ctx.save(); ctx.beginPath(); ctx.rect(x0, y0, fw, fh); ctx.clip();
-  ctx.translate(x0, y0); ctx.scale(k, k);
+  ctx.save(); ctx.translate(x0, y0); ctx.scale(k, k);
   ctx.fillStyle = css(C[0], -0.5); ctx.fillRect(0, 0, fw / k + 2, fh / k + 2);
   try { DRAW[s.craft][s.pid](ctx, fw / k, fh / k + base, C); } catch (e) {}
   ctx.restore();
@@ -113,7 +119,8 @@ function drawProgress(cv, s) {
   g.addColorStop(0, "rgba(0,0,0,.18)"); g.addColorStop(.5, "rgba(255,255,255,.04)"); g.addColorStop(1, "rgba(0,0,0,.2)");
   ctx.fillStyle = g; ctx.fillRect(x0, y0, fw, fh);
   if (dh < fh - 0.5) { ctx.globalAlpha = .7; ctx.fillStyle = cssVar("--bg"); ctx.fillRect(x0, y0, fw, fh - dh); ctx.globalAlpha = 1; }
-  ctx.setLineDash([5, 4]); ctx.strokeStyle = muted; ctx.lineWidth = 1.2; ctx.strokeRect(x0 + .5, y0 + .5, fw - 1, fh - 1); ctx.setLineDash([]);
+  ctx.restore();
+  outline();
   // 10단마다 눈금
   ctx.strokeStyle = muted; ctx.lineWidth = 1;
   for (let r = 10; r < s.target; r += 10) { const y = Math.round(yB - fh * r / s.target) + .5; ctx.beginPath(); ctx.moveTo(x0 - 6, y); ctx.lineTo(x0, y); ctx.stroke(); }
@@ -135,5 +142,5 @@ function drawProgress(cv, s) {
   ctx.fillStyle = accent; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(tx, ty - 10, tw, 20, 10) : ctx.rect(tx, ty - 10, tw, 20); ctx.fill();
   ctx.fillStyle = cssVar("--accent-ink"); ctx.fillText(tag, tx + 7, ty + 1);
   ctx.fillStyle = muted; ctx.textAlign = "center";
-  ctx.fillText(`${s.n ? s.n + "코 · " : ""}${s.mode === "round" ? "둘레" : "폭"} 약 ${Math.round(s.w)}cm`, x0 + fw / 2, yB + 16);
+  ctx.fillText(tri ? `지금 ${triRow(s.tri, s.n, Math.min(s.row, s.target)).from}코 · 넓은 쪽 약 ${Math.round(s.w)}cm` : `${s.n ? s.n + "코 · " : ""}${s.mode === "round" ? "둘레" : "폭"} 약 ${Math.round(s.w)}cm`, x0 + fw / 2, yB + 16);
 }

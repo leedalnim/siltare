@@ -248,3 +248,25 @@ function sizeOf(p, g, have) {
   const area = have / gpa * 100;
   return { side: Math.max(5, Math.round(Math.sqrt(area) / 5) * 5), len: Math.max(5, Math.round(area / 20 / 5) * 5) };
 }
+
+// ---------- 삼각형으로 뜨기: 단마다 콧수가 바뀌어요 ----------
+// tri = { dir: "inc"(꼭짓점부터 늘리기) | "dec"(넓은 쪽부터 줄이기), k: 1|2 (매 단 / 2단마다), a: 2|4 (한 번에 늘리는 코), n0: 꼭짓점 콧수 }
+const TRI_DEF = { dir: "inc", k: 2, a: 2, n0: 3 };
+const triOk = t => t && typeof t === "object" && (t.dir === "inc" || t.dir === "dec") && (t.k === 1 || t.k === 2) && (t.a === 2 || t.a === 4) && t.n0 >= 1;
+const triFit = (t, n) => t.n0 + t.a * Math.max(1, Math.round((n - t.n0) / t.a));   // 넓은 쪽 콧수를 늘림 단위에 맞춰요
+const triRows = (t, n) => t.k * Math.max(1, Math.ceil((n - t.n0) / t.a));
+// i단을 다 뜬 뒤, 다음(i+1번째) 단: 시작 콧수, 끝 콧수, 늘리거나 줄이는 단인지
+function triRow(t, n, i) {
+  const did = Math.ceil(i / t.k), chg = i % t.k === 0, sgn = t.dir === "inc" ? 1 : -1;
+  const from = t.dir === "inc" ? Math.min(n, t.n0 + t.a * did) : Math.max(t.n0, n - t.a * did);
+  const to = t.dir === "inc" ? Math.min(n, from + (chg ? t.a : 0)) : Math.max(t.n0, from - (chg ? t.a : 0));
+  return { from, to, chg: chg && to !== from, sgn };
+}
+function triHow(t, craft) {
+  const inc = t.dir === "inc";
+  if (t.a === 2) return inc
+    ? (craft === "knit" ? "양 끝에서 1코씩 늘려요 (겉1, 늘리기, … 끝 1코 전에 늘리기, 겉1)" : "양 끝 코에 2코씩 떠서 1코씩 늘려요")
+    : (craft === "knit" ? "양 끝에서 1코씩 줄여요 (겉1, 2코 모아뜨기, … 끝 3코 남으면 2코 모아뜨기, 겉1)" : "양 끝에서 2코를 1코로 모아 1코씩 줄여요");
+  return inc ? "양 끝과 가운데 코 양옆에서 1코씩, 모두 4코 늘려요" : "양 끝과 가운데 코 양옆에서 1코씩, 모두 4코 줄여요";
+}
+const triName = t => `${t.dir === "inc" ? "꼭짓점부터 늘리며" : "넓은 쪽부터 줄이며"} 삼각형`;
