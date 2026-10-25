@@ -90,7 +90,7 @@ document.addEventListener("click", e => {
   if (d.w) { form.weight = d.w; renderForm(); return; }
   if (d.s) { form.size = d.s; $("gram-input").value = ""; renderForm(); return; }
   if (d.t) { form.texture = d.t; renderForm(); return; }
-  if (d.c) { form.color = d.c; renderForm(); return; }
+  if (d.c) { pickColor(d.c); return; }
   if (t.id === "cnt-minus") { form.count = Math.max(1, form.count - 1); renderForm(); return; }
   if (t.id === "cnt-plus") { form.count = Math.min(20, form.count + 1); renderForm(); return; }
 });
@@ -99,10 +99,16 @@ document.addEventListener("change", e => {
   if (e.target.classList.contains("dbl")) { state.doubled = e.target.checked; if (state.doubled) state.group = "thin2"; save(); render(); }
   if (e.target.id === "st-auto") { const s = curSess(); if (s) { s.stAuto = e.target.checked; save(); } }
   if (e.target.id === "wake") setWake(e.target.checked);
+  if (e.target.id === "c-custom" && mixMode()) {
+    const hx = e.target.value.toUpperCase(), ps = mixParts(form.color);
+    if (ps.includes(hx)) return;
+    if (ps.length >= MIX_MAX) { toast(`섞인 색은 ${MIX_MAX}가지까지 고를 수 있어요`); return; }
+    form.color = mixKey([...ps, hx]); renderForm();
+  }
 });
 document.addEventListener("input", e => {
   if (/^su-[wnlr]$/.test(e.target.id)) { setupInput(e.target.id, parseFloat(e.target.value)); return; }
-  if (e.target.id !== "c-custom") return;
+  if (e.target.id !== "c-custom" || mixMode()) return;   // 섞인 색 고를 때는 다 고른 뒤(change)에 더해요
   form.color = e.target.value.toUpperCase();
   const w = $("c-custom-wrap"); w.classList.add("on"); $("c-custom-dot").style.background = form.color;
   [...w.childNodes].forEach(nd => { if (nd.nodeType === 3) nd.textContent = "고른 색"; });
@@ -118,7 +124,7 @@ $("add-form").addEventListener("submit", e => {
     const y = state.yarns.find(v => v.id === state.editId);
     if (y) {
       const label = gIn > 0 ? (Math.round(gIn) === y.grams ? y.label : "저울로 잼") : `${s.name} ×${form.count}`;
-      Object.assign(y, { weight: form.weight, grams, color: form.color, texture: form.texture, label });
+      Object.assign(y, { weight: form.weight, grams, color: finalColor(form.color), texture: form.texture, label });
       state.group = form.weight;
     }
     state.editId = null; form.count = 1; $("gram-input").value = "";
@@ -127,10 +133,10 @@ $("add-form").addEventListener("submit", e => {
   const label = gIn > 0 ? "저울로 잼" : `${s.name} ×${form.count}`;
   const wasExample = state.example;
   if (state.example) { state.yarns = []; state.example = false; }
-  state.yarns.push({ id: "y" + Date.now().toString(36), weight: form.weight, grams, color: form.color, texture: form.texture, label });
+  state.yarns.push({ id: "y" + Date.now().toString(36), weight: form.weight, grams, color: finalColor(form.color), texture: form.texture, label });
   state.group = form.weight;
   form.count = 1; $("gram-input").value = "";
   save(); closeSheets(); render();
-  const ci = cinfo(form.color), cn = ci.hex ? ci.name + " " : "";
+  const ci = cinfo(finalColor(form.color)), cn = ci.hex ? ci.name + " " : "";
   toast(`${cn}${WEIGHTS[form.weight].name} ${grams}g을 담았어요${wasExample ? " · 예시는 지웠어요" : ""}`);
 });

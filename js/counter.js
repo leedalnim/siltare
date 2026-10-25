@@ -84,14 +84,43 @@ async function setWake(on) {
 }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && state.wake && state.tab === "counter") setWake(true); });
 
+const mixMode = () => form.color === "multi" || isMix(form.color);
+// 색 고르기: 평소엔 하나만, '여러 색' 칩을 켜면 2~4가지를 차례로 골라 섞인 실로 담아요
+function pickColor(k) {
+  const parts = mixParts(form.color);
+  if (k === "multi") {
+    if (mixMode()) form.color = parts[0] || "unknown";
+    else form.color = form.color && form.color !== "unknown" && cinfo(form.color).hex ? mixKey([form.color]) : "multi";
+  } else if (k === "unknown") form.color = "unknown";
+  else if (mixMode()) {
+    const i = parts.indexOf(k);
+    if (i >= 0) parts.splice(i, 1);
+    else if (parts.length >= MIX_MAX) { toast(`섞인 색은 ${MIX_MAX}가지까지 고를 수 있어요`); return; }
+    else parts.push(k);
+    form.color = mixKey(parts);
+  } else form.color = k;
+  renderForm();
+}
+// 담을 때 정리: 섞인 색이 한 가지뿐이면 그냥 그 색으로
+const finalColor = c => { const ps = mixParts(c); return isMix(c) && ps.length < 2 ? (ps[0] || "multi") : c; };
 function renderForm() {
   $("opt-weight").innerHTML = WKEYS.map(k => `<button type="button" class="opt" id="w-${k}" data-w="${k}" aria-pressed="${form.weight === k}"><span class="strand" style="height:${WEIGHTS[k].line}px"></span><span>${WEIGHTS[k].name}</span><small>${WEIGHTS[k].needle}</small></button>`).join("");
   $("opt-size").innerHTML = Object.entries(SIZES).map(([k, s]) => `<button type="button" class="opt" id="s-${k}" data-s="${k}" aria-pressed="${form.size === k}"><span class="size-slot"><span class="size-ball" style="width:${s.px}px;height:${s.px}px"></span></span><span>${s.name}</span><small>${s.sub}</small></button>`).join("");
   $("opt-texture").innerHTML = Object.entries(TEXTURES).map(([k, t]) => `<button type="button" class="opt" id="t-${k}" data-t="${k}" aria-pressed="${form.texture === k}"><span>${t.name}</span><small>${t.sub}</small></button>`).join("");
-  const isCustom = /^#/.test(form.color || "");
-  $("opt-color").innerHTML = COLORS.map(([k, n, h]) => `<button type="button" class="sw ${h ? "" : "unknown-sw"}" id="c-${k}" data-c="${k}" style="${swStyle(k)}" aria-pressed="${form.color === k}" aria-label="${n}" title="${n}">${h ? "" : "?"}</button>`).join("")
-    + `<label class="sw-custom ${isCustom ? "on" : ""}" id="c-custom-wrap"><i id="c-custom-dot" style="background:${isCustom ? form.color : "transparent"}"></i>${isCustom ? "고른 색" : "+ 직접 고르기"}<input type="color" id="c-custom" aria-label="색 직접 고르기" value="${isCustom ? form.color.toLowerCase() : "#9e2a6b"}"></label>`;
-  $("color-name").textContent = form.color && form.color !== "unknown" ? cinfo(form.color).name : "선택 안 함";
+  const mixing = mixMode(), parts = mixParts(form.color);
+  const isCustom = !mixing && /^#/.test(form.color || "");
+  const hexParts = parts.filter(p => p[0] === "#");
+  $("opt-color").innerHTML = COLORS.map(([k, n, h]) => {
+    const on = k === "multi" ? mixing : mixing ? parts.includes(k) : form.color === k, no = mixing && on && k !== "multi" ? parts.indexOf(k) + 1 : 0;
+    const nm = k === "multi" ? "여러 색 섞인 실" : n;
+    return `<button type="button" class="sw ${h ? "" : "unknown-sw"}${no ? " num" : ""}" id="c-${k}" data-c="${k}" style="${swStyle(k)}" aria-pressed="${on}" aria-label="${nm}${no ? ` (${no}번째)` : ""}" title="${nm}">${h ? (no ? `<b>${no}</b>` : "") : "?"}</button>`;
+  }).join("")
+    + hexParts.map(p => `<button type="button" class="sw num" data-c="${p}" style="background:${p}" aria-pressed="true" aria-label="${nearestName(p)} 계열 (${parts.indexOf(p) + 1}번째) 빼기" title="눌러서 빼기"><b>${parts.indexOf(p) + 1}</b></button>`).join("")
+    + `<label class="sw-custom ${isCustom ? "on" : ""}" id="c-custom-wrap"><i id="c-custom-dot" style="background:${isCustom ? form.color : "transparent"}"></i>${mixing ? "+ 색 더하기" : isCustom ? "고른 색" : "+ 직접 고르기"}<input type="color" id="c-custom" aria-label="${mixing ? "섞인 색 하나 더 고르기" : "색 직접 고르기"}" value="${isCustom ? form.color.toLowerCase() : "#9e2a6b"}"></label>`;
+  $("color-name").textContent = form.color && form.color !== "unknown" ? (mixing && parts.length < 2 ? "여러 색 섞임" : cinfo(form.color).name) : "선택 안 함";
+  const mh = $("mix-hint");
+  mh.hidden = !mixing;
+  if (mixing) mh.innerHTML = `<span class="mix-ball" style="${swStyle(parts.length > 1 ? form.color : "multi")}"></span><span>섞여 있는 색을 <b>${MIX_MAX}가지까지</b> 차례로 눌러 주세요. ${parts.length ? `<b>${parts.length}가지</b> 골랐어요 · 1번이 대표색이에요.` : "먼저 누른 색이 대표색이 돼요."}</span>`;
   $("cnt-out").textContent = form.count + "개";
 }
 

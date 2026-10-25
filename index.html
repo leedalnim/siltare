@@ -115,7 +115,8 @@
       <div class="field">
         <span class="label">색 (선택) · <span id="color-name">선택 안 함</span></span>
         <div class="swatches" id="opt-color"></div>
-        <span class="hint">원하는 색이 없으면 <b>+ 직접 고르기</b>를 눌러 색을 골라 주세요. 고른 색으로 무늬와 완성 미리보기가 칠해져요.</span>
+        <p class="mix-hint" id="mix-hint" hidden></p>
+        <span class="hint">여러 색이 섞인 실이면 무지개 칩을 누르고 색을 차례로 골라 주세요. 원하는 색이 없으면 <b>+ 직접 고르기</b>.</span>
       </div>
       <button class="primary" type="submit" id="add-btn">바구니에 담기</button>
     </form>
@@ -176,6 +177,15 @@
   </div>
 </div>
 
+<div class="sheet picker" id="picker" hidden>
+  <div class="scrim" data-pick-x></div>
+  <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="pick-h">
+    <div class="grab" aria-hidden="true"></div>
+    <div class="sheet-hd"><h3 id="pick-h"></h3><button class="close" type="button" data-pick-x aria-label="닫기">×</button></div>
+    <div class="pick-list" id="pick-list" role="list"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script src="js/data.js"></script>
@@ -197,6 +207,7 @@
 <script src="js/knitview.js"></script>
 <script src="js/dotchart.js"></script>
 <script src="js/events.js"></script>
+<script src="js/picker.js"></script>
 <script src="js/main.js"></script>
 <script src="js/pwa.js"></script>
 </body>

@@ -47,7 +47,33 @@ function nearestName(hex) {
   });
   return best;
 }
+// 여러 색이 섞인 실: "mix:pink,blue,#AABBCC" (앞에 고른 색이 대표색, 2~4가지)
+const MIX_MAX = 4;
+const isMix = k => typeof k === "string" && k.startsWith("mix:");
+function mixParts(key) {
+  if (!isMix(key)) return [];
+  const out = [];
+  key.slice(4).split(",").forEach(p => {
+    p = p.trim(); if (/^#[0-9a-fA-F]{6}$/.test(p)) p = p.toUpperCase();
+    else if (!COLOR_MAP[p] || !COLOR_MAP[p][2] || p === "multi") return;
+    if (!out.includes(p) && out.length < MIX_MAX) out.push(p);
+  });
+  return out;
+}
+const mixKey = parts => parts.length ? "mix:" + parts.join(",") : "multi";
+const partHex = p => p[0] === "#" ? p : COLOR_MAP[p][2];
+const partName = p => p[0] === "#" ? nearestName(p) : COLOR_MAP[p][1];
+function mixBg(hexes) {   // 실타래에 여러 색이 감긴 느낌으로 조각조각
+  const n = hexes.length, seq = [...hexes, ...hexes], st = 100 / seq.length;
+  return `conic-gradient(${seq.map((h, i) => `${h} ${(i * st).toFixed(1)}% ${((i + 1) * st).toFixed(1)}%`).join(",")})`;
+}
 function cinfo(key) {
+  if (isMix(key)) {
+    const ps = mixParts(key);
+    if (ps.length === 1) return cinfo(ps[0]);
+    if (!ps.length) return cinfo("multi");
+    return { name: ps.map(partName).join("·") + " 섞임", hex: partHex(ps[0]), mix: ps.map(partHex) };
+  }
   if (typeof key === "string" && /^#[0-9a-fA-F]{6}$/.test(key)) return { name: nearestName(key) + " 계열", hex: key.toUpperCase(), custom: true };
   const c = COLOR_MAP[key];
   return c && c[2] ? { name: c[1], hex: c[2] } : { name: "색 모름", hex: null };

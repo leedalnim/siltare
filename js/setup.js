@@ -66,7 +66,7 @@ function renderSetup() {
   let h = `<div class="su-head"><canvas data-sw="${su.pid}" aria-hidden="true"></canvas><div><b>${b.p.name}</b><span>${craftName(su.craft)} · ${WEIGHTS[su.use].name} 기준</span></div></div>`;
   const mine = state.myProj.filter(m => m.craft === su.craft), isMine = mine.some(m => m.id === su.proj);
   h += `<div class="field"><label class="label" for="su-proj">무엇을 뜰까요</label>
-    <div class="su-proj"><select id="su-proj" class="my-in">
+    <div class="su-proj bsel"><select id="su-proj" class="my-in">
       <option value=""${!su.proj && !su.newProj ? " selected" : ""}>정하지 않음</option>
       <optgroup label="이 무늬로 뜰 수 있는 것">${projs.map(pr => `<option value="${pr.id}"${su.proj === pr.id ? " selected" : ""}>${pr.name}</option>`).join("")}</optgroup>
       ${mine.length ? `<optgroup label="내가 등록한 작품">${mine.map(m => `<option value="${m.id}"${su.proj === m.id ? " selected" : ""}>${esc(m.name)}</option>`).join("")}</optgroup>` : ""}

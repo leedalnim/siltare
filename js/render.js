@@ -1,7 +1,7 @@
 // ---------- Render ----------
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const swStyle = key => { if (key === "multi") return `background:${RAINBOW}`; const c = cinfo(key); return c.hex ? `background:${c.hex}` : ""; };
+const swStyle = key => { if (key === "multi") return `background:${RAINBOW}`; const c = cinfo(key); return c.mix ? `background:${mixBg(c.mix)}` : c.hex ? `background:${c.hex}` : ""; };
 const dotsFor = ys => `<span class="dots">${[...new Set(ys.map(y => y.color))].slice(0, 4).map(k => `<i class="${cinfo(k).hex ? "" : "unknown-sw"}" style="${swStyle(k)}"></i>`).join("")}</span>`;
 const stLabel = { ok: "충분해요", tight: "빠듯해요", risk: "조금 모자랄 수도" };
 const ro = w => { const c = String(w).charCodeAt(String(w).length - 1) - 0xAC00; const j = c >= 0 && c <= 11171 ? c % 28 : 0; return w + (j && j !== 8 ? "으로" : "로"); };   // 받침에 따라 '으로/로'
@@ -250,7 +250,7 @@ function renderDetail() {
   if (sel) state.pv = sel.pr.id;
   const ckeys = Object.keys(r.byColor).sort((a, b) => r.byColor[b] - r.byColor[a]);
   const cchips = ckeys.length > 1 ? `<div class="field"><span class="label">${r.multi ? "메인 색 고르기 · 나머지 색은 배색으로 들어가요" : "어떤 색으로 뜰까요"}</span>
-    <div class="cchips">${ckeys.map(k => `<button type="button" class="cchip" data-main="${esc(k)}" aria-pressed="${k === r.mainKey}"><i style="background:${hexFor(k)}"></i>${cinfo(k).name}<span class="x">${r.byColor[k]}g</span></button>`).join("")}</div></div>` : "";
+    <div class="cchips">${ckeys.map(k => `<button type="button" class="cchip" data-main="${esc(k)}" aria-pressed="${k === r.mainKey}"><i style="${isMix(k) ? swStyle(k) : `background:${hexFor(k)}`}"></i>${cinfo(k).name}<span class="x">${r.byColor[k]}g</span></button>`).join("")}</div></div>` : "";
   const z = sizeOf(p, g, r.have);
   $("pat-body").innerHTML = `${stageHTML(p, sel, cols, rx)}
     ${cchips}
