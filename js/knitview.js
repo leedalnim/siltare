@@ -6,10 +6,10 @@ const knitShade = (c, a) => c.map(v => Math.max(0, Math.min(255, Math.round(a < 
 const knitRgb = (c, al = 1) => `rgba(${c[0]},${c[1]},${c[2]},${al})`;
 function knitRand(seed) { let s = seed % 2147483647; if (s <= 0) s += 2147483646; return () => (s = s * 16807 % 2147483647) / 2147483647; }
 
-function knitLeg(ctx, cx, y, cw, ch, side, col, rand) {
+function knitLeg(ctx, cx, y, cw, ch, side, col, rand, o = {}) {
   ctx.save();
-  ctx.translate(cx + side * cw * 0.05, y + ch * 0.74); ctx.rotate(side * 0.45 + (rand() - .5) * 0.06);
-  const lw = cw * 0.47, lh = ch * 1.38;
+  ctx.translate(cx + side * cw * 0.05, y + ch * (o.by || 0.74)); ctx.rotate(side * (o.ang || 0.45) + (rand() - .5) * 0.06);
+  const lw = cw * (o.lw || 0.47), lh = ch * (o.lh || 1.38);
   const path = () => { ctx.beginPath(); ctx.moveTo(0, 0); ctx.bezierCurveTo(-lw * 0.62, -lh * 0.10, -lw * 0.66, -lh * 1.02, 0, -lh); ctx.bezierCurveTo(lw * 0.66, -lh * 1.02, lw * 0.62, -lh * 0.10, 0, 0); ctx.closePath(); };
   ctx.shadowColor = "rgba(0,0,0,.45)"; ctx.shadowBlur = cw * 0.18; ctx.shadowOffsetY = cw * 0.06; ctx.shadowOffsetX = side * cw * 0.03;
   const lit = side < 0, a = knitShade(col, 0.26), m = knitShade(col, 0.06), d = knitShade(col, -0.34);
@@ -50,15 +50,33 @@ function knitLeg(ctx, cx, y, cw, ch, side, col, rand) {
 }
 // 코 그림 미리 만들기: 색 · 크기마다 4가지(코마다 살짝 다르게 보이도록)
 const knitSprites = new Map();
-function knitSprite(hex, cw, ch, dpr, n) {
-  const key = `${hex}|${cw}|${dpr}|${n}`; let s = knitSprites.get(key); if (s) return s;
+// 짧은뜨기 코: 짧고 통통한 두 다리 + 위에 가로로 누운 고리(코 머리)
+function scTop(ctx, cx, y, cw, ch, col, rand) {
+  const rx = cw * 0.47, ry = ch * 0.13, cy = y, lwid = Math.max(0.8, ch * 0.15);
+  for (const [a0, a1, k] of [[Math.PI, Math.PI * 2, -0.3], [0, Math.PI, 0.12]]) {   // 뒤쪽 가닥(어둡게) → 앞쪽 가닥(밝게)
+    const g = ctx.createLinearGradient(0, cy - ry - lwid, 0, cy + ry + lwid);
+    g.addColorStop(0, knitRgb(knitShade(col, k + 0.15))); g.addColorStop(0.5, knitRgb(knitShade(col, k))); g.addColorStop(1, knitRgb(knitShade(col, k - 0.25)));
+    ctx.save(); ctx.shadowColor = "rgba(0,0,0,.35)"; ctx.shadowBlur = cw * 0.12; ctx.shadowOffsetY = cw * 0.04;
+    ctx.strokeStyle = g; ctx.lineWidth = lwid; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, (rand() - .5) * 0.08, a0, a1); ctx.stroke(); ctx.restore();
+    if (cw >= 7) {   // 꼬임 결
+      ctx.strokeStyle = knitRgb(knitShade(col, -0.35), 0.45); ctx.lineWidth = 0.4;
+      for (let t = a0 + 0.15; t < a1; t += 0.32) { const x = cx + Math.cos(t) * rx, yy = cy + Math.sin(t) * ry; ctx.beginPath(); ctx.moveTo(x - lwid * 0.35, yy - lwid * 0.4); ctx.lineTo(x + lwid * 0.35, yy + lwid * 0.4); ctx.stroke(); }
+    }
+  }
+}
+function knitSprite(hex, cw, ch, dpr, n, st = "knit") {
+  const key = `${hex}|${cw}|${dpr}|${n}|${st}`; let s = knitSprites.get(key); if (s) return s;
   if (knitSprites.size > 400) knitSprites.clear();
   const off = ch * 0.9, W = cw * 1.6, H = ch * 2.6, cv = document.createElement("canvas");
   cv.width = Math.ceil(W * dpr); cv.height = Math.ceil(H * dpr);
   const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const rand = knitRand(97 + n * 131 + parseInt(String(hex).slice(1), 16) % 997), col = knitShade(knitHex(hex), (rand() - .5) * 0.07);
   const wob = (rand() - .5) * cw * 0.04;
-  for (const side of [-1, 1]) knitLeg(ctx, cw * 0.8 + wob, off + ch * 0.5, cw, ch, side, col, rand);
+  if (st === "sc") {
+    for (const side of [-1, 1]) knitLeg(ctx, cw * 0.8 + wob, off + ch * 0.5, cw, ch, side, col, rand, { ang: 0.52, lw: 0.42, lh: 1.08, by: 0.92 });
+    scTop(ctx, cw * 0.8 + wob, off + ch * 0.5 - ch * 0.2, cw, ch, col, rand);
+  } else for (const side of [-1, 1]) knitLeg(ctx, cw * 0.8 + wob, off + ch * 0.5, cw, ch, side, col, rand);
   s = { cv, ox: cw * 0.3, oy: off }; knitSprites.set(key, s); return s;
 }
 // d = { w, h, cells(위쪽 줄부터, 팔레트 번호), pal(hex) }, opt = { rx, ry, maxW, maxH, row(지금 단 · 아래에서 0부터) }
@@ -66,7 +84,8 @@ function knitDraw(cv, d, opt = {}) {
   if (!cv || !d || !d.w) return;
   const rx = opt.rx || 1, ry = opt.ry || 1, cols = d.w * rx, rows = d.h * ry;
   const maxW = opt.maxW || (cv.parentElement ? cv.parentElement.clientWidth : 340), maxH = opt.maxH || 9999;
-  const cw = Math.max(3, Math.min(26, maxW / cols, maxH / ((rows + 0.5) * 0.86))), ch = cw * 0.86;
+  const st = opt.stitch === "sc" ? "sc" : "knit", ratio = st === "sc" ? 0.92 : 0.86;
+  const cw = Math.max(3, Math.min(26, maxW / cols, maxH / ((rows + 0.5) * ratio))), ch = cw * ratio;
   const W = cols * cw, H = rows * ch + ch * 0.5, dpr = Math.min(window.devicePixelRatio || 1, 2);
   cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); cv.style.width = W + "px"; cv.style.height = H + "px";
   const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -74,7 +93,7 @@ function knitDraw(cv, d, opt = {}) {
   for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) { ctx.fillStyle = knitRgb(knitShade(knitHex(at(r, c)), -0.78)); ctx.fillRect(c * cw, r * ch, cw + .5, ch * 1.5 + .5); }
   const cwq = Math.round(cw * 4) / 4;   // 크기를 조금 묶어서 코 그림을 다시 쓰게
   for (let r = rows - 1; r >= 0; r--) for (let c = 0; c < cols; c++) {
-    const s = knitSprite(at(r, c), cwq, cwq * 0.86, dpr, (r * 7 + c * 13) % 4);
+    const s = knitSprite(at(r, c), cwq, cwq * ratio, dpr, (r * 7 + c * 13) % 4, st);
     ctx.drawImage(s.cv, c * cw - s.ox, r * ch - s.oy, s.cv.width / dpr, s.cv.height / dpr);
   }
   const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "rgba(255,255,255,.05)"); g.addColorStop(1, "rgba(0,0,0,.07)");

@@ -111,3 +111,12 @@
 .dot-vmode { display: flex; width: 100%; margin-bottom: 10px; }
 .dot-vmode button { flex: 1; }
 .knit-rep { margin-top: 10px; }
+.knit-st { display: flex; width: 100%; margin-top: 8px; }
+.knit-st button { flex: 1; }
+.knit-map { display: grid; gap: 6px; margin: 4px 0 10px; }
+.knit-map .label { margin: 0 0 2px; }
+.kmap { display: flex; align-items: center; gap: 8px; background: var(--surface-2); border-radius: 12px; padding: 7px 10px; }
+.kmap i { width: 22px; height: 22px; border-radius: 6px; flex: none; box-shadow: inset 0 0 0 1px rgba(0,0,0,.1); }
+.kmap .ar { color: var(--muted); font-size: 13px; }
+.kmap select { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 13.5px; padding: 4px 0; }
+.knit-map .ghost-btn { justify-self: start; padding: 7px 12px; font-size: 13px; }

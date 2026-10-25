@@ -3,7 +3,10 @@
 // 맨 아래 줄이 1단이에요.
 const DOT_PAL = ["#FFFFFF", "#1D1A24", "#E07A2F", "#9A9AA2"];
 const DOT_SYM = ["♡", "●", "@", "Σ", "▲", "★", "◆", "✕", "○", "■", "♣", "♠"];   // 색마다 붙는 기호 (출력하거나 비슷한 색일 때 구분용)
-const dotView = { sym: true, mode: "chart", rep: [1, 1] };
+const dotView = { sym: true, mode: "chart", rep: [1, 1], st: "knit" };
+// 내 바구니 실 색 (떴을 때 모습에서 도안 색을 바꿔 볼 때)
+const yarnHex = y => cinfo(y.color).hex || hexFor(colorKey(y));
+const yarnLabel = y => `${WEIGHTS[y.weight] ? WEIGHTS[y.weight].name : ""} · ${cinfo(y.color).name} ${y.grams}g`;
 const knitLiveOn = () => { try { return localStorage.getItem("siltare-knit-live") !== "off"; } catch (e) { return true; } };
 const dotEd = { id: null, w: 20, h: 16, cells: [], pal: DOT_PAL.slice(), cur: 1, tool: "pen", hist: [], name: "", sym: true };
 const DOT_DRAFT = "siltare-dot-draft";   // 저장 전 그림 임시 보관 (앱이 꺼지거나 실수로 닫아도 이어 그리기)
@@ -133,12 +136,17 @@ function dotOpenView(p) {
   const row = Math.min(p.row || 0, p.h), done = row >= p.h, pct = Math.round(row / p.h * 100);
   const now = done ? `<div class="dot-now done"><b>다 떴어요!</b><span>${p.h}단 완성</span></div>`
     : (() => { const r = dotRuns(p, row); return `<div class="dot-now"><div class="dn-hd"><b>지금 ${row + 1}단</b><span>${r.rtl ? "← 오른쪽부터" : "왼쪽부터 →"}</span></div><div class="runs">${r.html}</div></div>`; })();
-  const knit = dotView.mode === "knit", [rx, ry] = dotView.rep;
+  const knit = dotView.mode === "knit", [rx, ry] = dotView.rep, ymap = p.ymap || {};
+  const vpal = p.pal.map((h, i) => { const y = ymap[i] && state.yarns.find(v => v.id === ymap[i]); return y ? yarnHex(y) : h; });
   const vtabs = `<div class="seg dot-vmode" role="group" aria-label="보기"><button type="button" data-dot-vmode="chart" aria-pressed="${!knit}">칸 도안</button><button type="button" data-dot-vmode="knit" aria-pressed="${knit}">떴을 때 모습</button></div>`;
   const vbody = knit
     ? `<div class="knit-view"><canvas id="dot-kcv" aria-label="떴을 때 모습"></canvas></div>
       <div class="seg2 knit-rep" role="group" aria-label="반복해서 보기">${[[1, 1], [2, 1], [3, 2], [4, 3]].map(([a, b]) => `<button type="button" data-dot-rep="${a}x${b}" aria-pressed="${rx === a && ry === b}">${a}×${b}</button>`).join("")}</div>
-      <p class="my-hint">${rx === 1 && ry === 1 ? "아직 안 뜬 단은 흐리게 보여요. " : ""}반복을 고르면 무늬를 이어 붙인 모습을 볼 수 있어요.</p>`
+      <div class="seg knit-st" role="group" aria-label="코 모양"><button type="button" data-dot-st="knit" aria-pressed="${dotView.st !== "sc"}">대바늘 · 겉뜨기</button><button type="button" data-dot-st="sc" aria-pressed="${dotView.st === "sc"}">코바늘 · 짧은뜨기</button></div>
+      <p class="my-hint">${rx === 1 && ry === 1 ? "아직 안 뜬 단은 흐리게 보여요. " : ""}반복을 고르면 무늬를 이어 붙인 모습을 볼 수 있어요.</p>
+      <div class="knit-map"><span class="label">실 색 · 내 바구니 실로 바꿔 보기</span>${p.pal.map((h, i) => `<label class="kmap"><i style="background:${h}"></i><span class="ar">→</span><i style="background:${vpal[i]}"></i>
+        <select data-knit-map="${i}" aria-label="${i + 1}번 색을 뜰 실"><option value="">원래 색</option>${state.yarns.map(y => `<option value="${y.id}"${ymap[i] === y.id ? " selected" : ""}>${esc(yarnLabel(y))}</option>`).join("")}</select></label>`).join("")}
+        ${Object.values(ymap).some(Boolean) ? `<button type="button" class="ghost-btn" data-knit-reset>원래 색으로</button>` : ""}</div>`
     : `<div class="dot-wrap view"><canvas id="dot-vcv" aria-label="도트 도안 ${p.w}코 × ${p.h}단"></canvas></div>
     <div class="dot-vtools"><button type="button" data-dot-vsym aria-pressed="${dotView.sym}">기호 ${dotView.sym ? "켜짐" : "꺼짐"}</button><span class="my-hint">초록 ✓ 다 뜬 단 · 보라 테두리 지금 단 · ◀▶ 뜨는 방향(왕복 기준)</span></div>`;
   $("mypat-body").innerHTML = `${vtabs}${vbody}
@@ -149,7 +157,7 @@ function dotOpenView(p) {
     <div class="my-acts"><button type="button" class="ghost-btn" data-dot-edit="${p.id}">그림 고치기</button><button type="button" class="ghost-btn danger" data-my-del="${p.id}">삭제</button></div>`;
   if ($("sheet-mypat").hidden) openSheet("sheet-mypat");
   const dd = { w: p.w, h: p.h, cells: dec(p.cells), pal: p.pal };
-  requestAnimationFrame(() => knit ? knitDraw($("dot-kcv"), dd, { rx, ry, row: rx === 1 && ry === 1 ? row : null, maxH: 420 }) : dotDraw($("dot-vcv"), dd, { row, sym: dotView.sym }));
+  requestAnimationFrame(() => knit ? knitDraw($("dot-kcv"), { ...dd, pal: vpal }, { rx, ry, row: rx === 1 && ry === 1 ? row : null, maxH: 420, stitch: dotView.st }) : dotDraw($("dot-vcv"), dd, { row, sym: dotView.sym }));
 }
 
 // ----- 색 편집 팝업 -----
@@ -195,6 +203,8 @@ document.addEventListener("click", e => {
   }
   if (t.closest("[data-dot-sym]")) { dotEd.name = $("dot-name").value; dotEd.sym = !dotEd.sym; dotRenderEditor(); return; }
   const vm = t.closest("[data-dot-vmode]"); if (vm) { dotView.mode = vm.dataset.dotVmode; const p = myPats.find(x => x.id === myView.id); if (p) dotOpenView(p); return; }
+  const stb = t.closest("[data-dot-st]"); if (stb) { dotView.st = stb.dataset.dotSt; const p = myPats.find(x => x.id === myView.id); if (p) dotOpenView(p); return; }
+  if (t.closest("[data-knit-reset]")) { const p = myPats.find(x => x.id === myView.id); if (p) { p.ymap = {}; mySave(); dotOpenView(p); } return; }
   const rp = t.closest("[data-dot-rep]"); if (rp) { dotView.rep = rp.dataset.dotRep.split("x").map(Number); const p = myPats.find(x => x.id === myView.id); if (p) dotOpenView(p); return; }
   if (t.closest("[data-knit-toggle]")) { const on = !knitLiveOn(); try { localStorage.setItem("siltare-knit-live", on ? "on" : "off"); } catch (e) {} const box = t.closest(".knit-live"); box.classList.toggle("off", !on); box.querySelector(".kl-box").hidden = !on; t.textContent = on ? "접기" : "펼치기"; if (on) knitLive(); return; }
   if (t.closest("[data-dot-vsym]")) { dotView.sym = !dotView.sym; const p = myPats.find(x => x.id === myView.id); if (p) dotOpenView(p); return; }
@@ -212,6 +222,8 @@ document.addEventListener("input", e => {
   }
 });
 document.addEventListener("change", e => {
+  const km = e.target.closest && e.target.closest("[data-knit-map]");
+  if (km) { const p = myPats.find(x => x.id === myView.id); if (p) { p.ymap = { ...(p.ymap || {}), [km.dataset.knitMap]: km.value || undefined }; if (!km.value) delete p.ymap[km.dataset.knitMap]; mySave(); dotOpenView(p); } return; }
   if (e.target.id === "dot-editc") { dotEd.name = $("dot-name").value; dotRenderEditor(); dotPop(true); return; }
   if (e.target.id !== "dot-addc") return;
   dotEd.name = $("dot-name").value; dotPush(); dotEd.pal.push(e.target.value.toUpperCase()); dotEd.cur = dotEd.pal.length - 1; dotEd.tool = "pen"; dotRenderEditor();
