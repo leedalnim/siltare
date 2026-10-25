@@ -100,3 +100,14 @@
 .dot-pop-ft .primary { padding: 9px 22px; }
 .dot-pop-ft .danger { color: var(--risk); margin-right: auto; }
 .dot-wrap.move canvas { touch-action: auto; cursor: grab; }
+
+/* 떴을 때 모습: 그리는 동안 실시간 미리보기 · 보기 화면 */
+.knit-live { padding: 2px 0 4px; }
+.knit-live .kl-hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.knit-live .kl-hd .label { margin: 0; }
+.knit-live .kl-box, .knit-view { border-radius: 12px; overflow: hidden; display: grid; place-items: center; background: var(--surface-2); box-shadow: var(--card-sh); }
+.knit-live canvas, .knit-view canvas { display: block; }
+.knit-view { margin-bottom: 4px; }
+.dot-vmode { display: flex; width: 100%; margin-bottom: 10px; }
+.dot-vmode button { flex: 1; }
+.knit-rep { margin-top: 10px; }

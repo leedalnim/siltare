@@ -3,7 +3,8 @@
 // 맨 아래 줄이 1단이에요.
 const DOT_PAL = ["#FFFFFF", "#1D1A24", "#E07A2F", "#9A9AA2"];
 const DOT_SYM = ["♡", "●", "@", "Σ", "▲", "★", "◆", "✕", "○", "■", "♣", "♠"];   // 색마다 붙는 기호 (출력하거나 비슷한 색일 때 구분용)
-const dotView = { sym: true };
+const dotView = { sym: true, mode: "chart", rep: [1, 1] };
+const knitLiveOn = () => { try { return localStorage.getItem("siltare-knit-live") !== "off"; } catch (e) { return true; } };
 const dotEd = { id: null, w: 20, h: 16, cells: [], pal: DOT_PAL.slice(), cur: 1, tool: "pen", hist: [], name: "", sym: true };
 const DOT_DRAFT = "siltare-dot-draft";   // 저장 전 그림 임시 보관 (앱이 꺼지거나 실수로 닫아도 이어 그리기)
 const dotSnap = () => ({ w: dotEd.w, h: dotEd.h, cells: dotEd.cells.slice(), pal: dotEd.pal.slice() });
@@ -77,10 +78,12 @@ function dotRenderEditor() {
       <button type="button" class="dot-cedit-btn" data-dot-pop aria-haspopup="dialog">✎ 색 편집</button></div>
     <div class="dot-tools">${[["pen", "칠하기"], ["fill", "채우기"], ["erase", "지우개"], ["move", "✋ 화면 이동"]].map(([k, n]) => `<button type="button" data-dot-tool="${k}" aria-pressed="${d.tool === k}">${n}</button>`).join("")}
       <button type="button" data-dot-undo${d.hist.length ? "" : " disabled"}>되돌리기</button><button type="button" data-dot-clear>모두 지우기</button><button type="button" data-dot-sym aria-pressed="${d.sym}">기호 ${d.sym ? "켜짐" : "꺼짐"}</button></div>
+    <div class="knit-live${knitLiveOn() ? "" : " off"}"><div class="kl-hd"><span class="label">떴을 때 모습 · 실시간</span><button type="button" class="link" data-knit-toggle>${knitLiveOn() ? "접기" : "펼치기"}</button></div>
+      <div class="kl-box"${knitLiveOn() ? "" : " hidden"}><canvas id="dot-knit" aria-label="떴을 때 모습 미리보기"></canvas></div></div>
     <div class="dot-wrap${d.tool === "move" ? " move" : ""}"><canvas id="dot-cv" aria-label="도트 도안 그리기 판"></canvas></div>
     <p class="my-hint">칸을 누르거나 끌어서 칠해요. 판이 화면보다 크면 ‘화면 이동’을 골라 밀어서 옮겨요. 지우개는 바탕색으로 칠하고, 채우기는 같은 색으로 이어진 칸을 한 번에 칠해요. 맨 아래 줄이 1단이에요.</p>
     <button type="button" class="primary wide" data-dot-save>저장</button></div>`;
-  requestAnimationFrame(() => { dotDraw.last = dotDraw($("dot-cv"), d, { sym: d.sym }); });
+  requestAnimationFrame(() => { dotDraw.last = dotDraw($("dot-cv"), d, { sym: d.sym }); knitLive(); });
   dotDraft(true);
 }
 function dotCellAt(e) {
@@ -96,7 +99,7 @@ function dotPaint(i) {
     const st = [i]; while (st.length) { const k = st.pop(); if (d.cells[k] !== from) continue; d.cells[k] = col; const r = Math.floor(k / d.w), c = k % d.w;
       if (c > 0) st.push(k - 1); if (c < d.w - 1) st.push(k + 1); if (r > 0) st.push(k - d.w); if (r < d.h - 1) st.push(k + d.w); }
   } else { if (d.cells[i] === col) return; d.cells[i] = col; }
-  dotDraw.last = dotDraw($("dot-cv"), d, { sym: d.sym });
+  dotDraw.last = dotDraw($("dot-cv"), d, { sym: d.sym }); knitLive();
 }
 function dotResize(w, h) {
   const d = dotEd, n = new Array(w * h).fill(0);
@@ -130,15 +133,23 @@ function dotOpenView(p) {
   const row = Math.min(p.row || 0, p.h), done = row >= p.h, pct = Math.round(row / p.h * 100);
   const now = done ? `<div class="dot-now done"><b>다 떴어요!</b><span>${p.h}단 완성</span></div>`
     : (() => { const r = dotRuns(p, row); return `<div class="dot-now"><div class="dn-hd"><b>지금 ${row + 1}단</b><span>${r.rtl ? "← 오른쪽부터" : "왼쪽부터 →"}</span></div><div class="runs">${r.html}</div></div>`; })();
-  $("mypat-body").innerHTML = `<div class="dot-wrap view"><canvas id="dot-vcv" aria-label="도트 도안 ${p.w}코 × ${p.h}단"></canvas></div>
-    <div class="dot-vtools"><button type="button" data-dot-vsym aria-pressed="${dotView.sym}">기호 ${dotView.sym ? "켜짐" : "꺼짐"}</button><span class="my-hint">초록 ✓ 다 뜬 단 · 보라 테두리 지금 단 · ◀▶ 뜨는 방향(왕복 기준)</span></div>
+  const knit = dotView.mode === "knit", [rx, ry] = dotView.rep;
+  const vtabs = `<div class="seg dot-vmode" role="group" aria-label="보기"><button type="button" data-dot-vmode="chart" aria-pressed="${!knit}">칸 도안</button><button type="button" data-dot-vmode="knit" aria-pressed="${knit}">떴을 때 모습</button></div>`;
+  const vbody = knit
+    ? `<div class="knit-view"><canvas id="dot-kcv" aria-label="떴을 때 모습"></canvas></div>
+      <div class="seg2 knit-rep" role="group" aria-label="반복해서 보기">${[[1, 1], [2, 1], [3, 2], [4, 3]].map(([a, b]) => `<button type="button" data-dot-rep="${a}x${b}" aria-pressed="${rx === a && ry === b}">${a}×${b}</button>`).join("")}</div>
+      <p class="my-hint">${rx === 1 && ry === 1 ? "아직 안 뜬 단은 흐리게 보여요. " : ""}반복을 고르면 무늬를 이어 붙인 모습을 볼 수 있어요.</p>`
+    : `<div class="dot-wrap view"><canvas id="dot-vcv" aria-label="도트 도안 ${p.w}코 × ${p.h}단"></canvas></div>
+    <div class="dot-vtools"><button type="button" data-dot-vsym aria-pressed="${dotView.sym}">기호 ${dotView.sym ? "켜짐" : "꺼짐"}</button><span class="my-hint">초록 ✓ 다 뜬 단 · 보라 테두리 지금 단 · ◀▶ 뜨는 방향(왕복 기준)</span></div>`;
+  $("mypat-body").innerHTML = `${vtabs}${vbody}
     ${now}
     <div class="my-ctr"><span class="label">단수 세기 · ${p.w}코 × ${p.h}단</span><div class="my-ctr-row"><button type="button" data-dot-row="-1" aria-label="한 단 빼기"${row ? "" : " disabled"}>−</button>
       <output aria-live="polite"><b>${row}</b>단 <small>/ ${p.h}단</small></output><button type="button" data-dot-row="1" class="plus" aria-label="한 단 더하기"${done ? " disabled" : ""}>+1</button></div>
       <div class="pbar"><i style="width:${pct}%"></i></div></div>
     <div class="my-acts"><button type="button" class="ghost-btn" data-dot-edit="${p.id}">그림 고치기</button><button type="button" class="ghost-btn danger" data-my-del="${p.id}">삭제</button></div>`;
   if ($("sheet-mypat").hidden) openSheet("sheet-mypat");
-  requestAnimationFrame(() => dotDraw($("dot-vcv"), { w: p.w, h: p.h, cells: dec(p.cells), pal: p.pal }, { row, sym: dotView.sym }));
+  const dd = { w: p.w, h: p.h, cells: dec(p.cells), pal: p.pal };
+  requestAnimationFrame(() => knit ? knitDraw($("dot-kcv"), dd, { rx, ry, row: rx === 1 && ry === 1 ? row : null, maxH: 420 }) : dotDraw($("dot-vcv"), dd, { row, sym: dotView.sym }));
 }
 
 // ----- 색 편집 팝업 -----
@@ -183,6 +194,9 @@ document.addEventListener("click", e => {
     dotRenderEditor(); dotPop(true); return;
   }
   if (t.closest("[data-dot-sym]")) { dotEd.name = $("dot-name").value; dotEd.sym = !dotEd.sym; dotRenderEditor(); return; }
+  const vm = t.closest("[data-dot-vmode]"); if (vm) { dotView.mode = vm.dataset.dotVmode; const p = myPats.find(x => x.id === myView.id); if (p) dotOpenView(p); return; }
+  const rp = t.closest("[data-dot-rep]"); if (rp) { dotView.rep = rp.dataset.dotRep.split("x").map(Number); const p = myPats.find(x => x.id === myView.id); if (p) dotOpenView(p); return; }
+  if (t.closest("[data-knit-toggle]")) { const on = !knitLiveOn(); try { localStorage.setItem("siltare-knit-live", on ? "on" : "off"); } catch (e) {} const box = t.closest(".knit-live"); box.classList.toggle("off", !on); box.querySelector(".kl-box").hidden = !on; t.textContent = on ? "접기" : "펼치기"; if (on) knitLive(); return; }
   if (t.closest("[data-dot-vsym]")) { dotView.sym = !dotView.sym; const p = myPats.find(x => x.id === myView.id); if (p) dotOpenView(p); return; }
   const ed = t.closest("[data-dot-edit]"); if (ed) { const p = myPats.find(x => x.id === ed.dataset.dotEdit); if (p) { closeSheets(); dotOpenEditor(p); } return; }
   const rw = t.closest("[data-dot-row]"); if (rw) { const p = myPats.find(x => x.id === myView.id); if (p) { p.row = Math.max(0, Math.min(p.h, (p.row || 0) + (+rw.dataset.dotRow))); mySave(); dotOpenView(p); } return; }
@@ -194,7 +208,7 @@ document.addEventListener("input", e => {
     const c = e.target.value.toUpperCase(); dotEd.pal[dotEd.cur] = c;
     const pick = e.target.closest(".dot-cpick"); if (pick) pick.style.background = c;
     document.querySelectorAll(`[data-dot-c="${dotEd.cur}"],[data-dot-pc="${dotEd.cur}"]`).forEach(sw => sw.style.background = c);
-    dotDraw.last = dotDraw($("dot-cv"), dotEd, { sym: dotEd.sym });
+    dotDraw.last = dotDraw($("dot-cv"), dotEd, { sym: dotEd.sym }); knitLive();
   }
 });
 document.addEventListener("change", e => {
