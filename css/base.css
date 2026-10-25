@@ -92,3 +92,8 @@ button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .view-title .meta { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
 .label { font-size: 12px; font-weight: 600; letter-spacing: .06em; color: var(--muted); }
 .empty { color: var(--muted); font-size: 14px; padding: 18px; border: 1px dashed var(--line); border-radius: var(--radius); text-align: center; display: grid; gap: 10px; justify-items: center; }
+
+/* 아이폰에서 두 번 탭할 때 확대되지 않게 (두 손가락 확대는 그대로) */
+html, body, button, a, label, input, select, textarea, canvas { touch-action: manipulation; }
+/* 입력칸을 누를 때 iOS가 자동 확대하지 않게 글자를 16px 이상으로 */
+@media (pointer: coarse) { input, select, textarea { font-size: max(16px, 1em) !important; } }

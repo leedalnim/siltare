@@ -69,7 +69,7 @@
 .dot-tools button:disabled { opacity: .4; }
 .dot-wrap { overflow: auto; background: var(--chart-bg); border-radius: var(--radius); padding: 8px; max-height: 60vh; }
 .dot-wrap canvas { display: block; touch-action: none; margin: 0 auto; }
-.dot-wrap.view canvas { touch-action: auto; }
+.dot-wrap.view canvas { touch-action: manipulation; }
 .dot-now { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; margin-top: 10px; display: grid; gap: 8px; }
 .dot-now.done { color: var(--ok); }
 .dn-hd { display: flex; justify-content: space-between; align-items: baseline; }
@@ -99,7 +99,7 @@
 .dot-pop-ft { display: flex; gap: 8px; justify-content: flex-end; }
 .dot-pop-ft .primary { padding: 9px 22px; }
 .dot-pop-ft .danger { color: var(--risk); margin-right: auto; }
-.dot-wrap.move canvas { touch-action: auto; cursor: grab; }
+.dot-wrap.move canvas { touch-action: manipulation; cursor: grab; }
 
 /* 떴을 때 모습: 그리는 동안 실시간 미리보기 · 보기 화면 */
 .knit-live { padding: 2px 0 4px; }
