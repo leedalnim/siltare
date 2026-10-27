@@ -89,13 +89,17 @@ function knitDraw(cv, d, opt = {}) {
   const W = cols * cw, H = rows * ch + ch * 0.5, dpr = Math.min(window.devicePixelRatio || 1, 2);
   cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); cv.style.width = W + "px"; cv.style.height = H + "px";
   const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const at = (r, c) => d.pal[d.cells[(r % d.h) * d.w + (c % d.w)]] || d.pal[0] || "#FFFFFF";
+  // 대바늘 겉뜨기 코는 위아래를 뒤집어 그려요 (무늬 방향은 그대로): 줄 순서를 뒤집고 캔버스를 뒤집어요
+  const flip = st === "knit";
+  const at = (r, c) => { const rr = flip ? rows - 1 - r : r; return d.pal[d.cells[(rr % d.h) * d.w + (c % d.w)]] || d.pal[0] || "#FFFFFF"; };
+  if (flip) { ctx.save(); ctx.translate(0, H); ctx.scale(1, -1); }
   for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) { ctx.fillStyle = knitRgb(knitShade(knitHex(at(r, c)), -0.78)); ctx.fillRect(c * cw, r * ch, cw + .5, ch * 1.5 + .5); }
   const cwq = Math.round(cw * 4) / 4;   // 크기를 조금 묶어서 코 그림을 다시 쓰게
   for (let r = rows - 1; r >= 0; r--) for (let c = 0; c < cols; c++) {
     const s = knitSprite(at(r, c), cwq, cwq * ratio, dpr, (r * 7 + c * 13) % 4, st);
     ctx.drawImage(s.cv, c * cw - s.ox, r * ch - s.oy, s.cv.width / dpr, s.cv.height / dpr);
   }
+  if (flip) ctx.restore();
   const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "rgba(255,255,255,.05)"); g.addColorStop(1, "rgba(0,0,0,.07)");
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   if (opt.row != null && opt.row < d.h && ry === 1) {   // 아직 안 뜬 단은 흐리게
