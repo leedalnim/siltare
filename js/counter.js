@@ -24,6 +24,19 @@ function triLine(s) {
     <div>${r.chg ? `<b>${word} 단</b> · ${esc(triHow(t, s.craft))}<br><span>${r.from}코 → <b>${r.to}코</b>가 돼요</span>`
       : `<b>${word} 없이</b> 떠요<br><span><b>${r.from}코</b> 그대로${when}</span>`}</div></div>`;
 }
+// 카운터 상세에서는 맨 위 막대가 '목록으로 · 삭제' 막대로 바뀌어요
+const BAR_ICON = {
+  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>',
+  del: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>'
+};
+function barDetail() {
+  const s = state.tab === "counter" && state.sessions.find(x => x.id === state.sess), bd = $("bar-detail");
+  document.querySelector(".topbar").classList.toggle("detail", !!s); bd.hidden = !s;
+  if (!s) { bd.innerHTML = ""; return; }
+  const delC = isConfirming("del", s.id);
+  bd.innerHTML = `<button type="button" class="bar-btn" data-sess-back aria-label="단수 세기 목록으로">${BAR_ICON.back}<span>단수 세기</span></button>
+    <button type="button" class="bar-btn del${delC ? " warn" : ""}" data-sess-del="${s.id}" aria-label="${delC ? "한 번 더 누르면 삭제돼요" : "이 카운터 삭제"}">${BAR_ICON.del}${delC ? "<span>한 번 더 누르면 삭제</span>" : ""}</button>`;
+}
 function renderCounter() {
   const box = $("v-counter");
   const s = state.sessions.find(x => x.id === state.sess);
@@ -41,7 +54,7 @@ function renderCounter() {
       }).join("")}</ul>`;
     }
     html += syncLine();
-    box.innerHTML = html;
+    box.innerHTML = html; barDetail();
     requestAnimationFrame(() => paintSess(box));
     return;
   }
@@ -50,9 +63,7 @@ function renderCounter() {
   const reached = s.target && s.row >= s.target && !info.done;
   const kP = starKey("p", s.pid, s.craft);
   const delC = isConfirming("del", s.id), resetC = isConfirming("reset", s.id);
-  let html = `<div class="ctr-top"><button type="button" class="link" data-sess-back>‹ 단수 세기 목록</button>
-    <button type="button" class="link danger" data-sess-del="${s.id}">${delC ? "한 번 더 누르면 삭제" : "카운터 삭제"}</button></div>
-    <div class="ctr-head"><canvas data-ss="${s.id}" aria-hidden="true"></canvas><div><h2 id="h-counter">${p ? p.name : ""}</h2><span>${pr ? pr.name + " · " : ""}${craftName(s.craft)}</span></div>${starBtn(kP, p ? p.name : "", true)}</div>
+  let html = `<div class="ctr-head"><canvas data-ss="${s.id}" aria-hidden="true"></canvas><div><h2 id="h-counter">${p ? p.name : ""}</h2><span>${pr ? pr.name + " · " : ""}${craftName(s.craft)}</span></div>${starBtn(kP, p ? p.name : "", true)}</div>
     ${progressHTML(s, rx, info)}`;
   if (info.done) {
     html += `<div class="ctr-card done" aria-live="polite"><span class="label">${s.row}단 완료</span><div class="big">완성!</div><p class="inst">도안의 마지막 단까지 다 떴어요. 마무리하고 실 끝을 정리해 주세요.</p></div>
@@ -74,7 +85,7 @@ function renderCounter() {
       <label class="toggle"><input type="checkbox" id="st-auto" ${s.stAuto ? "checked" : ""}> 다음 단으로 넘어가면 0으로 돌리기</label></div>
     <label class="toggle"><input type="checkbox" id="wake" ${state.wake ? "checked" : ""}> 뜨는 동안 화면이 꺼지지 않게</label>`;
   html += `<details class="rx-fold"><summary>도안 전체 보기</summary>${recipeHTML(rx, s.cols, { noChart: true, hi: info.done ? -1 : info.hi })}</details>` + syncLine();
-  box.innerHTML = html;
+  box.innerHTML = html; barDetail();
   requestAnimationFrame(() => { paintSess(box); box.querySelectorAll("canvas[data-prog]").forEach(cv => drawProgress(cv, s)); box.querySelectorAll("canvas[data-pw]").forEach(cv => drawPatWindow(cv, s));
     const fs = box.querySelector("[data-filet-scroll]"), fb = fs && fs.querySelector(".filet-band");   // 필레 도안: 지금 단이 보이게 스크롤
     if (fb) { fs.scrollTop = Math.max(0, fb.getBoundingClientRect().top - fs.getBoundingClientRect().top + fs.scrollTop - fs.clientHeight / 2);
@@ -144,6 +155,7 @@ function renderNav() {
   const { g } = currentGroup();
   const bb = $("badge-basket"); bb.hidden = !state.yarns.length; bb.textContent = state.yarns.length;
   const bp = $("badge-patterns"); const n = g ? analyse(g).ok.length : 0; bp.hidden = !n; bp.textContent = n;
+  barDetail();
   const bc = $("badge-counter"); bc.hidden = !state.sessions.length; bc.textContent = state.sessions.length;
 }
 function render() {

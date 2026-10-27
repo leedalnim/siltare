@@ -72,6 +72,41 @@ function dotOpenEditor(p) {
   $("dot-title").textContent = p ? "도트 도안 고치기" : "도트 도안 그리기";
   dotRenderEditor(); openSheet("sheet-dot");
 }
+// 도트 편집 아이콘 (선 아이콘, 글자색을 따라가요)
+const DICON = Object.fromEntries(Object.entries({
+  pen: '<path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/>',
+  fill: '<path d="M4.5 11.5l7-7 7.5 7.5-7 7z"/><path d="M4.5 11.5h14"/><path d="M20 15.5s1.8 2.3 1.8 3.6a1.8 1.8 0 0 1-3.6 0c0-1.3 1.8-3.6 1.8-3.6z"/>',
+  erase: '<path d="M8.5 19.5L3.8 14.8a1.5 1.5 0 0 1 0-2.1l8.6-8.6a1.5 1.5 0 0 1 2.1 0l5.6 5.6a1.5 1.5 0 0 1 0 2.1l-7.9 7.7z"/><path d="M8.5 19.5H20"/><path d="M8.8 8.6l6.6 6.6"/>',
+  move: '<path d="M12 3v18M3 12h18"/><path d="M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/>',
+  undo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+  sym: '<rect x="3.5" y="3.5" width="17" height="17" rx="3"/><circle cx="9" cy="9" r="1.6"/><path d="M13.5 13.5l4 4M17.5 13.5l-4 4"/>',
+  clear: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  palette: '<path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-.9-.8-1.3-.8-2.1 0-.9.8-1.6 1.7-1.6H17a4 4 0 0 0 4-4C21 6.8 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10" cy="7" r="1.2"/><circle cx="15" cy="7.5" r="1.2"/>',
+  yarn: '<circle cx="12" cy="12" r="8.5"/><path d="M5 8.5c4.5.5 9 4.5 10.5 11.5M4.2 13.5c3.6 0 6.8 2.4 8.2 6.8M9 3.9c4.2 2 7.7 6.6 8.8 12.6"/>'
+}).map(([k, v]) => [k, `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${v}</svg>`]));
+// 내 실 바구니의 실 색을 팔레트로 불러오기 (섞인 색 실은 섞인 색을 모두)
+function dotYarnColors(y) { const c = cinfo(y.color); return c.mix ? c.mix : [yarnHex(y)]; }
+function dotYarnPick() {
+  const d = dotEd, have = new Set(d.pal.map(c => c.toUpperCase())), seen = new Set(), items = [];
+  state.yarns.forEach(y => {
+    const hs = dotYarnColors(y).map(h => h.toUpperCase()), key = hs.join(","); if (seen.has(key)) return; seen.add(key);
+    items.push({ v: y.id, label: yarnLabel(y), sw: yarnSw(y), on: hs.every(h => have.has(h)), sub: hs.every(h => have.has(h)) ? "이미 팔레트에 있어요" : "" });
+  });
+  if (!items.length) { toast("바구니에 담긴 실이 없어요. '내 실'에서 먼저 담아 주세요"); return; }
+  if (items.length > 1) items.unshift({ v: "__all", label: "바구니 실 색 모두 넣기", cls: "new" });
+  pickShow("내 실 색 불러오기", items, v => {
+    const ys = v === "__all" ? state.yarns : state.yarns.filter(y => y.id === v);
+    const add = [...new Set(ys.flatMap(dotYarnColors).map(h => h.toUpperCase()))];
+    d.name = $("dot-name") ? $("dot-name").value : d.name;
+    const fresh = add.filter(h => !d.pal.some(c => c.toUpperCase() === h)), room = 12 - d.pal.length;
+    if (!fresh.length) { const i = d.pal.findIndex(c => c.toUpperCase() === add[0]); if (i >= 0) { d.cur = i; if (d.tool === "erase" || d.tool === "move") d.tool = "pen"; } dotRenderEditor(); toast("이미 팔레트에 있는 색이라 그 색을 골랐어요"); return; }
+    if (room <= 0) { toast("색은 12가지까지 넣을 수 있어요. 안 쓰는 색을 지우고 다시 불러와 주세요"); return; }
+    dotPush(); fresh.slice(0, room).forEach(h => d.pal.push(h));
+    d.cur = d.pal.length - Math.min(room, fresh.length); if (d.tool === "erase" || d.tool === "move") d.tool = "pen";
+    dotRenderEditor();
+    toast(fresh.length > room ? `${room}가지만 넣었어요 (색은 12가지까지)` : `내 실 색 ${fresh.length}가지를 넣었어요`);
+  });
+}
 function dotRenderEditor() {
   const d = dotEd;
   $("dot-body").innerHTML = `<div class="dot-ed">
@@ -79,9 +114,14 @@ function dotRenderEditor() {
     <div class="dot-size"><label>가로 <input id="dot-w" class="my-in" type="number" inputmode="numeric" min="4" max="80" value="${d.w}"> 코</label><span>×</span><label>세로 <input id="dot-h" class="my-in" type="number" inputmode="numeric" min="4" max="80" value="${d.h}"> 단</label><button type="button" class="ghost-btn" data-dot-resize>적용</button></div>
     <div class="dot-pal" role="group" aria-label="색">${d.pal.map((c, i) => `<button type="button" class="dot-sw" data-dot-c="${i}" style="background:${c}" aria-pressed="${d.cur === i && d.tool !== "erase"}" aria-label="${i === 0 ? "바탕색" : `${i + 1}번 색`}"><span style="color:${inkOn(c)}">${DOT_SYM[i]}</span>${i === 0 ? "<small>바탕</small>" : ""}</button>`).join("")}
       ${d.pal.length < 12 ? `<label class="dot-sw dot-add" aria-label="색 추가">＋<input type="color" id="dot-addc" value="#7DA9D8"></label>` : ""}
-      <button type="button" class="dot-cedit-btn" data-dot-pop aria-haspopup="dialog">✎ 색 편집</button></div>
-    <div class="dot-tools">${[["pen", "칠하기"], ["fill", "채우기"], ["erase", "지우개"], ["move", "✋ 화면 이동"]].map(([k, n]) => `<button type="button" data-dot-tool="${k}" aria-pressed="${d.tool === k}">${n}</button>`).join("")}
-      <button type="button" data-dot-undo${d.hist.length ? "" : " disabled"}>되돌리기</button><button type="button" data-dot-clear>모두 지우기</button><button type="button" data-dot-sym aria-pressed="${d.sym}">기호 ${d.sym ? "켜짐" : "꺼짐"}</button></div>
+</div>
+    <div class="dot-pacts"><button type="button" class="dot-chip" data-dot-yarn aria-haspopup="dialog">${DICON.yarn}내 실 불러오기</button><button type="button" class="dot-chip" data-dot-pop aria-haspopup="dialog">${DICON.palette}색 편집</button></div>
+    <div class="dot-tb" role="toolbar" aria-label="그리기 도구">
+      <div class="dot-tb-g" role="group" aria-label="도구">${[["pen", "칠하기"], ["fill", "채우기"], ["erase", "지우개"], ["move", "이동"]].map(([k, n]) => `<button type="button" data-dot-tool="${k}" aria-pressed="${d.tool === k}">${DICON[k]}<span>${n}</span></button>`).join("")}</div>
+      <div class="dot-tb-g">
+        <button type="button" data-dot-undo${d.hist.length ? "" : " disabled"}>${DICON.undo}<span>되돌리기</span></button>
+        <button type="button" data-dot-sym aria-pressed="${d.sym}" aria-label="기호 ${d.sym ? "끄기" : "켜기"}">${DICON.sym}<span>기호</span></button>
+        <button type="button" data-dot-clear class="warn">${DICON.clear}<span>지우기</span></button></div></div>
     <div class="knit-live${knitLiveOn() ? "" : " off"}"><div class="kl-hd"><span class="label">떴을 때 모습 · 실시간</span><button type="button" class="link" data-knit-toggle>${knitLiveOn() ? "접기" : "펼치기"}</button></div>
       <div class="kl-box"${knitLiveOn() ? "" : " hidden"}><canvas id="dot-knit" aria-label="떴을 때 모습 미리보기"></canvas></div></div>
     <div class="dot-wrap${d.tool === "move" ? " move" : ""}"><canvas id="dot-cv" aria-label="도트 도안 그리기 판"></canvas></div>
@@ -180,6 +220,7 @@ function dotPop(open) {
 document.addEventListener("click", e => {
   const t = e.target;
   if (t.closest("[data-dot-new]")) { dotOpenEditor(); return; }
+  if (t.closest("[data-dot-yarn]")) { dotYarnPick(); return; }
   if (t.closest("[data-dot-pop]")) { if (dotEd.tool === "erase" || dotEd.tool === "move") dotEd.tool = "pen"; dotPop(true); return; }
   if (t.closest("[data-dot-popx]") || t.id === "dot-pop") { dotPop(false); dotRenderEditor(); return; }
   const pc = t.closest("[data-dot-pc]"); if (pc) { dotEd.cur = +pc.dataset.dotPc; dotPop(true); return; }

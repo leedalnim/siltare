@@ -97,3 +97,11 @@ button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 html, body, button, a, label, input, select, textarea, canvas { touch-action: manipulation; }
 /* 입력칸을 누를 때 iOS가 자동 확대하지 않게 글자를 16px 이상으로 */
 @media (pointer: coarse) { input, select, textarea { font-size: max(16px, 1em) !important; } }
+
+/* 카운터 상세: 맨 위 막대가 '‹ 단수 세기 · 삭제'로 바뀌어요 */
+.topbar.detail .brand, .topbar.detail .bar-end { display: none; }
+.bar-detail { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 44px; }
+.bar-btn { display: inline-flex; align-items: center; gap: 4px; height: 44px; padding: 0 14px 0 8px; border: 0; border-radius: 999px; background: var(--surface-2); color: var(--ink); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
+.bar-btn svg { width: 22px; height: 22px; flex: none; }
+.bar-btn.del { width: 44px; padding: 0; justify-content: center; color: var(--muted); }
+.bar-btn.del.warn { width: auto; padding: 0 14px 0 12px; background: #c2414f; color: #fff; font-size: 13.5px; }
