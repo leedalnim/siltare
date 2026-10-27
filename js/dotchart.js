@@ -93,7 +93,7 @@ function dotYarnPick() {
     items.push({ v: y.id, label: yarnLabel(y), sw: yarnSw(y), on: hs.every(h => have.has(h)), sub: hs.every(h => have.has(h)) ? "이미 팔레트에 있어요" : "" });
   });
   if (!items.length) { toast("바구니에 담긴 실이 없어요. '내 실'에서 먼저 담아 주세요"); return; }
-  if (items.length > 1) items.unshift({ v: "__all", label: "바구니 실 색 모두 넣기", cls: "all" });
+  if (items.length > 1) items.push({ v: "__all", label: "바구니 실 색 모두 넣기", cls: "all" });
   pickShow("내 실 색 불러오기", items, v => {
     const ys = v === "__all" ? state.yarns : state.yarns.filter(y => y.id === v);
     const add = [...new Set(ys.flatMap(dotYarnColors).map(h => h.toUpperCase()))];
