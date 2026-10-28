@@ -8,15 +8,16 @@ html { background: var(--bg); }
 /* iOS 26 홈 화면 앱은 앱 화면을 상태바만큼 짧게 잡고(창 848 / 실제 화면 100lvh 896), 그 아래 띠에는 그림을 그릴 수 없어요.
    --gap = 그 띠 높이. 이 문제가 없는 기기·사파리 탭·안드로이드에서는 0이에요.
    띠가 있으면 탭바 아래 홈 표시줄 여백을 그 띠가 대신하고, 띠 색(문서 바탕)을 탭바와 같은 색으로 맞춰요. */
-:root { --gap: 0px; }
+:root { --gap: 0px; --sbx: 0px; }
 @media (display-mode: standalone) {
-  :root { --gap: max(0px, calc(100lvh - 100dvh)); }
+  /* --sbx: iOS가 상태바 아래로 약 20pt까지 흐림을 펼쳐서, 상태바가 있는 기기에서만 니트 띠를 그만큼 내려요 */
+  :root { --gap: max(0px, calc(100lvh - 100dvh)); --sbx: min(20px, env(safe-area-inset-top, 0px)); }
   html { background: var(--surface); }
 }
 /* 상태바 자리 + 니트 무늬 띠를 앱 바탕색 고정 띠로 (스크롤 상자는 이 띠 아래에서 시작해서 iOS 흐림이 덮을 게 없어요) */
-.sb-cover { position: fixed; top: 0; left: 0; right: 0; padding-top: env(safe-area-inset-top, 0px); background: var(--bg); z-index: 15; }
+.sb-cover { position: fixed; top: 0; left: 0; right: 0; padding-top: calc(env(safe-area-inset-top, 0px) + var(--sbx)); background: var(--bg); z-index: 15; }
 .sb-cover .band { margin-inline: 0; }
-#root { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 16px); left: 0; right: 0; bottom: 0; background: var(--bg); overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
+#root { position: fixed; top: calc(env(safe-area-inset-top, 0px) + var(--sbx) + 16px); left: 0; right: 0; bottom: 0; background: var(--bg); overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
 
 
 /* Layout: phone-style app column; sticky top bar with knit band, three views switched by a fixed bottom tab bar, bottom sheets for adding yarn and pattern detail. */
