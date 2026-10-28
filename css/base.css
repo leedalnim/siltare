@@ -80,7 +80,10 @@ button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .app { max-width: 640px; margin: 0 auto; padding-inline: 16px; padding-block: 0 calc(var(--tabbar) + 32px + env(safe-area-inset-bottom, 0px)); }
 
 /* Top bar */
-.topbar { position: sticky; top: 0; z-index: 5; background: var(--bg); margin-inline: -16px; padding-inline: 16px; padding-block: 0 10px; }
+/* 상단 막대는 화면에 고정된 단색 막대예요: iOS 26 홈 화면 앱이 고정 막대를 알아보고 흐림 대신 이 색으로 깔끔하게 처리해요.
+   본문 칸(최대 640px)과 줄이 맞도록 좌우 여백을 계산하고, 스크롤 상자는 막대 높이(--tbh)만큼 위를 비워 둬요. */
+.topbar { --tbpad: max(16px, calc(50% - 304px)); position: fixed; top: env(safe-area-inset-top, 0px); left: 0; right: 0; z-index: 5; background: var(--bg); padding-inline: var(--tbpad); padding-block: 0 10px; }
+#root { padding-top: var(--tbh, 82px); scroll-padding-top: var(--tbh, 82px); }
 .band { height: 16px; background: var(--accent); opacity: .85;
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 24'%3E%3Cpath d='M10 23C6 19 1.5 13 1.5 1.5 6 5 9 12 10 23Z M10 23C14 19 18.5 13 18.5 1.5 14 5 11 12 10 23Z'/%3E%3C/svg%3E") 0 2px / 11px 11px repeat-x;
           mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 24'%3E%3Cpath d='M10 23C6 19 1.5 13 1.5 1.5 6 5 9 12 10 23Z M10 23C14 19 18.5 13 18.5 1.5 14 5 11 12 10 23Z'/%3E%3C/svg%3E") 0 2px / 11px 11px repeat-x;

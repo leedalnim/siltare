@@ -27,3 +27,10 @@ applyTheme();
 render();
 if (state.wake && state.tab === "counter") setWake(true);
 initSync();
+
+// 고정된 상단 막대 높이만큼 스크롤 상자 위를 비워요 (밝기·카운터 상세 등으로 높이가 바뀌면 따라가요)
+(function () {
+  const tb = document.querySelector(".topbar"), root = $("root"); if (!tb || !root) return;
+  const set = () => root.style.setProperty("--tbh", Math.ceil(tb.getBoundingClientRect().height) + "px");
+  set(); if (window.ResizeObserver) new ResizeObserver(set).observe(tb); else window.addEventListener("resize", set);
+})();
