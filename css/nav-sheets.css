@@ -1,5 +1,5 @@
 /* Tab bar */
-.tabbar { position: fixed; left: 0; right: 0; bottom: var(--vb); z-index: 10; background: var(--surface); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; background: var(--surface); border-top: 1px solid var(--line); padding-bottom: max(0px, env(safe-area-inset-bottom, 0px) - var(--gap)); }
 .tabbar-in { max-width: 640px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); height: var(--tabbar); }
 .tab { border: 0; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 12px; font-weight: 600; color: var(--muted); position: relative; }
 .tab svg { width: 24px; height: 24px; }
@@ -7,9 +7,9 @@
 .tab .badge { position: absolute; top: 8px; left: calc(50% + 8px); min-width: 18px; height: 18px; padding-inline: 5px; border-radius: 999px; background: var(--badge-bg); color: var(--badge-ink); font-size: 11px; font-family: var(--font-mono); display: grid; place-items: center; }
 
 /* Sheets */
-.sheet { position: fixed; inset: 0; bottom: var(--vb); z-index: 20; display: flex; align-items: flex-end; justify-content: center; }
+.sheet { position: fixed; inset: 0; z-index: 20; display: flex; align-items: flex-end; justify-content: center; }
 .scrim { position: absolute; inset: 0; background: var(--scrim); }
-.sheet-panel { position: relative; width: 100%; max-width: 640px; max-height: 90%; overflow-y: auto; overscroll-behavior: contain; background: var(--surface); border-radius: 20px 20px 0 0; padding-inline: 18px; padding-block: 8px calc(24px + env(safe-area-inset-bottom, 0px)); }
+.sheet-panel { position: relative; width: 100%; max-width: 640px; max-height: 90%; overflow-y: auto; overscroll-behavior: contain; background: var(--surface); border-radius: 20px 20px 0 0; padding-inline: 18px; padding-block: 8px calc(24px + max(0px, env(safe-area-inset-bottom, 0px) - var(--gap))); }
 @media (prefers-reduced-motion: no-preference) { .sheet:not([hidden]) .sheet-panel { animation: up .22s ease-out; } @keyframes up { from { transform: translateY(24px); opacity: .5; } } }
 .grab { width: 40px; height: 4px; border-radius: 99px; background: var(--line); margin: 0 auto 8px; }
 .sheet-hd { display: flex; justify-content: space-between; align-items: center; gap: 10px; position: sticky; top: -8px; background: var(--surface); padding-block: 6px; z-index: 1; }
@@ -73,7 +73,7 @@ details.help ul { margin: 6px 0 0; padding-left: 18px; }
 .more { font-size: 13px; color: var(--muted); margin: 0; }
 .sub-h { font-size: 13px; font-weight: 600; color: var(--muted); margin: 0; }
 
-.toast { position: fixed; left: 50%; bottom: calc(var(--tabbar) + 16px + env(safe-area-inset-bottom, 0px) + var(--vb)); transform: translateX(-50%); background: var(--toast-bg); color: var(--toast-ink); box-shadow: 0 6px 20px rgba(0,0,0,.45); padding: 10px 16px; border-radius: 999px; font-size: 13.5px; z-index: 30; max-width: calc(100% - 32px); display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+.toast { position: fixed; left: 50%; bottom: calc(var(--tabbar) + 16px + max(0px, env(safe-area-inset-bottom, 0px) - var(--gap))); transform: translateX(-50%); background: var(--toast-bg); color: var(--toast-ink); box-shadow: 0 6px 20px rgba(0,0,0,.45); padding: 10px 16px; border-radius: 999px; font-size: 13.5px; z-index: 30; max-width: calc(100% - 32px); display: flex; align-items: center; gap: 12px; white-space: nowrap; }
 .toast .undo { border: 0; background: transparent; color: var(--toast-link); font-weight: 600; font-size: 13.5px; padding: 2px 0; }
 @media (max-width: 400px) { .opts.w5 { grid-template-columns: repeat(3, minmax(0,1fr)); } .pick { grid-template-columns: 76px minmax(0,1fr); } .pick canvas { width: 76px; height: 76px; } }
 
