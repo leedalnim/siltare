@@ -169,7 +169,7 @@ function commitSetup() {
   }
   const s = Object.assign({ id: "s" + Date.now().toString(36), craft: su.craft, pid: su.pid, cols: su.cols, row: 0, st: 0, stAuto: true, at: Date.now() }, fields);
   state.sessions.unshift(s); state.sess = s.id; state.tab = "counter"; state.setup = null;
-  save(); closeSheets(); render(); scroller().scrollTo(0, 0); toast("단수 카운터를 만들었어요");
+  save(); closeSheets(); render(); window.scrollTo(0, 0); toast("단수 카운터를 만들었어요");
 }
 document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id === "su-pname") { e.preventDefault(); addMyProj(); } });
 // 무엇을 뜰까요: 목록에서 고르거나 '＋ 새 작품 등록…'

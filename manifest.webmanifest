@@ -8,8 +8,8 @@
   "id": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#FFFFFF",
-  "theme_color": "#FFFFFF",
+  "background_color": "#F7F5F2",
+  "theme_color": "#F7F5F2",
   "share_target": {
     "action": "./share-target",
     "method": "POST",

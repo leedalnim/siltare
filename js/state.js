@@ -1,5 +1,3 @@
-// 앱 화면을 스크롤하는 상자 (문서 대신 #root가 스크롤해요)
-const scroller = () => document.getElementById("root") || document.scrollingElement;
 // ---------- State ----------
 const EXAMPLE = [
   { id: "e1", weight: "mid", grams: 100, color: "gray", texture: "smooth", label: "주먹 ×2" },

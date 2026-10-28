@@ -322,8 +322,8 @@ document.addEventListener("click", e => {
   const v = e.target.closest("[data-filet-v]"), z = e.target.closest("[data-filet-z]");
   if (!v && !z) return;
   if (v) filetUI.v = v.dataset.filetV; else filetUI.zoom = !filetUI.zoom;
-  const y = scroller().scrollTop, inSheet = !$("sheet-pat").hidden, panel = inSheet && $("sheet-pat").querySelector(".sheet-panel"), py = panel ? panel.scrollTop : 0;
-  if (inSheet) { renderDetail(); panel.scrollTop = py; } else { renderCounter(); scroller().scrollTop = y; }
+  const y = window.scrollY, inSheet = !$("sheet-pat").hidden, panel = inSheet && $("sheet-pat").querySelector(".sheet-panel"), py = panel ? panel.scrollTop : 0;
+  if (inSheet) { renderDetail(); panel.scrollTop = py; } else { renderCounter(); window.scrollTo(0, y); }
   requestAnimationFrame(() => { const box = document.querySelector(".cchart.filet"); if (box) box.scrollIntoView({ block: "nearest" }); });
 });
 function crochetChartHTML(pid, cols, hiRow = -1) {

@@ -4,7 +4,7 @@ document.addEventListener("click", e => {
   if (e.target.closest("[data-close]")) { closeSheets(); return; }
   const t = e.target.closest("button"); if (!t) return;
   const d = t.dataset;
-  if (d.tab) { confirmState = null; state.tab = d.tab; if (d.tab !== "counter") state.sess = state.sess; saveLocal(); if (anySheetOpen()) closeSheets(); render(); scroller().scrollTo(0, 0); return; }
+  if (d.tab) { confirmState = null; state.tab = d.tab; if (d.tab !== "counter") state.sess = state.sess; saveLocal(); if (anySheetOpen()) closeSheets(); render(); window.scrollTo(0, 0); return; }
   if (d.craft) { state.craft = d.craft; saveLocal(); render(); return; }
   if (d.star) {
     if (state.stars[d.star]) delete state.stars[d.star]; else state.stars[d.star] = Date.now();
@@ -39,8 +39,8 @@ document.addEventListener("click", e => {
   if (d.suDelproj) { const su = state.setup, m = state.myProj.find(q => q.id === d.suDelproj); if (!su || !m) return;
     if (!confirm(`'${m.name}'을(를) 내 작품 목록에서 지울까요? 이미 만든 카운터는 그대로예요.`)) return;
     state.myProj = state.myProj.filter(q => q.id !== m.id); if (su.proj === m.id) su.proj = null; save(); renderSetup(); toast("내 작품에서 지웠어요"); return; }
-  if (d.sess) { confirmState = null; state.sess = d.sess; state.tab = "counter"; saveLocal(); if (!$("sheet-pat").hidden) closeSheets(); render(); scroller().scrollTo(0, 0); return; }
-  if ("sessBack" in d) { confirmState = null; state.sess = null; saveLocal(); renderCounter(); scroller().scrollTo(0, 0); return; }
+  if (d.sess) { confirmState = null; state.sess = d.sess; state.tab = "counter"; saveLocal(); if (!$("sheet-pat").hidden) closeSheets(); render(); window.scrollTo(0, 0); return; }
+  if ("sessBack" in d) { confirmState = null; state.sess = null; saveLocal(); renderCounter(); window.scrollTo(0, 0); return; }
   if (d.sessDel) {
     if (!confirmed("del", d.sessDel)) return;
     state.sessions = state.sessions.filter(x => x.id !== d.sessDel); state.sess = null;

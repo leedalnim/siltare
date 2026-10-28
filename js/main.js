@@ -14,9 +14,7 @@ function applyTheme() {
   const t = themePref(), root = document.documentElement;
   if (t === "auto") delete root.dataset.theme; else root.dataset.theme = t;
   const b = $("theme-btn"); if (b) { b.innerHTML = THEME_ICON[t]; b.setAttribute("aria-label", "화면 밝기: " + THEME_NAME[t]); b.title = "화면 밝기: " + THEME_NAME[t]; }
-  // 홈 화면 앱에서는 iOS가 화면 아래 그릴 수 없는 띠를 이 색으로 칠해요 → 탭바 색과 맞춰요
-  const standalone = navigator.standalone === true || matchMedia("(display-mode: standalone)").matches;
-  const bg = getComputedStyle(root).getPropertyValue(standalone ? "--surface" : "--bg").trim();
+  const bg = getComputedStyle(root).getPropertyValue("--bg").trim();
   document.querySelectorAll('meta[name="theme-color"]').forEach(m => m.setAttribute("content", bg));
 }
 document.addEventListener("click", e => {
