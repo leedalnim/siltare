@@ -77,8 +77,7 @@ details.help ul { margin: 6px 0 0; padding-left: 18px; }
 .toast .undo { border: 0; background: transparent; color: var(--toast-link); font-weight: 600; font-size: 13.5px; padding: 2px 0; }
 @media (max-width: 400px) { .opts.w5 { grid-template-columns: repeat(3, minmax(0,1fr)); } .pick { grid-template-columns: 76px minmax(0,1fr); } .pick canvas { width: 76px; height: 76px; } }
 
-/* 내용이 짧을 때 iOS에서 탭바 아래가 떠 보이지 않게: 문서를 화면 높이만큼 채우고, 탭바 바탕을 아래로 이어 붙임 */
-html { box-sizing: border-box; min-height: 100vh; min-height: 100lvh; }
+/* 내용이 짧을 때 iOS에서 탭바 아래가 떠 보이지 않게: 탭바 바탕을 아래로 이어 붙임 */
 .tabbar::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 200px; background: var(--surface); pointer-events: none; }
 .gram-hint { margin: 8px 0 0; }
 
