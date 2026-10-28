@@ -15,6 +15,8 @@
       ["안전 영역 위/아래", `${probe("height:env(safe-area-inset-top,0px)")} / ${probe("height:env(safe-area-inset-bottom,0px)")}`],
       ["스크롤 상자 위/아래", `${Math.round(rt.top)} / ${Math.round(rt.bottom)}`],
       ["탭바 위/아래", `${Math.round(tb.top)} / ${Math.round(tb.bottom)}`],
+      ["바닥 보정(--vb)", probe("height:calc(0px - var(--vb))")],
+      ["상단 띠 아래", Math.round(document.querySelector(".sb-cover").getBoundingClientRect().bottom)],
       ["standalone", `${window.navigator.standalone} · ${matchMedia("(display-mode: standalone)").matches}`]
     ];
     let box = $("diag-box");
