@@ -6,6 +6,7 @@
   const show = () => {
     const tb = document.querySelector(".tabbar").getBoundingClientRect(), rt = $("root").getBoundingClientRect(), vv = window.visualViewport;
     const rows = [
+      ["버전", ((document.querySelector('link[href*="base.css"]') || {}).href || "").split("v=")[1] || "-"],
       ["화면(screen)", `${screen.width}×${screen.height}`],
       ["창(inner)", `${innerWidth}×${innerHeight}`],
       ["보이는 영역(vv)", vv ? `${Math.round(vv.width)}×${Math.round(vv.height)} @${Math.round(vv.offsetTop)}` : "-"],

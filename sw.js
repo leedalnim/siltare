@@ -1,6 +1,6 @@
 // 오프라인에서도 열리도록 앱 파일을 저장해 두는 서비스 워커.
 // 같은 주소의 파일은 "인터넷 먼저, 안 되면 저장본" 방식이라 업데이트하면 바로 새 버전이 떠요.
-const CACHE = "yarn-rx-v1";
+const CACHE = "yarn-rx-v2";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png"];
 
 self.addEventListener("install", e => {
@@ -45,7 +45,8 @@ self.addEventListener("fetch", e => {
       return hit || net;
     }
     try {
-      const r = await fetch(req);
+      // 브라우저 HTTP 캐시(GitHub Pages는 10분)를 거치지 않고 항상 서버에 새 버전이 있는지 확인해요
+      const r = req.mode === "navigate" ? await fetch(req.url, { cache: "no-cache", credentials: "same-origin" }) : await fetch(req, { cache: "no-cache" });
       if (r.ok) cache.put(req, r.clone());
       return r;
     } catch (err) {
