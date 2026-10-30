@@ -126,13 +126,16 @@ $("add-form").addEventListener("submit", e => {
       const label = gIn > 0 ? (Math.round(gIn) === y.grams ? y.label : "저울로 잼") : `${s.name} ×${form.count}`;
       Object.assign(y, { weight: form.weight, grams, color: finalColor(form.color), texture: form.texture, label });
       state.group = form.weight;
+      if (state.example && !isPristineExample(y)) state.example = false;   // 예시 실을 고쳐 쓰면 이제 내 실이에요
     }
     state.editId = null; form.count = 1; $("gram-input").value = "";
     save(); closeSheets(); render(); toast("수정했어요"); return;
   }
   const label = gIn > 0 ? "저울로 잼" : `${s.name} ×${form.count}`;
-  const wasExample = state.example;
-  if (state.example) { state.yarns = []; state.example = false; }
+  // 예시 실은 처음 그대로인 것만 지워요 (고쳐 쓴 실·직접 담은 실은 절대 지우지 않아요)
+  const before = state.yarns.length;
+  if (state.example) { state.yarns = state.yarns.filter(y => !isPristineExample(y)); state.example = false; }
+  const wasExample = state.yarns.length < before;
   state.yarns.push({ id: "y" + Date.now().toString(36), weight: form.weight, grams, color: finalColor(form.color), texture: form.texture, label });
   state.group = form.weight;
   form.count = 1; $("gram-input").value = "";

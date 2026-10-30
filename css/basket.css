@@ -55,3 +55,12 @@
 /* 굵기 칩: 실 두께 모양 */
 .gstrand { display: inline-flex; flex-direction: column; justify-content: center; gap: 2px; width: 18px; flex: none; }
 .gstrand i { display: block; width: 100%; border-radius: 99px; background: currentColor; }
+
+/* 백업 · 옮기기 */
+.backup { margin-top: 6px; border-top: 1px solid var(--line); padding-top: 10px; }
+.backup summary { cursor: pointer; width: fit-content; font-weight: 600; font-size: 14px; color: var(--muted); padding-block: 4px; }
+.backup .hint { display: block; margin: 6px 0 10px; }
+.bk-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.bk-row .ghost-btn { justify-content: center; text-align: center; }
+.bk-file { position: relative; overflow: hidden; cursor: pointer; display: inline-flex; align-items: center; }
+.bk-file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }

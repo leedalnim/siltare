@@ -47,6 +47,8 @@ try {
 } catch (e) {}
 // 예시 실만 들어 있으면 항상 최신 예시로 바꿔요 (예전 예시의 분홍 보송한 가는 실 → 아이보리 매끈한 실)
 if (state.example && state.yarns.some(y => /^e\d$/.test(y.id) && y.color === "pink")) { state.yarns = EXAMPLE.slice(); setTimeout(saveLocal, 0); }
+// 처음 그대로인 예시 실인지 (고쳐 쓴 예시 실은 내 실로 봐요)
+const isPristineExample = y => EXAMPLE.some(e => e.id === y.id && e.weight === y.weight && e.grams === y.grams && e.color === y.color && e.texture === y.texture);
 function saveLocal() {
   try { localStorage.setItem(STORE, JSON.stringify({ craft: state.craft, tab: state.tab, sess: state.sess, mode: state.mode, cat: state.cat, wake: state.wake,
     yarns: state.yarns, example: state.example, doubled: state.doubled, stars: state.stars, sessions: state.sessions, myProj: state.myProj, updatedAt: state.updatedAt })); } catch (e) {}
