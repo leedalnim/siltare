@@ -89,3 +89,8 @@
 .filet-scroll { max-height: 58vh; overflow: auto; padding: 4px; -webkit-overflow-scrolling: touch; }
 .filet-svg { display: block; width: 100%; height: auto; }
 .filet-scroll.zoom .filet-svg { width: 260%; max-width: none; }
+/* 필레 커튼: 완성 사진 */
+.filet-photo { margin: 0; display: grid; gap: 8px; }
+.filet-photo button { border: 0; padding: 0; background: none; border-radius: 14px; overflow: hidden; cursor: zoom-in; }
+.filet-photo img { display: block; width: 100%; height: auto; }
+.filet-photo figcaption { font-size: 13px; color: var(--muted); }

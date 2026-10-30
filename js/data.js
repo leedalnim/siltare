@@ -221,7 +221,7 @@ const PATTERNS = {
       how: "<b>매직링에서 부채꼴로 코를 떠서</b> 귀가 달린 고양이 얼굴을 만드는 모티브예요. 9장을 3×3으로 놓고 짧은뜨기로 채워 이어요. 도안은 첨부한 원본 이미지 기준이에요.", note: "고양이 도안" },
     { id: "blackcat", name: "검은 고양이 배색", en: "Peeking black cat", f: 1.15, w: ["thin","mid","thick"], tex: ["smooth"], c: 2, d: 2, suits: ["cat","flat"],
       how: "<b>짧은뜨기로 바탕 · 고양이 · 아랫단 세 가지 색</b>을 칸 도안대로 바꿔 가며 떠요. 안 쓰는 색 실은 코 안에 감싸 넣으며 떠서 뒤에 실이 걸치지 않아요. 네모 가방, 원형 가방, 코스터에 써요.", note: "고양이 배색" },
-    { id: "filetcat", src: "images/ref/catfiletblanket.png", name: "고양이 필레 커튼", en: "Filet crochet cats", f: 0.76, w: ["thin"], tex: ["smooth"], c: 1, d: 3, suits: ["filetcat"],
+    { id: "filetcat", src: "images/ref/catfiletblanket.png", photo: "images/ref/catfiletcurtain.webp", photoCap: "같은 고양이 칸을 3×3(9칸)으로 늘리고 아래에 레이스 단을 단 커튼이에요.", name: "고양이 필레 커튼", en: "Filet crochet cats", f: 0.76, w: ["thin"], tex: ["smooth"], c: 1, d: 3, suits: ["filetcat"],
       how: "모눈 도안대로 <b>칸을 한길긴뜨기로 채우거나 사슬로 비워</b> 고양이 6마리를 그려요. 한 칸 4코 기준 한 단 221코, 82단이에요. 가는 실 · 3mm 코바늘이면 약 92 × 63~68cm, 25g 실 10~11볼이 들어요.", note: "큰 작품" },
     { id: "amigu", name: "아미구루미", en: "Amigurumi", f: 1.0, w: ["thin","mid","thick"], tex: ["smooth","fluffy"], c: 1, d: 2, suits: ["toy"],
       how: "<b>매직링에서 짧은뜨기를 나선으로</b> 늘리고 줄여 입체를 만들어요. 솜을 넣으면 인형이 돼요.", note: "입체 인형" },

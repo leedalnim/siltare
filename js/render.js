@@ -203,13 +203,18 @@ function detailChartHTML(p, rx, cols) {
   if (state.craft === "crochet") { const h = crochetChartHTML(p.id, cols); if (h) return h; }
   return `<div class="empty-chart">이 무늬는 기호 도안이 없어요. 아래 '도안'의 단별 설명을 따라 떠 주세요.</div>`;
 }
+// 완성 사진: 누르면 크게 봐요
+const photoFigure = (src, name, cap) => `<figure class="filet-photo"><button type="button" data-photo="${src}" data-photo-name="${esc(name)}" data-photo-kind="완성 사진" aria-label="완성 사진 크게 보기"><img src="${src}" alt="${esc(name)} 완성 사진" loading="lazy"></button>
+  <figcaption>${cap ? esc(cap) + " " : ""}사진을 누르면 크게 볼 수 있어요.</figcaption></figure>`;
 function stageHTML(p, sel, cols, rx) {
   if (detailUI.pid !== p.id) { detailUI.pid = p.id; detailUI.view = p.id === "cat" ? "chart" : "swatch"; detailUI.zoom = 1; }
   const views = [["swatch", "무늬 크게"], ["chart", "기호 도안"]];
+  if (p.photo) views.push(["photo", "완성 사진"]);
   if (!views.some(v => v[0] === detailUI.view)) detailUI.view = "swatch";
   const seg = `<div class="seg dv-seg" role="group" aria-label="무늬 보기 방식">${views.map(([k, n]) => `<button type="button" data-dv="${k}" aria-pressed="${detailUI.view === k}">${n}</button>`).join("")}</div>`;
   let body;
   if (detailUI.view === "chart") body = detailChartHTML(p, rx, cols);
+  else if (detailUI.view === "photo") body = photoFigure(p.photo, p.name, p.photoCap);
   else body = `<div class="stage"><canvas class="big swbig" data-sw="${p.id}" data-zoom="${detailUI.zoom}" role="img" aria-label="${p.name} 무늬 크게 보기"></canvas>
       <span class="zoomer"><button type="button" data-dz="-1" aria-label="작게">−</button><button type="button" data-dz="1" aria-label="크게">＋</button></span></div>`;
   return seg + body;

@@ -310,12 +310,14 @@ function filetImgSVG(cur) {
   return `<svg class="filet-svg" viewBox="14 14 340 445" role="img" aria-label="고양이 필레 커튼 원본 모눈 도안"><image href="${F.src}" x="0" y="0" width="367" height="617"/>${ov}</svg>`;
 }
 function filetChartHTML(hiRow) {
-  const F = FILETCAT, cur = hiRow >= 0 ? Math.min(hiRow, F.rows) : -1, dot = filetUI.v !== "img";
-  const tools = `<div class="filet-tools"><div class="seg" role="group" aria-label="도안 보기"><button type="button" data-filet-v="dot" aria-pressed="${dot}">도트 도안</button><button type="button" data-filet-v="img" aria-pressed="${!dot}">원본 이미지</button></div>
+  const F = FILETCAT, cur = hiRow >= 0 ? Math.min(hiRow, F.rows) : -1, photo = filetUI.v === "photo", dot = !photo && filetUI.v !== "img";
+  const tools = `<div class="filet-tools"><div class="seg" role="group" aria-label="도안 보기"><button type="button" data-filet-v="dot" aria-pressed="${dot}">도트 도안</button><button type="button" data-filet-v="img" aria-pressed="${!dot && !photo}">원본 이미지</button><button type="button" data-filet-v="photo" aria-pressed="${photo}">완성 사진</button></div>
     <button type="button" class="ghost-btn" data-filet-z aria-pressed="${filetUI.zoom}">${filetUI.zoom ? "− 화면에 맞추기" : "＋ 크게 보기"}</button></div>`;
   const now = cur >= 0 && cur < F.rows ? `<div class="filet-now"><b>${cur + 1}단</b> <span>${filetRowText(cur + 1)}</span></div>` : "";
   const legend = dot ? `<p class="cc-cap">■ 채운 칸 · □ 빈 칸 · <b style="color:#C0563B">V</b> 레이스(2칸) · ═ 넓은 빈 칸(2칸). 맨 아래 줄이 1단이고, 홀수 단은 오른쪽부터 읽어요.</p>` : `<p class="cc-cap">받은 원본 모눈 도안이에요. 맨 아래 줄이 1단이에요.</p>`;
   const cap = cur < 0 ? "" : cur >= F.rows ? `<p class="cc-cap">모든 단을 다 떴어요!</p>` : `<p class="cc-cap">초록 = 다 뜬 단 · 보라 띠 = 지금 단 · 흐림 = 아직이에요.</p>`;
+  if (photo) return `<div class="cchart filet">${tools.replace(/<button type="button" class="ghost-btn" data-filet-z[^]*?<\/button>/, "")}${now}
+    ${photoFigure("images/ref/catfiletcurtain.webp", "고양이 필레 커튼", "같은 고양이 칸을 3×3(9칸)으로 늘리고 아래에 레이스 단을 단 커튼이에요.")}</div>`;
   return `<div class="cchart filet">${tools}${now}<div class="cchart-card filet-scroll${filetUI.zoom ? " zoom" : ""}" data-filet-scroll>${dot ? filetDotSVG(cur) : filetImgSVG(cur)}</div>${cap}${legend}</div>`;
 }
 document.addEventListener("click", e => {
