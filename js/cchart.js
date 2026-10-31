@@ -257,7 +257,9 @@ const FILETCAT = { src: "images/ref/catfiletblanket.png", x0: 33.33, x1: 326.36,
     ".##########################.##########################.",
     "......................................................."
   ] };
-const filetUI = { v: "dot", zoom: false };
+// v: 보기, scale: 확대 배율(두 손가락으로 조절), flip: 뒤집어 뜨는(짝수) 단은 도안도 좌우로 뒤집어 보기
+const filetUI = { v: "dot", scale: 1, flip: (() => { try { return localStorage.getItem("siltare-filet-flip") !== "off"; } catch (e) { return true; } })() };
+const filetMirror = cur => filetUI.flip && cur >= 0 && cur < FILETCAT.rows && (cur + 1) % 2 === 0;
 const FILET_NAME = { "#": "채움", ".": "빈칸", v: "레이스", "=": "넓은 빈칸" }, FILET_MARK = { "#": "■", ".": "□", v: "V", "=": "═" };
 // k단(1부터, 아래에서)의 칸을 뜨는 순서대로 묶어요. 레이스·넓은 빈 칸은 2칸이 한 묶음이에요.
 function filetUnits(k) {
@@ -268,11 +270,13 @@ function filetUnits(k) {
 function filetRowText(k) {
   const u = filetUnits(k), out = []; let i = 0;
   while (i < u.length) { let j = i; while (u[j] === u[i]) j++; out.push(`${FILET_MARK[u[i]]}${j - i}`); i = j; }
-  return `${k % 2 ? "← 오른쪽부터" : "왼쪽부터 →"}  ${out.join(" · ")}  (■ 채움 · □ 빈칸 · ═ 넓은 빈칸 · V 레이스, 2칸짜리는 1묶음으로 셈)`;
+  const dir = k % 2 ? "← 오른쪽부터" : filetUI.flip ? "← 오른쪽부터 (뒤집은 면 · 도안도 뒤집어 보여요)" : "왼쪽부터 →";
+  return `${dir}  ${out.join(" · ")}  (■ 채움 · □ 빈칸 · ═ 넓은 빈칸 · V 레이스, 2칸짜리는 1묶음으로 셈)`;
 }
 function filetDotSVG(cur) {
   const F = FILETCAT, cs = 10, L = 22, T = 4, Rm = 30, W = L + F.cols * cs + Rm, H = T + F.rows * cs + 6;
-  let s = `<rect x="${L}" y="${T}" width="${F.cols * cs}" height="${F.rows * cs}" fill="#fff"/>`;
+  const mir = filetMirror(cur);
+  let s = `<g${mir ? ` transform="translate(${2 * L + F.cols * cs} 0) scale(-1 1)"` : ""}><rect x="${L}" y="${T}" width="${F.cols * cs}" height="${F.rows * cs}" fill="#fff"/>`;
   F.grid.forEach((row, r) => {
     const y = T + r * cs;
     for (let c = 0; c < row.length; c++) {
@@ -290,9 +294,10 @@ function filetDotSVG(cur) {
     if (cur < F.rows) {
       s += `<rect x="${L}" y="${T}" width="${F.cols * cs}" height="${yTop(cur + 1) - T}" fill="#fff" fill-opacity=".55"/>`;
       s += `<rect class="filet-band" x="${L - 2}" y="${yTop(cur + 1) - 1}" width="${F.cols * cs + 4}" height="${cs + 2}" fill="#B9A0FF" fill-opacity=".3" stroke="#7B5CE0" stroke-width="2"/>`;
-      s += `<text x="${L + F.cols * cs + 4}" y="${yTop(cur + 1) + cs - 1.5}" font-size="9" font-weight="700" fill="#7B5CE0">${(cur + 1) % 2 ? "◀" : "▶"}${cur + 1}</text>`;
     }
   }
+  s += `</g>`;
+  if (cur >= 0 && cur < F.rows) s += `<text x="${L + F.cols * cs + 4}" y="${yTop(cur + 1) + cs - 1.5}" font-size="9" font-weight="700" fill="#7B5CE0">${(cur + 1) % 2 || mir ? "◀" : "▶"}${cur + 1}</text>`;
   for (let k = 1; k <= F.rows; k++) if (k === 1 || k % 5 === 0) s += `<text x="${L - 3}" y="${yTop(k) + cs - 2}" font-size="7.5" text-anchor="end" fill="${cur >= 0 && k <= cur ? "#1F8A5A" : "#6F6A7E"}">${k}</text>`;
   return `<svg class="filet-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="고양이 필레 커튼 도트 도안 ${F.cols}칸 × ${F.rows}단">${s}</svg>`;
 }
@@ -306,24 +311,29 @@ function filetImgSVG(cur) {
       ov += `<rect class="filet-band" x="${F.x0 - 2}" y="${yOf(cur + 1)}" width="${F.x1 - F.x0 + 4}" height="${ph}" fill="#B9A0FF" fill-opacity=".35" stroke="#7B5CE0" stroke-width="1.2"/>`;
     }
   }
-  for (let k = 5; k <= F.rows; k += 5) ov += `<text x="${F.x0 - 3}" y="${yOf(k) + ph * .8}" font-size="5.5" text-anchor="end" fill="#6F6A7E">${k}</text>`;
-  return `<svg class="filet-svg" viewBox="14 14 340 445" role="img" aria-label="고양이 필레 커튼 원본 모눈 도안"><image href="${F.src}" x="0" y="0" width="367" height="617"/>${ov}</svg>`;
+  let num = "";
+  for (let k = 5; k <= F.rows; k += 5) num += `<text x="${F.x0 - 3}" y="${yOf(k) + ph * .8}" font-size="5.5" text-anchor="end" fill="#6F6A7E">${k}</text>`;
+  const mir = filetMirror(cur);
+  return `<svg class="filet-svg" viewBox="14 14 340 445" role="img" aria-label="고양이 필레 커튼 원본 모눈 도안${mir ? " (좌우로 뒤집어 보기)" : ""}"><g${mir ? ` transform="translate(${F.x0 + F.x1} 0) scale(-1 1)"` : ""}><image href="${F.src}" x="0" y="0" width="367" height="617"/>${ov}</g>${num}</svg>`;
 }
 function filetChartHTML(hiRow) {
   const F = FILETCAT, cur = hiRow >= 0 ? Math.min(hiRow, F.rows) : -1, photo = filetUI.v === "photo", dot = !photo && filetUI.v !== "img";
   const tools = `<div class="filet-tools"><div class="seg" role="group" aria-label="도안 보기"><button type="button" data-filet-v="dot" aria-pressed="${dot}">도트 도안</button><button type="button" data-filet-v="img" aria-pressed="${!dot && !photo}">원본 이미지</button><button type="button" data-filet-v="photo" aria-pressed="${photo}">완성 사진</button></div>
-    <button type="button" class="ghost-btn" data-filet-z aria-pressed="${filetUI.zoom}">${filetUI.zoom ? "− 화면에 맞추기" : "＋ 크게 보기"}</button></div>`;
+    <button type="button" class="ghost-btn" data-filet-z aria-pressed="${filetUI.scale > 1.05}">${filetUI.scale > 1.05 ? "− 화면에 맞추기" : "＋ 크게 보기"}</button>
+    ${cur >= 0 ? `<button type="button" class="ghost-btn" data-filet-flip aria-pressed="${filetUI.flip}">뒤집은 단 좌우 반전 ${filetUI.flip ? "켜짐" : "꺼짐"}</button>` : ""}</div>`;
   const now = cur >= 0 && cur < F.rows ? `<div class="filet-now"><b>${cur + 1}단</b> <span>${filetRowText(cur + 1)}</span></div>` : "";
   const legend = dot ? `<p class="cc-cap">■ 채운 칸 · □ 빈 칸 · <b style="color:#C0563B">V</b> 레이스(2칸) · ═ 넓은 빈 칸(2칸). 맨 아래 줄이 1단이고, 홀수 단은 오른쪽부터 읽어요.</p>` : `<p class="cc-cap">받은 원본 모눈 도안이에요. 맨 아래 줄이 1단이에요.</p>`;
   const cap = cur < 0 ? "" : cur >= F.rows ? `<p class="cc-cap">모든 단을 다 떴어요!</p>` : `<p class="cc-cap">초록 = 다 뜬 단 · 보라 띠 = 지금 단 · 흐림 = 아직이에요.</p>`;
   if (photo) return `<div class="cchart filet">${tools.replace(/<button type="button" class="ghost-btn" data-filet-z[^]*?<\/button>/, "")}${now}
     ${photoFigure("images/ref/catfiletcurtain.webp", "고양이 필레 커튼", "같은 고양이 칸을 3×3(9칸)으로 늘리고 아래에 레이스 단을 단 커튼이에요.")}</div>`;
-  return `<div class="cchart filet">${tools}${now}<div class="cchart-card filet-scroll${filetUI.zoom ? " zoom" : ""}" data-filet-scroll>${dot ? filetDotSVG(cur) : filetImgSVG(cur)}</div>${cap}${legend}</div>`;
+  return `<div class="cchart filet">${tools}${now}<div class="cchart-card filet-scroll" data-filet-scroll style="--fz:${filetUI.scale}">${dot ? filetDotSVG(cur) : filetImgSVG(cur)}</div>${filetMirror(cur) ? `<p class="cc-cap flip-note">↔ ${cur + 1}단은 편물을 뒤집어 뜨는 단이라, 내 쪽에서 보이는 대로 도안을 좌우로 뒤집어 보여 줘요.</p>` : ""}${cap}${legend}</div>`;
 }
 document.addEventListener("click", e => {
-  const v = e.target.closest("[data-filet-v]"), z = e.target.closest("[data-filet-z]");
-  if (!v && !z) return;
-  if (v) filetUI.v = v.dataset.filetV; else filetUI.zoom = !filetUI.zoom;
+  const v = e.target.closest("[data-filet-v]"), z = e.target.closest("[data-filet-z]"), fl = e.target.closest("[data-filet-flip]");
+  if (!v && !z && !fl) return;
+  if (v) filetUI.v = v.dataset.filetV;
+  else if (z) filetUI.scale = filetUI.scale > 1.05 ? 1 : 2.6;
+  else { filetUI.flip = !filetUI.flip; try { localStorage.setItem("siltare-filet-flip", filetUI.flip ? "on" : "off"); } catch (err) {} }
   const y = scroller().scrollTop, inSheet = !$("sheet-pat").hidden, panel = inSheet && $("sheet-pat").querySelector(".sheet-panel"), py = panel ? panel.scrollTop : 0;
   if (inSheet) { renderDetail(); panel.scrollTop = py; } else { renderCounter(); scroller().scrollTop = y; }
   requestAnimationFrame(() => { const box = document.querySelector(".cchart.filet"); if (box) box.scrollIntoView({ block: "nearest" }); });
@@ -342,3 +352,30 @@ function crochetChartHTML(pid, cols, hiRow = -1) {
   }
   return null;
 }
+
+// 도안 상자 안에서 두 손가락으로 확대·축소 (화면 전체는 커지지 않아요). 트랙패드는 ctrl+스크롤.
+(function () {
+  let pz = null;
+  const box = e => e.target.closest && e.target.closest("[data-filet-scroll]");
+  const apply = (sc, scale, fx, fy) => {   // (fx, fy): 상자 안 손가락 위치. 그 지점이 그대로 머물게 스크롤을 맞춰요
+    const old = filetUI.scale, k = scale / old; filetUI.scale = scale; sc.style.setProperty("--fz", scale);
+    sc.scrollLeft = (sc.scrollLeft + fx) * k - fx; sc.scrollTop = (sc.scrollTop + fy) * k - fy;
+    const zb = sc.closest(".cchart").querySelector("[data-filet-z]"); if (zb) { zb.textContent = scale > 1.05 ? "− 화면에 맞추기" : "＋ 크게 보기"; zb.setAttribute("aria-pressed", scale > 1.05); }
+  };
+  const clamp = x => Math.max(1, Math.min(6, x));
+  const mid = (t, r) => [(t[0].clientX + t[1].clientX) / 2 - r.left, (t[0].clientY + t[1].clientY) / 2 - r.top];
+  const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  document.addEventListener("touchstart", e => { const sc = box(e); if (!sc || e.touches.length !== 2) return; pz = { sc, d0: dist(e.touches), s0: filetUI.scale }; }, { passive: true });
+  document.addEventListener("touchmove", e => {
+    if (!pz || e.touches.length !== 2) return; e.preventDefault();
+    const r = pz.sc.getBoundingClientRect(), [fx, fy] = mid(e.touches, r);
+    apply(pz.sc, clamp(pz.s0 * dist(e.touches) / pz.d0), fx, fy);
+  }, { passive: false });
+  document.addEventListener("touchend", e => { if (pz && e.touches.length < 2) pz = null; });
+  document.addEventListener("gesturestart", e => { if (box(e)) e.preventDefault(); });   // 아이폰: 페이지 전체 확대 막기
+  document.addEventListener("gesturechange", e => { if (box(e)) e.preventDefault(); });
+  document.addEventListener("wheel", e => {
+    const sc = box(e); if (!sc || !e.ctrlKey) return; e.preventDefault();
+    const r = sc.getBoundingClientRect(); apply(sc, clamp(filetUI.scale * Math.exp(-e.deltaY / 200)), e.clientX - r.left, e.clientY - r.top);
+  }, { passive: false });
+})();
