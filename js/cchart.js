@@ -326,7 +326,7 @@ function filetChartHTML(hiRow, opt = {}) {
   const tools = `<div class="filet-tools">${opt.noSeg ? "" : `<div class="seg" role="group" aria-label="도안 보기"><button type="button" data-filet-v="dot" aria-pressed="${dot}">도트 도안</button><button type="button" data-filet-v="img" aria-pressed="${!dot && !photo}">원본 이미지</button><button type="button" data-filet-v="photo" aria-pressed="${photo}">완성 사진</button></div>`}
     <button type="button" class="ghost-btn" data-filet-z aria-pressed="${filetUI.scale > 1.05}">${filetUI.scale > 1.05 ? "− 화면에 맞추기" : "＋ 크게 보기"}</button>
     ${cur >= 0 ? `<button type="button" class="ghost-btn" data-filet-flip aria-pressed="${filetUI.flip}">뒤집은 단 좌우 반전 ${filetUI.flip ? "켜짐" : "꺼짐"}</button>` : ""}</div>`;
-  const now = cur >= 0 && cur < F.rows ? `<div class="filet-now"><b>${cur + 1}단</b> <span>${filetRowText(cur + 1)}</span></div>` : "";
+  const now = cur >= 0 && cur < F.rows ? `<div class="filet-now fr-now">${filetRowBody(cur + 1)}</div>` : "";
   const legend = dot ? `<p class="cc-cap">■ 채운 칸 · □ 빈 칸 · <b style="color:#C0563B">V</b> 레이스(2칸) · ═ 넓은 빈 칸(2칸). 맨 아래 줄이 1단이고, 홀수 단은 오른쪽부터 읽어요.</p>` : `<p class="cc-cap">받은 원본 모눈 도안이에요. 맨 아래 줄이 1단이에요.</p>`;
   const cap = cur < 0 ? "" : cur >= F.rows ? `<p class="cc-cap">모든 단을 다 떴어요!</p>` : `<p class="cc-cap">초록 = 다 뜬 단 · 보라 띠 = 지금 단 · 흐림 = 아직이에요.</p>`;
   if (photo) return `<div class="cchart filet">${tools.replace(/<button type="button" class="ghost-btn" data-filet-z[^]*?<\/button>/, "")}${now}
@@ -385,10 +385,14 @@ function crochetChartHTML(pid, cols, hiRow = -1) {
   }, { passive: false });
 })();
 
+// 한 단을 '몇 단 · 방향 · 칸 묶음'으로 (지금 단 상자와 단별 읽기에서 같이 써요)
+function filetRowBody(k) {
+  const { dir, runs } = filetRowParts(k);
+  return `<span class="fr-k">${k}단</span><span class="fr-dir">${dir}</span><span class="fr-runs">${runs.map(([m, n]) => `<span class="fr-run m${m === "#" ? "f" : m === "." ? "e" : m === "v" ? "v" : "w"}"><i>${FILET_MARK[m]}</i>${n}</span>`).join("")}</span>`;
+}
 // 단별 읽기: 다 뜬 단은 접고, 지금 단과 다음 3단을 칸 순서로 보여 줘요
 function filetRowsHTML(cur) {
-  const F = FILETCAT, row = k => { const { dir, runs } = filetRowParts(k);
-    return `<span class="fr-k">${k}단</span><span class="fr-dir">${dir}</span><span class="fr-runs">${runs.map(([m, n]) => `<span class="fr-run m${m === "#" ? "f" : m === "." ? "e" : m === "v" ? "v" : "w"}"><i>${FILET_MARK[m]}</i>${n}</span>`).join("")}</span>`; };
+  const F = FILETCAT, row = filetRowBody;
   if (cur >= F.rows) return `<div class="frows"><p class="fr-all">✓ ${F.rows}단을 모두 떴어요!</p></div>`;
   const now = cur + 1, next = [now + 1, now + 2, now + 3].filter(k => k <= F.rows), restFrom = now + 4;
   let h = `<div class="frows">`;
