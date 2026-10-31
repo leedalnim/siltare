@@ -5,6 +5,8 @@ const ctrUI = { view: null };
 function ctrViews(s, rx) {
   const kind = rx.once ? "once" : (rx.tail || !s.w) ? "tail" : "meas";
   if (s.pid === "cat") return { kind, list: [["chart", "도안"], ["steps", "단계"]] };
+  // 필레 커튼: 칸 도안이 전부라 도안 보기들을 맨 위 탭으로 바로 골라요
+  if (s.pid === "filetcat") return { kind, list: [["dot", "도트 도안"], ["img", "원본"], ["photo", "완성 사진"], ["rows", "단별 읽기"]] };
   return { kind, list: [["pat", "무늬 확대"], ["chart", "기호 도안"], kind === "meas" ? ["all", "전체 편물"] : ["steps", "단계"]] };
 }
 function ctrChartBody(s, rx, info) {
@@ -21,12 +23,14 @@ function progressHTML(s, rx, info) {
   const meta = `<div class="prog-meta"><span>${tri ? `${triName(s.tri)} · ${s.tri.dir === "inc" ? `${s.tri.n0}→${s.n}코` : `${s.n}→${s.tri.n0}코`}` : `${s.n ? `${s.n}코 · ` : ""}${s.mode === "round" ? "원통" : "왕복"}`} · 목표 ${s.target}단</span><button type="button" class="link" data-su-edit="${s.id}">뜨는 방법 바꾸기</button></div>`;
   const bar = `<div class="pbar" role="progressbar" aria-valuemin="0" aria-valuemax="${s.target}" aria-valuenow="${Math.min(s.row, s.target)}" aria-label="진행률"><i style="width:${pct}%"></i></div>`;
   const { kind, list } = ctrViews(s, rx);
-  const defView = s.pid === "cat" || s.pid === "filetcat" ? "chart" : "pat";
+  const defView = s.pid === "cat" ? "chart" : s.pid === "filetcat" ? (["dot", "img", "photo"].includes(filetUI.v) ? filetUI.v : "dot") : "pat";
   const view = list.some(v => v[0] === ctrUI.view) ? ctrUI.view : defView;
   const seg = `<div class="seg cv-seg" role="group" aria-label="보기 방식">${list.map(([k, n]) => `<button type="button" data-cv="${k}" aria-pressed="${view === k}">${n}</button>`).join("")}</div>`;
   const total = kind === "once" ? (rx.setup || []).length + rx.rows.length : s.target;
   let body = "", stats = `<div class="prog-stats"><b>${Math.min(s.row, total)} / ${total}단</b><span>${pct}%</span></div>`;
-  if (view === "pat") body = `<canvas class="prog-cv pw" data-pw="${s.id}" style="height:280px" role="img" aria-label="무늬 확대: ${s.row}단까지 떴어요"></canvas><p class="cc-cap">초록 = 다 뜬 단, 밝은 줄 = 지금 단, 흐림 = 아직이에요. +1을 누르면 지금 단이 한 줄 올라가요.</p>`;
+  if (s.pid === "filetcat" && ["dot", "img", "photo"].includes(view)) { filetUI.v = view; body = filetChartHTML(info.done ? -1 : s.row, { noSeg: true }); }
+  else if (view === "rows") body = filetRowsHTML(Math.min(s.row, FILETCAT.rows));
+  else if (view === "pat") body = `<canvas class="prog-cv pw" data-pw="${s.id}" style="height:280px" role="img" aria-label="무늬 확대: ${s.row}단까지 떴어요"></canvas><p class="cc-cap">초록 = 다 뜬 단, 밝은 줄 = 지금 단, 흐림 = 아직이에요. +1을 누르면 지금 단이 한 줄 올라가요.</p>`;
   else if (view === "chart") body = ctrChartBody(s, rx, info);
   else if (view === "all") {
     const cm = Math.round(s.row / s.target * s.l), left = Math.max(0, Math.round(s.l - cm));

@@ -267,9 +267,14 @@ function filetUnits(k) {
   for (let c = 0; c < s.length; c++) { const ch = s[c]; if (ch === "v" || ch === "=") { u.push(ch); c++; } else u.push(ch); }
   return k % 2 ? u.reverse() : u;   // 홀수 단은 오른쪽부터
 }
+// k단: 뜨는 방향과 [칸 종류, 몇 묶음] 목록
+function filetRowParts(k) {
+  const u = filetUnits(k), runs = []; let i = 0;
+  while (i < u.length) { let j = i; while (u[j] === u[i]) j++; runs.push([u[i], j - i]); i = j; }
+  return { dir: k % 2 ? "← 오른쪽부터" : filetUI.flip ? "← 오른쪽부터 (뒤집은 면)" : "왼쪽부터 →", runs };
+}
 function filetRowText(k) {
-  const u = filetUnits(k), out = []; let i = 0;
-  while (i < u.length) { let j = i; while (u[j] === u[i]) j++; out.push(`${FILET_MARK[u[i]]}${j - i}`); i = j; }
+  const { runs } = filetRowParts(k), out = runs.map(([m, n]) => `${FILET_MARK[m]}${n}`);
   const dir = k % 2 ? "← 오른쪽부터" : filetUI.flip ? "← 오른쪽부터 (뒤집은 면 · 도안도 뒤집어 보여요)" : "왼쪽부터 →";
   return `${dir}  ${out.join(" · ")}  (■ 채움 · □ 빈칸 · ═ 넓은 빈칸 · V 레이스, 2칸짜리는 1묶음으로 셈)`;
 }
@@ -316,9 +321,9 @@ function filetImgSVG(cur) {
   const mir = filetMirror(cur);
   return `<svg class="filet-svg" viewBox="14 14 340 445" role="img" aria-label="고양이 필레 커튼 원본 모눈 도안${mir ? " (좌우로 뒤집어 보기)" : ""}"><g${mir ? ` transform="translate(${F.x0 + F.x1} 0) scale(-1 1)"` : ""}><image href="${F.src}" x="0" y="0" width="367" height="617"/>${ov}</g>${num}</svg>`;
 }
-function filetChartHTML(hiRow) {
+function filetChartHTML(hiRow, opt = {}) {
   const F = FILETCAT, cur = hiRow >= 0 ? Math.min(hiRow, F.rows) : -1, photo = filetUI.v === "photo", dot = !photo && filetUI.v !== "img";
-  const tools = `<div class="filet-tools"><div class="seg" role="group" aria-label="도안 보기"><button type="button" data-filet-v="dot" aria-pressed="${dot}">도트 도안</button><button type="button" data-filet-v="img" aria-pressed="${!dot && !photo}">원본 이미지</button><button type="button" data-filet-v="photo" aria-pressed="${photo}">완성 사진</button></div>
+  const tools = `<div class="filet-tools">${opt.noSeg ? "" : `<div class="seg" role="group" aria-label="도안 보기"><button type="button" data-filet-v="dot" aria-pressed="${dot}">도트 도안</button><button type="button" data-filet-v="img" aria-pressed="${!dot && !photo}">원본 이미지</button><button type="button" data-filet-v="photo" aria-pressed="${photo}">완성 사진</button></div>`}
     <button type="button" class="ghost-btn" data-filet-z aria-pressed="${filetUI.scale > 1.05}">${filetUI.scale > 1.05 ? "− 화면에 맞추기" : "＋ 크게 보기"}</button>
     ${cur >= 0 ? `<button type="button" class="ghost-btn" data-filet-flip aria-pressed="${filetUI.flip}">뒤집은 단 좌우 반전 ${filetUI.flip ? "켜짐" : "꺼짐"}</button>` : ""}</div>`;
   const now = cur >= 0 && cur < F.rows ? `<div class="filet-now"><b>${cur + 1}단</b> <span>${filetRowText(cur + 1)}</span></div>` : "";
@@ -379,3 +384,17 @@ function crochetChartHTML(pid, cols, hiRow = -1) {
     const r = sc.getBoundingClientRect(); apply(sc, clamp(filetUI.scale * Math.exp(-e.deltaY / 200)), e.clientX - r.left, e.clientY - r.top);
   }, { passive: false });
 })();
+
+// 단별 읽기: 다 뜬 단은 접고, 지금 단과 다음 3단을 칸 순서로 보여 줘요
+function filetRowsHTML(cur) {
+  const F = FILETCAT, row = k => { const { dir, runs } = filetRowParts(k);
+    return `<span class="fr-k">${k}단</span><span class="fr-dir">${dir}</span><span class="fr-runs">${runs.map(([m, n]) => `<span class="fr-run m${m === "#" ? "f" : m === "." ? "e" : m === "v" ? "v" : "w"}"><i>${FILET_MARK[m]}</i>${n}</span>`).join("")}</span>`; };
+  if (cur >= F.rows) return `<div class="frows"><p class="fr-all">✓ ${F.rows}단을 모두 떴어요!</p></div>`;
+  const now = cur + 1, next = [now + 1, now + 2, now + 3].filter(k => k <= F.rows), restFrom = now + 4;
+  let h = `<div class="frows">`;
+  if (cur > 0) h += `<details class="fr-fold"><summary>✓ 1~${cur}단 다 떴어요</summary><ol class="fr-list done">${Array.from({ length: cur }, (_, i) => `<li>${row(i + 1)}</li>`).join("")}</ol></details>`;
+  h += `<div class="fr-now"><span class="label">지금 뜰 단</span>${row(now)}</div>`;
+  if (next.length) h += `<ol class="fr-list">${next.map(k => `<li>${row(k)}</li>`).join("")}</ol>`;
+  if (restFrom <= F.rows) h += `<details class="fr-fold"><summary>나머지 ${restFrom}~${F.rows}단 보기</summary><ol class="fr-list">${Array.from({ length: F.rows - restFrom + 1 }, (_, i) => `<li>${row(restFrom + i)}</li>`).join("")}</ol></details>`;
+  return h + `<p class="cc-cap">■ 채움 · □ 빈칸 · ═ 넓은 빈칸 · V 레이스 (2칸짜리는 1묶음으로 셈). 숫자는 이어지는 묶음 수예요.</p></div>`;
+}

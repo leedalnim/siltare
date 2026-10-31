@@ -116,3 +116,21 @@
 .tri-now.chg { background: var(--surface); box-shadow: inset 0 0 0 1.5px var(--accent); }
 .tri-now.chg > div > b { color: var(--accent); }
 .tri-ic { font-size: 11px; letter-spacing: -2px; color: var(--accent) !important; flex: none; }
+
+/* 필레 단별 읽기 */
+.frows { display: grid; gap: 10px; }
+.fr-now { background: var(--accent-soft, var(--surface-2)); border-radius: 12px; padding: 10px 12px; display: grid; gap: 4px; }
+.fr-now .label { margin: 0; }
+.fr-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.fr-list li { display: grid; gap: 3px; padding: 8px 10px; border-radius: 10px; background: var(--surface-2); }
+.fr-list.done li { opacity: .65; }
+.fr-k { font-weight: 700; font-size: 14px; }
+.fr-now .fr-k { color: var(--accent); font-size: 16px; }
+.fr-dir { font-size: 12.5px; color: var(--muted); }
+.fr-runs { display: flex; flex-wrap: wrap; gap: 4px; }
+.fr-run { display: inline-flex; align-items: center; gap: 2px; padding: 1px 6px 1px 4px; border-radius: 6px; background: var(--surface); font-size: 13px; font-variant-numeric: tabular-nums; box-shadow: inset 0 0 0 1px var(--line); }
+.fr-run i { font-style: normal; font-size: 12px; }
+.fr-run.mf i { color: var(--ink); } .fr-run.mv i { color: #C0563B; font-weight: 700; } .fr-run.mw i { color: #8C7A5B; } .fr-run.me i { color: var(--muted); }
+.fr-fold summary { cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--muted); padding-block: 4px; width: fit-content; }
+.fr-fold[open] summary { margin-bottom: 6px; }
+.fr-all { font-weight: 700; color: var(--ok, #2FA36E); }
