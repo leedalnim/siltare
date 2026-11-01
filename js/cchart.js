@@ -259,7 +259,9 @@ const FILETCAT = { src: "images/ref/catfiletblanket.png", x0: 33.33, x1: 326.36,
   ] };
 // v: 보기, scale: 확대 배율(두 손가락으로 조절), flip: 뒤집어 뜨는(짝수) 단은 도안도 좌우로 뒤집어 보기
 // flip: "even" 짝수 단이 뒤집은 면 / "odd" 홀수 단이 뒤집은 면 (1단을 반대쪽에서 시작한 경우) / "off" 반전 안 함
-const filetUI = { v: "dot", scale: 1, flip: (() => { try { const v = localStorage.getItem("siltare-filet-flip"); return v === "off" || v === "odd" ? v : "even"; } catch (e) { return "even"; } })() };
+// 카운터마다 따로 기억해요(s.flip). 카운터에 아직 없으면 마지막으로 고른 값을 써요
+const filetFlipDefault = () => { try { const v = localStorage.getItem("siltare-filet-flip"); return v === "off" || v === "odd" ? v : "even"; } catch (e) { return "even"; } };
+const filetUI = { v: "dot", scale: 1, flip: filetFlipDefault() };
 const FLIP_NEXT = { even: "odd", odd: "off", off: "even" }, FLIP_LABEL = { even: "좌우 반전: 짝수 단", odd: "좌우 반전: 홀수 단", off: "좌우 반전: 끔" };
 // k단이 편물 뒷면(뒤집어 뜨는 면)인지. 반전을 끄면 짝수 단을 뒷면으로 봐요
 const filetBack = k => filetUI.flip === "odd" ? k % 2 === 1 : k % 2 === 0;
@@ -342,7 +344,11 @@ document.addEventListener("click", e => {
   if (!v && !z && !fl) return;
   if (v) filetUI.v = v.dataset.filetV;
   else if (z) filetUI.scale = filetUI.scale > 1.05 ? 1 : 2.6;
-  else { filetUI.flip = FLIP_NEXT[filetUI.flip]; try { localStorage.setItem("siltare-filet-flip", filetUI.flip); } catch (err) {} toast(filetUI.flip === "off" ? "좌우 반전을 껐어요" : `${filetUI.flip === "even" ? "짝수" : "홀수"} 단을 좌우로 뒤집어 보여 줘요`); }
+  else {
+    filetUI.flip = FLIP_NEXT[filetUI.flip]; try { localStorage.setItem("siltare-filet-flip", filetUI.flip); } catch (err) {}
+    const cs = state.tab === "counter" && state.sessions.find(x => x.id === state.sess);
+    if (cs && cs.pid === "filetcat") { cs.flip = filetUI.flip; save(); }   /* 이 카운터(도안)에 기억 */
+    toast(filetUI.flip === "off" ? "좌우 반전을 껐어요" : `${filetUI.flip === "even" ? "짝수" : "홀수"} 단을 좌우로 뒤집어 보여 줘요`); }
   const y = scroller().scrollTop, inSheet = !$("sheet-pat").hidden, panel = inSheet && $("sheet-pat").querySelector(".sheet-panel"), py = panel ? panel.scrollTop : 0;
   if (inSheet) { renderDetail(); panel.scrollTop = py; } else { renderCounter(); scroller().scrollTop = y; }
   requestAnimationFrame(() => { const box = document.querySelector(".cchart.filet"); if (box) box.scrollIntoView({ block: "nearest" }); });

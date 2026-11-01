@@ -28,6 +28,7 @@ function progressHTML(s, rx, info) {
   const seg = `<div class="seg cv-seg" role="group" aria-label="보기 방식">${list.map(([k, n]) => `<button type="button" data-cv="${k}" aria-pressed="${view === k}">${n}</button>`).join("")}</div>`;
   const total = kind === "once" ? (rx.setup || []).length + rx.rows.length : s.target;
   let body = "", stats = `<div class="prog-stats"><b>${Math.min(s.row, total)} / ${total}단</b><span>${pct}%</span></div>`;
+  if (s.pid === "filetcat") filetUI.flip = FLIP_NEXT[s.flip] ? s.flip : filetFlipDefault();   // 이 카운터의 뒤집은 면 설정
   if (s.pid === "filetcat" && ["dot", "img", "photo"].includes(view)) { filetUI.v = view; body = filetChartHTML(info.done ? -1 : s.row, { noSeg: true }); }
   else if (view === "rows") body = filetRowsHTML(Math.min(s.row, FILETCAT.rows));
   else if (view === "pat") body = `<canvas class="prog-cv pw" data-pw="${s.id}" style="height:280px" role="img" aria-label="무늬 확대: ${s.row}단까지 떴어요"></canvas><p class="cc-cap">초록 = 다 뜬 단, 밝은 줄 = 지금 단, 흐림 = 아직이에요. +1을 누르면 지금 단이 한 줄 올라가요.</p>`;
