@@ -258,24 +258,28 @@ const FILETCAT = { src: "images/ref/catfiletblanket.png", x0: 33.33, x1: 326.36,
     "......................................................."
   ] };
 // v: 보기, scale: 확대 배율(두 손가락으로 조절), flip: 뒤집어 뜨는(짝수) 단은 도안도 좌우로 뒤집어 보기
-const filetUI = { v: "dot", scale: 1, flip: (() => { try { return localStorage.getItem("siltare-filet-flip") !== "off"; } catch (e) { return true; } })() };
-const filetMirror = cur => filetUI.flip && cur >= 0 && cur < FILETCAT.rows && (cur + 1) % 2 === 0;
+// flip: "even" 짝수 단이 뒤집은 면 / "odd" 홀수 단이 뒤집은 면 (1단을 반대쪽에서 시작한 경우) / "off" 반전 안 함
+const filetUI = { v: "dot", scale: 1, flip: (() => { try { const v = localStorage.getItem("siltare-filet-flip"); return v === "off" || v === "odd" ? v : "even"; } catch (e) { return "even"; } })() };
+const FLIP_NEXT = { even: "odd", odd: "off", off: "even" }, FLIP_LABEL = { even: "좌우 반전: 짝수 단", odd: "좌우 반전: 홀수 단", off: "좌우 반전: 끔" };
+// k단이 편물 뒷면(뒤집어 뜨는 면)인지. 반전을 끄면 짝수 단을 뒷면으로 봐요
+const filetBack = k => filetUI.flip === "odd" ? k % 2 === 1 : k % 2 === 0;
+const filetMirror = cur => filetUI.flip !== "off" && cur >= 0 && cur < FILETCAT.rows && filetBack(cur + 1);
 const FILET_NAME = { "#": "채움", ".": "빈칸", v: "레이스", "=": "넓은 빈칸" }, FILET_MARK = { "#": "■", ".": "□", v: "V", "=": "═" };
 // k단(1부터, 아래에서)의 칸을 뜨는 순서대로 묶어요. 레이스·넓은 빈 칸은 2칸이 한 묶음이에요.
 function filetUnits(k) {
   const s = FILETCAT.grid[FILETCAT.rows - k], u = [];
   for (let c = 0; c < s.length; c++) { const ch = s[c]; if (ch === "v" || ch === "=") { u.push(ch); c++; } else u.push(ch); }
-  return k % 2 ? u.reverse() : u;   // 홀수 단은 오른쪽부터
+  return filetBack(k) ? u : u.reverse();   // 앞면 단은 도안을 오른쪽부터, 뒷면 단은 도안을 왼쪽부터 읽어요
 }
 // k단: 뜨는 방향과 [칸 종류, 몇 묶음] 목록
 function filetRowParts(k) {
   const u = filetUnits(k), runs = []; let i = 0;
   while (i < u.length) { let j = i; while (u[j] === u[i]) j++; runs.push([u[i], j - i]); i = j; }
-  return { dir: k % 2 ? "← 오른쪽부터" : filetUI.flip ? "← 오른쪽부터 (뒤집은 면)" : "왼쪽부터 →", runs };
+  return { dir: !filetBack(k) ? "← 오른쪽부터" : filetUI.flip !== "off" ? "← 오른쪽부터 (뒤집은 면)" : "왼쪽부터 →", runs };
 }
 function filetRowText(k) {
   const { runs } = filetRowParts(k), out = runs.map(([m, n]) => `${FILET_MARK[m]}${n}`);
-  const dir = k % 2 ? "← 오른쪽부터" : filetUI.flip ? "← 오른쪽부터 (뒤집은 면 · 도안도 뒤집어 보여요)" : "왼쪽부터 →";
+  const dir = !filetBack(k) ? "← 오른쪽부터" : filetUI.flip !== "off" ? "← 오른쪽부터 (뒤집은 면 · 도안도 뒤집어 보여요)" : "왼쪽부터 →";
   return `${dir}  ${out.join(" · ")}  (■ 채움 · □ 빈칸 · ═ 넓은 빈칸 · V 레이스, 2칸짜리는 1묶음으로 셈)`;
 }
 function filetDotSVG(cur) {
@@ -302,7 +306,7 @@ function filetDotSVG(cur) {
     }
   }
   s += `</g>`;
-  if (cur >= 0 && cur < F.rows) s += `<text x="${L + F.cols * cs + 4}" y="${yTop(cur + 1) + cs - 1.5}" font-size="9" font-weight="700" fill="#7B5CE0">${(cur + 1) % 2 || mir ? "◀" : "▶"}${cur + 1}</text>`;
+  if (cur >= 0 && cur < F.rows) s += `<text x="${L + F.cols * cs + 4}" y="${yTop(cur + 1) + cs - 1.5}" font-size="9" font-weight="700" fill="#7B5CE0">${!filetBack(cur + 1) || mir ? "◀" : "▶"}${cur + 1}</text>`;
   for (let k = 1; k <= F.rows; k++) if (k === 1 || k % 5 === 0) s += `<text x="${L - 3}" y="${yTop(k) + cs - 2}" font-size="7.5" text-anchor="end" fill="${cur >= 0 && k <= cur ? "#1F8A5A" : "#6F6A7E"}">${k}</text>`;
   return `<svg class="filet-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="고양이 필레 커튼 도트 도안 ${F.cols}칸 × ${F.rows}단">${s}</svg>`;
 }
@@ -325,7 +329,7 @@ function filetChartHTML(hiRow, opt = {}) {
   const F = FILETCAT, cur = hiRow >= 0 ? Math.min(hiRow, F.rows) : -1, photo = filetUI.v === "photo", dot = !photo && filetUI.v !== "img";
   const tools = `<div class="filet-tools">${opt.noSeg ? "" : `<div class="seg" role="group" aria-label="도안 보기"><button type="button" data-filet-v="dot" aria-pressed="${dot}">도트 도안</button><button type="button" data-filet-v="img" aria-pressed="${!dot && !photo}">원본 이미지</button><button type="button" data-filet-v="photo" aria-pressed="${photo}">완성 사진</button></div>`}
     <button type="button" class="ghost-btn" data-filet-z aria-pressed="${filetUI.scale > 1.05}">${filetUI.scale > 1.05 ? "− 화면에 맞추기" : "＋ 크게 보기"}</button>
-    ${cur >= 0 ? `<button type="button" class="ghost-btn" data-filet-flip aria-pressed="${filetUI.flip}">뒤집은 단 좌우 반전 ${filetUI.flip ? "켜짐" : "꺼짐"}</button>` : ""}</div>`;
+    ${cur >= 0 ? `<button type="button" class="ghost-btn" data-filet-flip aria-pressed="${filetUI.flip !== "off"}" title="누를 때마다 짝수 단 → 홀수 단 → 끔">${FLIP_LABEL[filetUI.flip]}</button>` : ""}</div>`;
   const now = cur >= 0 && cur < F.rows ? `<div class="filet-now fr-now">${filetRowBody(cur + 1)}</div>` : "";
   const legend = dot ? `<p class="cc-cap">■ 채운 칸 · □ 빈 칸 · <b style="color:#C0563B">V</b> 레이스(2칸) · ═ 넓은 빈 칸(2칸). 맨 아래 줄이 1단이고, 홀수 단은 오른쪽부터 읽어요.</p>` : `<p class="cc-cap">받은 원본 모눈 도안이에요. 맨 아래 줄이 1단이에요.</p>`;
   const cap = cur < 0 ? "" : cur >= F.rows ? `<p class="cc-cap">모든 단을 다 떴어요!</p>` : `<p class="cc-cap">초록 = 다 뜬 단 · 보라 띠 = 지금 단 · 흐림 = 아직이에요.</p>`;
@@ -338,7 +342,7 @@ document.addEventListener("click", e => {
   if (!v && !z && !fl) return;
   if (v) filetUI.v = v.dataset.filetV;
   else if (z) filetUI.scale = filetUI.scale > 1.05 ? 1 : 2.6;
-  else { filetUI.flip = !filetUI.flip; try { localStorage.setItem("siltare-filet-flip", filetUI.flip ? "on" : "off"); } catch (err) {} }
+  else { filetUI.flip = FLIP_NEXT[filetUI.flip]; try { localStorage.setItem("siltare-filet-flip", filetUI.flip); } catch (err) {} toast(filetUI.flip === "off" ? "좌우 반전을 껐어요" : `${filetUI.flip === "even" ? "짝수" : "홀수"} 단을 좌우로 뒤집어 보여 줘요`); }
   const y = scroller().scrollTop, inSheet = !$("sheet-pat").hidden, panel = inSheet && $("sheet-pat").querySelector(".sheet-panel"), py = panel ? panel.scrollTop : 0;
   if (inSheet) { renderDetail(); panel.scrollTop = py; } else { renderCounter(); scroller().scrollTop = y; }
   requestAnimationFrame(() => { const box = document.querySelector(".cchart.filet"); if (box) box.scrollIntoView({ block: "nearest" }); });
