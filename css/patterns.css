@@ -96,3 +96,7 @@
 .filet-photo button { border: 0; padding: 0; background: none; border-radius: 14px; overflow: hidden; cursor: zoom-in; }
 .filet-photo img { display: block; width: 100%; height: auto; }
 .filet-photo figcaption { font-size: 13px; color: var(--muted); }
+/* 무늬 상세: 접어 둔 작품 카드·도안 */
+.more-fold summary, .detail-rx > summary { cursor: pointer; width: fit-content; font-weight: 600; font-size: 14px; color: var(--accent); padding-block: 6px; }
+.more-fold[open] summary { margin-bottom: 8px; }
+.detail-rx[open] > summary { margin-bottom: 4px; }

@@ -236,8 +236,8 @@ function recipeHTML(rx, cols, opts = {}) {
   const cn = labelsFor(cols);
   let h = `<section class="recipe" aria-labelledby="rx-h"><h4 id="rx-h">도안</h4>`;
   h += `<p class="rx-cast"><span class="label">코 잡기</span>${esc(rx.cast)}</p>`;
-  if (rx.setup) h += `<p class="label">처음 한 번</p><ol class="rx-rows">${rx.setup.map(s => `<li><b>${esc(s.t)}</b>${esc(s.d)}</li>`).join("")}</ol>`;
-  h += `<p class="label">${rx.once ? "순서대로" : rx.tail ? "이어서" : `${rx.rows.length}단마다 반복`}</p><ol class="rx-rows">${rx.rows.map((s, i) => `<li${i === opts.hi ? ' class="hi"' : ""}><b>${esc(s.t)}</b>${esc(s.d)}</li>`).join("")}</ol>`;
+  if (!opts.noRows && rx.setup) h += `<p class="label">처음 한 번</p><ol class="rx-rows">${rx.setup.map(s => `<li><b>${esc(s.t)}</b>${esc(s.d)}</li>`).join("")}</ol>`;
+  if (!opts.noRows) h += `<p class="label">${rx.once ? "순서대로" : rx.tail ? "이어서" : `${rx.rows.length}단마다 반복`}</p><ol class="rx-rows">${rx.rows.map((s, i) => `<li${i === opts.hi ? ' class="hi"' : ""}><b>${esc(s.t)}</b>${esc(s.d)}</li>`).join("")}</ol>`;
   if (rx.round) h += `<p class="rx-note">${esc(rx.round)}</p>`;
   if (rx.tip) h += `<p class="rx-note">${esc(rx.tip)}</p>`;
   if (rx.chart && !opts.noChart) h += `<p class="label">기호 도안 · 겉면에서 본 모양, 아래에서 위로 읽어요</p>` + chartHTML(rx.chart, chartHexes(cols), -1, cn);

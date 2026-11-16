@@ -4,10 +4,10 @@ const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(
 const ctrUI = { view: null };
 function ctrViews(s, rx) {
   const kind = rx.once ? "once" : (rx.tail || !s.w) ? "tail" : "meas";
-  if (s.pid === "cat") return { kind, list: [["chart", "도안"], ["steps", "단계"]] };
+  if (s.pid === "cat") return { kind, list: [["chart", "도안"], ["rows", "단별 읽기"]] };
   // 필레 커튼: 칸 도안이 전부라 도안 보기들을 맨 위 탭으로 바로 골라요
   if (s.pid === "filetcat") return { kind, list: [["dot", "도트 도안"], ["img", "원본"], ["photo", "완성 사진"], ["rows", "단별 읽기"]] };
-  return { kind, list: [["pat", "무늬 확대"], ["chart", "기호 도안"], kind === "meas" ? ["all", "전체 편물"] : ["steps", "단계"]] };
+  return { kind, list: [["pat", "무늬 확대"], ["chart", "기호 도안"], ...(kind === "meas" ? [["all", "전체 편물"]] : []), ["rows", "단별 읽기"]] };
 }
 function ctrChartBody(s, rx, info) {
   const done = info.done, hi = done ? -1 : info.hi;
@@ -15,6 +15,16 @@ function ctrChartBody(s, rx, info) {
   if (rx.chart) return `<div class="kchart"><div class="chart-scroll">${chartHTML(rx.chart, chartHexes(s.cols), hi, labelsFor(s.cols))}</div><p class="cc-cap">${hi >= 0 ? `지금은 ${hi + 1}번 줄이에요. 초록 ✓ = 다 뜬 줄, 보라 = 지금 줄, 흐림 = 아직이에요.` : "겉면에서 본 모양, 아래에서 위로 읽어요."}</p></div>`;
   if (s.craft === "crochet") { const h = crochetChartHTML(s.pid, s.cols, done ? -1 : s.row); if (h) return h; }
   return `<div class="empty-chart">이 무늬는 기호 도안이 없어요. 아래 '도안 전체 보기'를 따라 떠 주세요.</div>`;
+}
+// 단별 읽기: 지금 단이 표시된 단별 설명 + 코 잡기·팁 (예전 '도안 전체 보기' 내용이 여기로 왔어요)
+function ctrRowsHTML(s, rx, info, kind) {
+  const hi = info.done ? -1 : info.hi;
+  if (s.pid === "filetcat") return filetRowsHTML(Math.min(s.row, FILETCAT.rows)) + recipeHTML(rx, s.cols, { noChart: true, noRows: true });
+  if (kind === "once") {
+    const all = [...(rx.setup || []), ...rx.rows];
+    return `<ol class="rowlist" aria-label="단 진행 상황">${all.map((r, i) => `<li class="${i < s.row ? "done" : i === s.row ? "now" : "todo"}"><span class="sn">${i < s.row ? "✓" : i + 1}</span><span class="st-t"><b>${esc(r.t)}</b> ${esc(r.d)}</span></li>`).join("")}</ol>` + recipeHTML(rx, s.cols, { noChart: true, noRows: true });
+  }
+  return recipeHTML(rx, s.cols, { noChart: true, hi });
 }
 function progressHTML(s, rx, info) {
   if (!s.target) return `<div class="prog prog-empty"><p>콧수와 목표 단수를 정하면 지금까지 뜬 편물이 그림으로 보여요.</p><button type="button" class="ghost-btn" data-su-edit="${s.id}">어떻게 뜰지 정하기</button></div>`;
@@ -30,7 +40,7 @@ function progressHTML(s, rx, info) {
   let body = "", stats = `<div class="prog-stats"><b>${Math.min(s.row, total)} / ${total}단</b><span>${pct}%</span></div>`;
   if (s.pid === "filetcat") filetUI.flip = FLIP_NEXT[s.flip] ? s.flip : filetFlipDefault();   // 이 카운터의 뒤집은 면 설정
   if (s.pid === "filetcat" && ["dot", "img", "photo"].includes(view)) { filetUI.v = view; body = filetChartHTML(info.done ? -1 : s.row, { noSeg: true, noNow: true }); }
-  else if (view === "rows") body = filetRowsHTML(Math.min(s.row, FILETCAT.rows));
+  else if (view === "rows") body = ctrRowsHTML(s, rx, info, kind);
   else if (view === "pat") body = `<canvas class="prog-cv pw" data-pw="${s.id}" style="height:280px" role="img" aria-label="무늬 확대: ${s.row}단까지 떴어요"></canvas><p class="cc-cap">초록 = 다 뜬 단, 밝은 줄 = 지금 단, 흐림 = 아직이에요. +1을 누르면 지금 단이 한 줄 올라가요.</p>`;
   else if (view === "chart") body = ctrChartBody(s, rx, info);
   else if (view === "all") {

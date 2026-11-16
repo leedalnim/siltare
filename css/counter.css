@@ -166,3 +166,7 @@
   background: color-mix(in srgb, var(--bg) 62%, transparent);
   -webkit-backdrop-filter: blur(10px) saturate(1.1); backdrop-filter: blur(10px) saturate(1.1);
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18px); mask-image: linear-gradient(to bottom, transparent 0, #000 18px); pointer-events: none; }
+/* 카운터 아래 작은 설정 줄 */
+.ctr-set { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.ctr-set .link:disabled { opacity: .4; }
+.rowlist .st-t b { font-weight: 700; }

@@ -155,8 +155,7 @@ function projRow(row, act) {
     <div class="hd"><span class="nm">${row.pr.name}</span>${ing ? `<span class="ing inline">뜨는 중</span>` : ""}<span class="sp"></span><span class="st-pill ${b.x.st}">${stLabel[b.x.st]}</span>${starBtn(k, row.pr.name, true)}</div>
     <span class="sub">${lo === hi ? lo : lo + "~" + hi}g ·${left >= 0 ? `${ro(b.p.name)} 뜨면 ${left}g 남아요` : `${ro(b.p.name)}도 ${-left}g 모자라요`}</span>
     ${row.pr.how ? `<p class="howto">${row.pr.how}</p>` : ""}${refBtns(row.pr)}
-    <button type="button" class="fold" data-tp="${row.pr.id}" aria-expanded="${openP}" aria-controls="mini-${row.pr.id}">
-      <span class="stack" aria-hidden="true">${row.good.slice(0, 4).map(it => `<canvas data-sw="${it.p.id}"></canvas>`).join("")}</span>
+    <button type="button" class="fold fold-chip" data-tp="${row.pr.id}" aria-expanded="${openP}" aria-controls="mini-${row.pr.id}">
       <span class="fl">어울리는 무늬 ${row.good.length}개</span>
       <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
     </button>
@@ -242,7 +241,7 @@ function renderDetail() {
   if (r.skip || !r.doable.length) {
     $("pat-body").innerHTML = `${stageHTML(p, null, cols, rx)}
       <div class="size-line">${esc(r.skip || "지금 가진 실로는 가장 작은 작품도 뜨기엔 양이 적어요. 다른 실을 더 담으면 다시 계산해요.")}</div>
-      <p class="how">${p.how}</p>${srcBtn(p.src, p.name)}${startBtns}${recipeHTML(rx, cols)}`;
+      <p class="how">${p.how}</p>${srcBtn(p.src, p.name)}${startBtns}<details class="rx-fold detail-rx"><summary>도안 보기 · 코 잡기와 단별 설명</summary>${recipeHTML(rx, cols, { noChart: true })}</details>`;
     requestAnimationFrame(() => paintAll($("pat-body"), g));
     return;
   }
@@ -266,12 +265,13 @@ function renderDetail() {
     <p class="how">${p.how}</p>${srcBtn(p.src, p.name)}
     ${startBtns}
     <p class="sub-h">이 무늬로 뜰 수 있는 것</p>
-    <ul class="pgrid3">${r.doable.map(x => {
+    ${(() => { const card = x => {
       const nt = x.st === "ok" ? `약 ${r.have - x.need}g 남아요` : r.have >= x.need ? "거의 딱 맞아요" : `약 ${x.need - r.have}g 부족`;
-      return `<li class="pc3 ${x.st}"><span class="st">${stLabel[x.st]}</span><b class="nm">${x.pr.name}</b><span class="g">${x.need}g 필요</span><span class="nt">${nt}</span></li>`;
-    }).join("")}</ul>
+      return `<li class="pc3 ${x.st}"><span class="st">${stLabel[x.st]}</span><b class="nm">${x.pr.name}</b><span class="g">${x.need}g 필요</span><span class="nt">${nt}</span></li>`; };
+      const first = r.doable.slice(0, 6), rest = r.doable.slice(6);   // 처음엔 6개만, 나머지는 접어 둬요
+      return `<ul class="pgrid3">${first.map(card).join("")}</ul>${rest.length ? `<details class="more-fold"><summary>${rest.length}개 더 보기</summary><ul class="pgrid3">${rest.map(card).join("")}</ul></details>` : ""}`; })()}
     ${r.later.length ? `<p class="more">실이 더 있으면: ${r.later.slice(0, 4).map(x => `${x.pr.name} ${x.need}g`).join(" · ")}</p>` : ""}
-    ${recipeHTML(rx, cols)}
+    <details class="rx-fold detail-rx"><summary>도안 보기 · 코 잡기와 단별 설명</summary>${recipeHTML(rx, cols, { noChart: true })}</details>
     <p class="note">소요량과 크기는 일반적인 굵기와 손땀으로 잡은 대략값이에요. 실이나 손땀에 따라 10~20% 차이가 날 수 있어요.</p>`;
   requestAnimationFrame(() => paintAll($("pat-body"), g));
 }
