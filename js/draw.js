@@ -183,13 +183,16 @@ const DRAW = {
         for (const o of [-2.4, 2.4]) { ctx.beginPath(); ctx.moveTo(cx + o * 0.5, cy - 7); ctx.quadraticCurveTo(cx + o * 1.6, cy, cx + o * 0.5, cy + 7); ctx.stroke(); }
       }
     },
-    filetcat: (ctx, W, H, C) => {   // 필레: 한길긴 기둥 사이 빈 칸과 채운 칸
-      const s = 14, cat = ["0000000000", "0010001000", "0011111000", "0010101000", "0011111000", "0001110000", "0111111100", "0111111100", "0100100100", "0000000000"];
-      for (let j = Math.ceil(H / s); j >= -1; j--) for (let i = -1; i * s < W + s; i++) {
-        const on = cat[md(j, 10)][md(i, 10)] === "1", x = i * s, y = j * s;
-        for (let k = 0; k < (on ? 4 : 1); k++) dcSt(ctx, x + k * (s / 4) - 1.5, y, 5, s, C[0]);
-        if (!on) chain(ctx, x + s * 0.62, y + 2.5, s * 0.3, 0, mix(C[0], -0.08));
-      }
+    filetcat: (ctx, W, H, C) => {   // 필레 커튼: 실제 도트 도안(고양이 칸)을 그물 칸으로. 아래 고양이 칸이 보이게 잘라요
+      const F = typeof FILETCAT !== "undefined" ? FILETCAT : null; if (!F) return;
+      const s = Math.max(4, Math.min(W / 28, H / 22)), cols = Math.ceil(W / s), rows = Math.ceil(H / s);
+      const c0 = Math.max(0, Math.round((F.cols - cols) / 2) - 13), r0 = Math.max(0, F.rows - rows - 3);
+      ctx.fillStyle = css(C[0], -0.6); ctx.fillRect(0, 0, W, H);
+      for (let r = 0; r < rows; r++) { const line = F.grid[r0 + r] || ""; for (let c = 0; c < cols; c++) {
+        const ch = line[c0 + c] || ".", x = c * s, y = r * s;
+        if (ch === "#") { ctx.fillStyle = css(C[0], 0.06); ctx.fillRect(x + .3, y + .3, s - .6, s - .6); }
+        else { ctx.strokeStyle = css(C[0], -0.05); ctx.lineWidth = Math.max(1, s * 0.18); ctx.strokeRect(x + s * .12, y + s * .12, s * .76, s * .76); }
+      } }
     },
     moss: (ctx, W, H, C) => cgrid(W, H, CH, (i, j, px, py) => { if (md(i + j, 2)) scSt(ctx, px, py, CW, CH, C[0]); else chain(ctx, px + CW / 2, py + CH * 0.45, CW * 0.42, 0, mix(C[0], -0.1)); }),
     granny: (ctx, W, H, C) => {

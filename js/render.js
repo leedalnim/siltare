@@ -207,6 +207,7 @@ function detailChartHTML(p, rx, cols) {
 const photoFigure = (src, name, cap) => `<figure class="filet-photo"><button type="button" data-photo="${src}" data-photo-name="${esc(name)}" data-photo-kind="완성 사진" aria-label="완성 사진 크게 보기"><img src="${src}" alt="${esc(name)} 완성 사진" loading="lazy"></button>
   <figcaption>${cap ? esc(cap) + " " : ""}사진을 누르면 크게 볼 수 있어요.</figcaption></figure>`;
 function stageHTML(p, sel, cols, rx) {
+  if (p.chartFirst) return detailChartHTML(p, rx, cols);   // 무늬 크게 그림이 실제 모양과 달라서 도안(도트·원본·완성 사진)부터 보여 줘요
   if (detailUI.pid !== p.id) { detailUI.pid = p.id; detailUI.view = p.id === "cat" ? "chart" : "swatch"; detailUI.zoom = 1; }
   const views = [["swatch", "무늬 크게"], ["chart", "기호 도안"]];
   if (p.photo) views.push(["photo", "완성 사진"]);

@@ -282,7 +282,7 @@ function filetRowParts(k) {
 function filetRowText(k) {
   const { runs } = filetRowParts(k), out = runs.map(([m, n]) => `${FILET_MARK[m]}${n}`);
   const dir = !filetBack(k) ? "← 오른쪽부터" : filetUI.flip !== "off" ? "← 오른쪽부터 (뒤집은 면 · 도안도 뒤집어 보여요)" : "왼쪽부터 →";
-  return `${dir}  ${out.join(" · ")}  (■ 채움 · □ 빈칸 · ═ 넓은 빈칸 · V 레이스, 2칸짜리는 1묶음으로 셈)`;
+  return `${dir}  ${out.join(" · ")}`;
 }
 function filetDotSVG(cur) {
   const F = FILETCAT, cs = 10, L = 22, T = 4, Rm = 30, W = L + F.cols * cs + Rm, H = T + F.rows * cs + 6;
@@ -332,7 +332,7 @@ function filetChartHTML(hiRow, opt = {}) {
   const tools = `<div class="filet-tools">${opt.noSeg ? "" : `<div class="seg" role="group" aria-label="도안 보기"><button type="button" data-filet-v="dot" aria-pressed="${dot}">도트 도안</button><button type="button" data-filet-v="img" aria-pressed="${!dot && !photo}">원본 이미지</button><button type="button" data-filet-v="photo" aria-pressed="${photo}">완성 사진</button></div>`}
     <button type="button" class="ghost-btn" data-filet-z aria-pressed="${filetUI.scale > 1.05}">${filetUI.scale > 1.05 ? "− 화면에 맞추기" : "＋ 크게 보기"}</button>
     ${cur >= 0 ? `<button type="button" class="ghost-btn" data-filet-flip aria-pressed="${filetUI.flip !== "off"}" title="누를 때마다 짝수 단 → 홀수 단 → 끔">${FLIP_LABEL[filetUI.flip]}</button>` : ""}</div>`;
-  const now = cur >= 0 && cur < F.rows ? `<div class="filet-now fr-now">${filetRowBody(cur + 1)}</div>` : "";
+  const now = !opt.noNow && cur >= 0 && cur < F.rows ? `<div class="filet-now fr-now">${filetRowBody(cur + 1)}</div>` : "";
   const legend = dot ? `<p class="cc-cap">■ 채운 칸 · □ 빈 칸 · <b style="color:#C0563B">V</b> 레이스(2칸) · ═ 넓은 빈 칸(2칸). 맨 아래 줄이 1단이고, 홀수 단은 오른쪽부터 읽어요.</p>` : `<p class="cc-cap">받은 원본 모눈 도안이에요. 맨 아래 줄이 1단이에요.</p>`;
   const cap = cur < 0 ? "" : cur >= F.rows ? `<p class="cc-cap">모든 단을 다 떴어요!</p>` : `<p class="cc-cap">초록 = 다 뜬 단 · 보라 띠 = 지금 단 · 흐림 = 아직이에요.</p>`;
   if (photo) return `<div class="cchart filet">${tools.replace(/<button type="button" class="ghost-btn" data-filet-z[^]*?<\/button>/, "")}${now}

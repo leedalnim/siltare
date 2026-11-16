@@ -136,3 +136,18 @@
 .fr-all { font-weight: 700; color: var(--ok, #2FA36E); }
 .filet-now.fr-now { display: grid; gap: 4px; padding: 10px 12px; border: 0; }
 .filet-now.fr-now .fr-k { color: var(--accent); font-size: 16px; margin: 0; }
+
+/* 지금 단 설명: 길면 접어 두고 눌러서 펼치기 */
+.ctr-card .inst.clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ctr-card .next.one { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ctr-card [data-clamp].more { cursor: pointer; position: relative; }
+.ctr-card .inst.clamp.more:not(.open)::after { content: "더 보기 ▾"; position: absolute; right: 0; bottom: 0; padding-left: 28px; font-size: 13px; font-weight: 600; color: var(--accent);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 16%, var(--surface)) 24px); }
+.ctr-card [data-clamp].open { display: block; -webkit-line-clamp: unset; white-space: normal; overflow: visible; }
+.ctr-card .fr-inst { display: grid; gap: 6px; margin-top: 10px; }
+/* +1 버튼: 화면 아래(탭바 바로 위)에 붙어 있어요 */
+.ctr-dock { position: sticky; bottom: calc(var(--tabbar) + max(0px, calc(env(safe-area-inset-bottom, 0px) - 14px)) + 10px); z-index: 4; display: grid; grid-template-columns: 64px 1fr; gap: 8px; }
+.ctr-dock .done-btn { padding: 18px 12px; box-shadow: 0 6px 18px rgba(0,0,0,.18); }
+.dock-undo { border: 0; border-radius: 16px; background: var(--surface); color: var(--ink); font-size: 17px; font-weight: 700; box-shadow: 0 4px 14px rgba(0,0,0,.14); }
+.dock-undo:disabled { opacity: .45; }
+.ctr-sub.one { grid-template-columns: 1fr; }

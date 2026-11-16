@@ -37,6 +37,20 @@ function barDetail() {
   bd.innerHTML = `<button type="button" class="bar-btn" data-sess-back aria-label="단수 세기 목록으로">${BAR_ICON.back}<span>단수 세기</span></button>
     <button type="button" class="bar-btn del${delC ? " warn" : ""}" data-sess-del="${s.id}" aria-label="${delC ? "한 번 더 누르면 삭제돼요" : "이 카운터 삭제"}">${BAR_ICON.del}${delC ? "<span>한 번 더 누르면 삭제</span>" : ""}</button>`;
 }
+// 지금 단 설명: 필레는 칸 묶음으로, 나머지는 글로 쓰되 길면 세 줄까지만 보이고 눌러서 펼쳐요
+function instHTML(s, info) {
+  if (s.pid === "filetcat" && typeof filetRowParts === "function") {
+    const k = s.row + 1, { dir, runs } = filetRowParts(k);
+    return `<div class="inst fr-inst"><span class="fr-dir">${dir}</span><span class="fr-runs">${runs.map(([m, n]) => `<span class="fr-run m${m === "#" ? "f" : m === "." ? "e" : m === "v" ? "v" : "w"}"><i>${FILET_MARK[m]}</i>${n}</span>`).join("")}</span></div>`;
+  }
+  return `<p class="inst clamp" data-clamp><b>${esc(info.row.t)}</b>${esc(info.row.d)}</p>`;
+}
+// 다음 단: 한 줄만. 필레는 방향만 보여 줘요(칸 묶음은 '단별 읽기'에)
+function nextHTML(s, next) {
+  if (s.pid === "filetcat" && typeof filetRowParts === "function") return `<p class="next">다음 단: ${s.row + 2}단 · ${filetRowParts(s.row + 2).dir}</p>`;
+  return `<p class="next one" data-clamp>다음 단: ${esc(next.row.t)} · ${esc(next.row.d)}</p>`;
+}
+document.addEventListener("click", e => { const c = e.target.closest && e.target.closest("[data-clamp].more"); if (c) c.classList.toggle("open"); });
 function renderCounter() {
   const box = $("v-counter");
   const s = state.sessions.find(x => x.id === state.sess);
@@ -74,11 +88,11 @@ function renderCounter() {
         <div class="big">${s.row + 1}<small>단째</small></div>
         <span class="phase">${info.phase}${reached ? " · 목표 단수를 다 떴어요!" : ""}</span>
         ${triLine(s)}
-        <p class="inst"><b>${esc(info.row.t)}</b>${esc(info.row.d)}</p>
-        ${next.done ? `<p class="next">이 단이 마지막이에요</p>` : `<p class="next">다음 단: ${esc(next.row.t)} · ${esc(next.row.d)}</p>`}
+        ${instHTML(s, info)}
+        ${next.done ? `<p class="next">이 단이 마지막이에요</p>` : nextHTML(s, next)}
       </div>
-      <button type="button" class="done-btn" data-row="1">${s.row + 1}단 다 떴어요 <span aria-hidden="true">+1</span></button>
-      <div class="ctr-sub"><button type="button" data-row="-1"${s.row ? "" : " disabled"}>− 1단 되돌리기</button><button type="button" data-reset class="${resetC ? "warn" : ""}"${s.row ? "" : " disabled"}>${resetC ? "한 번 더 누르면 0단으로" : "처음부터"}</button></div>`;
+      <div class="ctr-dock"><button type="button" class="dock-undo" data-row="-1" aria-label="1단 되돌리기"${s.row ? "" : " disabled"}>−1</button><button type="button" class="done-btn" data-row="1">${s.row + 1}단 다 떴어요 <span aria-hidden="true">+1</span></button></div>
+      <div class="ctr-sub one"><button type="button" data-reset class="${resetC ? "warn" : ""}"${s.row ? "" : " disabled"}>${resetC ? "한 번 더 누르면 0단으로" : "처음부터"}</button></div>`;
   }
   html += `<div class="stitch"><div class="st-hd"><span class="label">코 세기</span><span class="hint">한 단 안에서 몇 코 떴는지 세요</span></div>
       <div class="st-row"><button type="button" data-st="-1" aria-label="코 하나 빼기">−</button><output aria-live="polite">${s.st}<small>코</small></output><button type="button" data-st="1" aria-label="코 하나 더하기">+</button></div>
@@ -86,7 +100,8 @@ function renderCounter() {
     <label class="toggle"><input type="checkbox" id="wake" ${state.wake ? "checked" : ""}> 뜨는 동안 화면이 꺼지지 않게</label>`;
   html += `<details class="rx-fold"><summary>도안 전체 보기</summary>${recipeHTML(rx, s.cols, { noChart: true, hi: info.done ? -1 : info.hi })}</details>` + syncLine();
   box.innerHTML = html; barDetail();
-  requestAnimationFrame(() => { paintSess(box); box.querySelectorAll("canvas[data-prog]").forEach(cv => drawProgress(cv, s)); box.querySelectorAll("canvas[data-pw]").forEach(cv => drawPatWindow(cv, s));
+  requestAnimationFrame(() => { paintSess(box);
+    box.querySelectorAll("[data-clamp]").forEach(el => { if (el.scrollHeight > el.clientHeight + 2) el.classList.add("more"); });   // 잘린 글만 '더 보기' box.querySelectorAll("canvas[data-prog]").forEach(cv => drawProgress(cv, s)); box.querySelectorAll("canvas[data-pw]").forEach(cv => drawPatWindow(cv, s));
     const fs = box.querySelector("[data-filet-scroll]"), fb = fs && fs.querySelector(".filet-band");   // 필레 도안: 지금 단이 보이게 스크롤
     if (fb) { fs.scrollTop = Math.max(0, fb.getBoundingClientRect().top - fs.getBoundingClientRect().top + fs.scrollTop - fs.clientHeight / 2);
       if (fs.scrollWidth > fs.clientWidth) fs.scrollLeft = !filetBack(s.row + 1) || filetUI.flip !== "off" ? fs.scrollWidth : 0; } });   // 크게 볼 땐 그 단을 시작하는 쪽으로 (뒤집어 보면 늘 오른쪽)
