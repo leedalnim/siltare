@@ -113,3 +113,4 @@ html, body, button, a, label, input, select, textarea, canvas { touch-action: ma
 .bar-btn svg { width: 22px; height: 22px; flex: none; }
 .bar-btn.del { width: 44px; padding: 0; justify-content: center; color: var(--muted); }
 .bar-btn.del.warn { width: auto; padding: 0 14px 0 12px; background: #c2414f; color: #fff; font-size: 13.5px; }
+.empty .primary { justify-self: stretch; width: 100%; }   /* 안내 상자 안 버튼은 가로로 꽉 차게 */
