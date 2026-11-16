@@ -115,7 +115,8 @@ function renderCounter() {
   html += `<details class="rx-fold"><summary>도안 전체 보기</summary>${recipeHTML(rx, s.cols, { noChart: true, hi: info.done ? -1 : info.hi })}</details>` + syncLine();
   box.innerHTML = html; barDetail();
   requestAnimationFrame(() => { paintSess(box);
-    box.querySelectorAll("[data-clamp]").forEach(el => { if (el.scrollHeight > el.clientHeight + 2) el.classList.add("more"); });   // 잘린 글만 '더 보기' box.querySelectorAll("canvas[data-prog]").forEach(cv => drawProgress(cv, s)); box.querySelectorAll("canvas[data-pw]").forEach(cv => drawPatWindow(cv, s));
+    box.querySelectorAll("[data-clamp]").forEach(el => { if (el.scrollHeight > el.clientHeight + 2) el.classList.add("more"); });   /* 잘린 글만 '더 보기' */
+    box.querySelectorAll("canvas[data-prog]").forEach(cv => drawProgress(cv, s)); box.querySelectorAll("canvas[data-pw]").forEach(cv => drawPatWindow(cv, s));
     const fs = box.querySelector("[data-filet-scroll]"), fb = fs && fs.querySelector(".filet-band");   // 필레 도안: 지금 단이 보이게 스크롤
     if (fb) { fs.scrollTop = Math.max(0, fb.getBoundingClientRect().top - fs.getBoundingClientRect().top + fs.scrollTop - fs.clientHeight / 2);
       if (fs.scrollWidth > fs.clientWidth) fs.scrollLeft = !filetBack(s.row + 1) || filetUI.flip !== "off" ? fs.scrollWidth : 0; } });   // 크게 볼 땐 그 단을 시작하는 쪽으로 (뒤집어 보면 늘 오른쪽)

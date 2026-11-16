@@ -16,7 +16,9 @@ for (const craft of ["knit","crochet"]) {
     await p.evaluate(()=>closeSheets()); n++;
     // 카운터 하나 만들어서 모든 보기 열기
     await p.evaluate(([c,id])=>{state.sessions=[{id:"t",craft:c,pid:id,cols:[],row:2,st:0,stAuto:true,at:Date.now(),mode:"flat",target:20,n:22,w:20,l:20}]; state.sess="t"; state.tab="counter"; ctrUI.view=null; render();}, [craft,id]); await p.waitForTimeout(120);
-    for (const v of await p.$$eval("[data-cv]", bs=>bs.map(b=>b.dataset.cv))) { await p.click(`[data-cv="${v}"]`); await p.waitForTimeout(80); }
+    for (const v of await p.$$eval("[data-cv]", bs=>bs.map(b=>b.dataset.cv))) { await p.click(`[data-cv="${v}"]`); await p.waitForTimeout(120);
+      const blank = await p.evaluate(()=>[...document.querySelectorAll("#v-counter canvas[data-pw], #v-counter canvas[data-prog]")].filter(cv=>{ const d=cv.getContext("2d").getImageData(0,0,cv.width,cv.height).data; for(let i=3;i<d.length;i+=40) if(d[i]) return false; return true; }).length);
+      if (blank) errs.push(`빈 그림: ${craft}/${id} 카운터 '${v}' 보기`); }
     if (await p.locator(".ctr-dock").count()) { await p.click(".ctr-dock .done-btn"); await p.click(".ctr-dock .dock-undo"); } n++;
   }
 }
