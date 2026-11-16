@@ -154,7 +154,7 @@ function projRow(row, act) {
   return `<li class="prow">${thumb}
     <div class="hd"><span class="nm">${row.pr.name}</span>${ing ? `<span class="ing inline">뜨는 중</span>` : ""}<span class="sp"></span><span class="st-pill ${b.x.st}">${stLabel[b.x.st]}</span>${starBtn(k, row.pr.name, true)}</div>
     <span class="sub">${lo === hi ? lo : lo + "~" + hi}g ·${left >= 0 ? `${ro(b.p.name)} 뜨면 ${left}g 남아요` : `${ro(b.p.name)}도 ${-left}g 모자라요`}</span>
-    ${row.pr.how ? `<p class="howto">${row.pr.how}</p>` : ""}${refBtns(row.pr)}
+    ${row.pr.how ? `<p class="howto">${row.pr.how}</p>` : ""}${refBtns(row.pr)}<button type="button" class="src-btn go" data-p="${b.p.id}" data-pv="${row.pr.id}">${b.p.name} 무늬 보기 · 단수 세기</button>
     <button type="button" class="fold" data-tp="${row.pr.id}" aria-expanded="${openP}" aria-controls="mini-${row.pr.id}">
       <span class="stack" aria-hidden="true">${row.good.slice(0, 4).map(it => `<canvas data-sw="${it.p.id}"></canvas>`).join("")}</span>
       <span class="fl">어울리는 무늬 ${row.good.length}개</span>
@@ -166,7 +166,12 @@ function projRow(row, act) {
 function renderProjects() {
   const { gs, g } = currentGroup();
   let html = `<div class="view-title"><h2 id="h-projects">만들 수 있는 것</h2><span class="meta">${craftName()} 기준</span></div>`;
-  if (!g) { $("v-projects").innerHTML = html + emptyBox("실을 담으면 만들 수 있는 작품이 나와요."); return; }
+  if (!g) {   // 실을 안 담아도 작품을 보고 단수 세기는 시작할 수 있어요
+    const all = PROJECTS[state.craft].filter(pr => PATTERNS[state.craft].some(p => pr.tags.some(t => p.suits.includes(t))));
+    $("v-projects").innerHTML = html + emptyBox("실을 담으면 지금 실로 뜰 수 있는 작품을 골라 드려요. 실을 안 담아도 아래에서 바로 단수 세기를 시작할 수 있어요.")
+      + `<ul class="plist">${all.map(otherRow).join("")}</ul>`;
+    requestAnimationFrame(() => paintAll($("v-projects"), PH)); return;
+  }
   const { doable, later } = projectRows(g), act = activeSet();
   const counts = {}; doable.forEach(r => { counts[r.cat] = (counts[r.cat] || 0) + 1; });
   const seen = new Set([...doable, ...later].map(r => r.pr.id));
@@ -270,7 +275,7 @@ function renderDetail() {
       const nt = x.st === "ok" ? `약 ${r.have - x.need}g 남아요` : r.have >= x.need ? "거의 딱 맞아요" : `약 ${x.need - r.have}g 부족`;
       return `<li><b class="nm">${x.pr.name}</b><span class="g">${x.need}g · ${nt}</span><span class="st-pill ${x.st}">${stLabel[x.st]}</span></li>`; };
       const first = r.doable.slice(0, 4), rest = r.doable.slice(4);   // 처음엔 4개만, 나머지는 접어 둬요
-      return `<ul class="plist">${first.map(card).join("")}</ul>${rest.length ? `<details class="more-fold"><summary>${rest.length}개 더 보기</summary><ul class="plist">${rest.map(card).join("")}</ul></details>` : ""}`; })()}
+      return `<ul class="canlist">${first.map(card).join("")}</ul>${rest.length ? `<details class="more-fold"><summary><span class="o">${rest.length}개 더 보기</span><span class="c">접기</span></summary><ul class="canlist">${rest.map(card).join("")}</ul></details>` : ""}`; })()}
     ${r.later.length ? `<p class="more">실이 더 있으면: ${r.later.slice(0, 4).map(x => `${x.pr.name} ${x.need}g`).join(" · ")}</p>` : ""}
     <details class="rx-fold detail-rx"><summary>도안 보기 · 코 잡기와 단별 설명</summary>${recipeHTML(rx, cols, { noChart: true })}</details>
     <p class="note">소요량과 크기는 일반적인 굵기와 손땀으로 잡은 대략값이에요. 실이나 손땀에 따라 10~20% 차이가 날 수 있어요.</p>`;
