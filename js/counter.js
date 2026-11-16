@@ -104,14 +104,14 @@ function renderCounter() {
         ${instHTML(s, info)}
         ${next.done ? `<p class="next">이 단이 마지막이에요</p>` : nextHTML(s, next)}
       </div>
-      <div class="ctr-dock">${stDockOn(s) ? dockStHTML(s) : ""}<button type="button" class="dock-undo" data-row="-1" aria-label="1단 되돌리기"${s.row ? "" : " disabled"}>−1</button><button type="button" class="done-btn" data-row="1">${s.row + 1}단 다 떴어요 <span aria-hidden="true">+1</span></button></div>`;
+      <div class="ctr-dock">${stDockOn(s) ? dockStHTML(s) : ""}<button type="button" class="dock-undo" data-row="-1" aria-label="1단 되돌리기"${s.row ? "" : " disabled"}>−1</button><button type="button" class="done-btn" data-row="1">${s.row + 1}단 다 떴어요 <span aria-hidden="true">+1</span></button></div>
+      <div class="ctr-sub one"><button type="button" data-reset class="${resetC ? "warn" : ""}"${s.row ? "" : " disabled"}>${resetC ? "한 번 더 누르면 0단으로" : "처음부터"}</button></div>`;
   }
   html += `<div class="stitch"><div class="st-hd"><span class="label">코 세기</span><span class="hint">한 단 안에서 몇 코 떴는지 세요</span></div>
       <div class="st-row"><button type="button" data-st="-1" aria-label="코 하나 빼기">−</button><output aria-live="polite">${s.st}<small>코</small></output><button type="button" data-st="1" aria-label="코 하나 더하기">+</button></div>
       <label class="toggle"><input type="checkbox" id="st-auto" ${s.stAuto ? "checked" : ""}> 다음 단으로 넘어가면 0으로 돌리기</label>
       <label class="toggle"><input type="checkbox" id="st-dock" ${stDockOn(s) ? "checked" : ""}> 아래 고정 막대에 같이 두기${stTarget(s) ? ` (이 단 목표 ${stTarget(s)}코)` : ""}</label></div>
-    <div class="ctr-set"><label class="toggle"><input type="checkbox" id="wake" ${state.wake ? "checked" : ""}> 뜨는 동안 화면 켜 두기</label>
-      ${info.done ? "" : `<button type="button" class="link${resetC ? " danger" : ""}" data-reset${s.row ? "" : " disabled"}>${resetC ? "한 번 더 누르면 0단으로" : "처음부터 다시"}</button>`}</div>`;
+    <label class="toggle"><input type="checkbox" id="wake" ${state.wake ? "checked" : ""}> 뜨는 동안 화면이 꺼지지 않게</label>`;
   html += syncLine();
   box.innerHTML = html; barDetail();
   requestAnimationFrame(() => { paintSess(box);

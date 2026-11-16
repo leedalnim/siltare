@@ -100,3 +100,9 @@
 .more-fold summary, .detail-rx > summary { cursor: pointer; width: fit-content; font-weight: 600; font-size: 14px; color: var(--accent); padding-block: 6px; }
 .more-fold[open] summary { margin-bottom: 8px; }
 .detail-rx[open] > summary { margin-bottom: 4px; }
+/* 무늬 상세 '이 무늬로 뜰 수 있는 것': 담백한 목록 */
+.plist { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.plist li { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "nm st" "g st"; column-gap: 10px; row-gap: 1px; align-items: center; padding: 10px 2px; border-bottom: 1px solid var(--line); }
+.plist .nm { grid-area: nm; font-size: 15px; font-weight: 600; }
+.plist .g { grid-area: g; font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.plist .st-pill { grid-area: st; }

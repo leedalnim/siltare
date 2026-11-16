@@ -36,7 +36,3 @@
 .prow .src-btn { grid-column: 2; justify-self: start; margin: 0 0 4px; }
 .prow .src-btn.go::before { content: "🧶"; }
 .skipped .plist { margin-top: 10px; }
-/* 작품 카드: 어울리는 무늬는 작은 칩으로 */
-.fold.fold-chip { width: auto; justify-self: start; margin-top: 2px; padding: 4px 8px 4px 10px; border: 0; border-radius: 999px; background: var(--surface-2); font-size: 12.5px; gap: 2px; color: var(--muted); }
-.fold.fold-chip .fl { flex: none; }
-.fold.fold-chip[aria-expanded="true"] { color: var(--accent); }
