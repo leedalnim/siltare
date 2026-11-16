@@ -98,6 +98,7 @@ document.addEventListener("toggle", e => { if (e.target.matches && e.target.matc
 document.addEventListener("change", e => {
   if (e.target.classList.contains("dbl")) { state.doubled = e.target.checked; if (state.doubled) state.group = "thin2"; save(); render(); }
   if (e.target.id === "st-auto") { const s = curSess(); if (s) { s.stAuto = e.target.checked; save(); } }
+  if (e.target.id === "st-dock") { const s = curSess(); if (s) { s.stDock = e.target.checked; save(); renderCounter(); } }
   if (e.target.id === "wake") setWake(e.target.checked);
   if (e.target.id === "c-custom" && mixMode()) {
     const hx = e.target.value.toUpperCase(), ps = mixParts(form.color);

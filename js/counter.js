@@ -37,6 +37,19 @@ function barDetail() {
   bd.innerHTML = `<button type="button" class="bar-btn" data-sess-back aria-label="단수 세기 목록으로">${BAR_ICON.back}<span>단수 세기</span></button>
     <button type="button" class="bar-btn del${delC ? " warn" : ""}" data-sess-del="${s.id}" aria-label="${delC ? "한 번 더 누르면 삭제돼요" : "이 카운터 삭제"}">${BAR_ICON.del}${delC ? "<span>한 번 더 누르면 삭제</span>" : ""}</button>`;
 }
+// 코 세기: 이 단에서 세야 할 코 수 (삼각형은 단이 끝났을 때 콧수, 필레는 칸 수, 나머지는 코 잡은 수)
+function stTarget(s) {
+  if (triOk(s.tri) && s.n) return triRow(s.tri, s.n, s.row).to;
+  if (s.pid === "filetcat" && typeof FILETCAT !== "undefined") return FILETCAT.cols;
+  return +s.n > 0 ? +s.n : 0;
+}
+// 고정 막대에 코 세기 줄을 둘지: 직접 고른 값, 없으면 코 수가 단마다 바뀌는 삼각형만 켜요
+const stDockOn = s => s.stDock != null ? !!s.stDock : !!(triOk(s.tri) && s.n);
+function dockStHTML(s) {
+  const t = stTarget(s), full = t && s.st >= t;
+  return `<div class="dock-st${full ? " full" : ""}"><span class="ds-l">코</span><output aria-live="polite"><b>${s.st}</b>${t ? `<small> / ${t}코</small>` : ""}</output>${full ? `<span class="ds-ok">이 단 끝!</span>` : ""}
+    <button type="button" data-st="-1" aria-label="코 하나 빼기">−</button><button type="button" data-st="1" aria-label="코 하나 더하기">＋</button></div>`;
+}
 // 지금 단 설명: 필레는 칸 묶음으로, 나머지는 글로 쓰되 길면 세 줄까지만 보이고 눌러서 펼쳐요
 function instHTML(s, info) {
   if (s.pid === "filetcat" && typeof filetRowParts === "function") {
@@ -91,12 +104,13 @@ function renderCounter() {
         ${instHTML(s, info)}
         ${next.done ? `<p class="next">이 단이 마지막이에요</p>` : nextHTML(s, next)}
       </div>
-      <div class="ctr-dock"><button type="button" class="dock-undo" data-row="-1" aria-label="1단 되돌리기"${s.row ? "" : " disabled"}>−1</button><button type="button" class="done-btn" data-row="1">${s.row + 1}단 다 떴어요 <span aria-hidden="true">+1</span></button></div>
+      <div class="ctr-dock">${stDockOn(s) ? dockStHTML(s) : ""}<button type="button" class="dock-undo" data-row="-1" aria-label="1단 되돌리기"${s.row ? "" : " disabled"}>−1</button><button type="button" class="done-btn" data-row="1">${s.row + 1}단 다 떴어요 <span aria-hidden="true">+1</span></button></div>
       <div class="ctr-sub one"><button type="button" data-reset class="${resetC ? "warn" : ""}"${s.row ? "" : " disabled"}>${resetC ? "한 번 더 누르면 0단으로" : "처음부터"}</button></div>`;
   }
   html += `<div class="stitch"><div class="st-hd"><span class="label">코 세기</span><span class="hint">한 단 안에서 몇 코 떴는지 세요</span></div>
       <div class="st-row"><button type="button" data-st="-1" aria-label="코 하나 빼기">−</button><output aria-live="polite">${s.st}<small>코</small></output><button type="button" data-st="1" aria-label="코 하나 더하기">+</button></div>
-      <label class="toggle"><input type="checkbox" id="st-auto" ${s.stAuto ? "checked" : ""}> 다음 단으로 넘어가면 0으로 돌리기</label></div>
+      <label class="toggle"><input type="checkbox" id="st-auto" ${s.stAuto ? "checked" : ""}> 다음 단으로 넘어가면 0으로 돌리기</label>
+      <label class="toggle"><input type="checkbox" id="st-dock" ${stDockOn(s) ? "checked" : ""}> 아래 고정 막대에 같이 두기${stTarget(s) ? ` (이 단 목표 ${stTarget(s)}코)` : ""}</label></div>
     <label class="toggle"><input type="checkbox" id="wake" ${state.wake ? "checked" : ""}> 뜨는 동안 화면이 꺼지지 않게</label>`;
   html += `<details class="rx-fold"><summary>도안 전체 보기</summary>${recipeHTML(rx, s.cols, { noChart: true, hi: info.done ? -1 : info.hi })}</details>` + syncLine();
   box.innerHTML = html; barDetail();

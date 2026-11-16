@@ -151,3 +151,13 @@
 .dock-undo { border: 0; border-radius: 16px; background: var(--surface); color: var(--ink); font-size: 17px; font-weight: 700; box-shadow: 0 4px 14px rgba(0,0,0,.14); }
 .dock-undo:disabled { opacity: .45; }
 .ctr-sub.one { grid-template-columns: 1fr; }
+/* 고정 막대의 코 세기 줄 */
+.ctr-dock .dock-st { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; padding: 6px 6px 6px 14px; border-radius: 14px; background: var(--surface); box-shadow: 0 4px 14px rgba(0,0,0,.14); }
+.dock-st .ds-l { font-size: 13px; font-weight: 600; color: var(--muted); }
+.dock-st output { font-variant-numeric: tabular-nums; margin-right: auto; }
+.dock-st output b { font-size: 22px; font-weight: 800; }
+.dock-st output small { font-size: 13px; color: var(--muted); }
+.dock-st .ds-ok { font-size: 13px; font-weight: 700; color: var(--ok, #2FA36E); margin-right: 4px; }
+.dock-st.full output b { color: var(--ok, #2FA36E); }
+.dock-st button { width: 48px; height: 40px; border: 0; border-radius: 10px; background: var(--surface-2); color: var(--ink); font-size: 20px; font-weight: 700; }
+.dock-st button[data-st="1"] { background: var(--accent-soft); color: var(--accent); }
