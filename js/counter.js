@@ -64,14 +64,30 @@ function nextHTML(s, next) {
   return `<p class="next one" data-clamp>다음 단: ${esc(next.row.t)} · ${esc(next.row.d)}</p>`;
 }
 document.addEventListener("click", e => { const c = e.target.closest && e.target.closest("[data-clamp].more"); if (c) c.classList.toggle("open"); });
-// 단수 세기 탭에서 바로 새 카운터: 무늬를 고르면 '어떻게 뜰까요' 설정으로 이어져요 (실을 안 담아도 돼요)
+// 단수 세기 탭에서 바로 새 카운터: ① 어떤 작품을 뜰까요 → ② 어떤 무늬로 뜰까요 → '어떻게 뜰까요' 설정 (실을 안 담아도 돼요)
 function newSessPick() {
-  const items = [];
-  [state.craft, state.craft === "knit" ? "crochet" : "knit"].forEach(c => {
-    items.push({ grp: `${craftName(c)} 무늬` });
-    PATTERNS[c].forEach(p => items.push({ v: `${c}:${p.id}`, label: p.name, sub: p.en }));
+  const items = [], crafts = [state.craft, state.craft === "knit" ? "crochet" : "knit"];
+  crafts.forEach(c => {
+    const prs = PROJECTS[c].filter(pr => PATTERNS[c].some(p => pr.tags.some(t => p.suits.includes(t))));
+    items.push({ grp: `${craftName(c)} 작품` });
+    prs.forEach(pr => items.push({ v: `p:${c}:${pr.id}`, label: pr.name }));
+    const mine = state.myProj.filter(m => m.craft === c);
+    if (mine.length) { items.push({ grp: `내가 등록한 작품 · ${craftName(c)}` }); mine.forEach(m => items.push({ v: `p:${c}:${m.id}`, label: m.name })); }
   });
-  pickShow("어떤 무늬로 뜰까요?", items, v => { const [c, pid] = v.split(":"); openSetup({ pid, craft: c, proj: null }); });
+  items.push({ v: "pat", label: "작품 없이 무늬만 고르기", cls: "new" });
+  pickShow("어떤 작품을 뜰까요?", items, v => {
+    if (v === "pat") return setTimeout(() => newSessPattern(null, null), 0);
+    const [, c, proj] = v.split(":"); setTimeout(() => newSessPattern(c, proj), 0);
+  });
+}
+function newSessPattern(craft, proj) {
+  const pr = proj && PROJECTS[craft].find(x => x.id === proj);
+  const fit = (c) => PATTERNS[c].filter(p => !pr || pr.tags.some(t => p.suits.includes(t)));
+  if (pr) { const ps = fit(craft); if (ps.length === 1) return openSetup({ pid: ps[0].id, craft, proj }); }
+  const items = [], crafts = craft ? [craft] : [state.craft, state.craft === "knit" ? "crochet" : "knit"];
+  crafts.forEach(c => { items.push({ grp: `${craftName(c)} 무늬` }); fit(c).forEach(p => items.push({ v: `${c}:${p.id}`, label: p.name, sub: p.en })); });
+  pickShow(pr ? `${pr.name} · 어떤 무늬로 뜰까요?` : proj ? `${(state.myProj.find(m => m.id === proj) || {}).name || ""} · 어떤 무늬로 뜰까요?` : "어떤 무늬로 뜰까요?", items,
+    v => { const [c, pid] = v.split(":"); openSetup({ pid, craft: c, proj: proj || null }); });
 }
 document.addEventListener("click", e => { if (e.target.closest && e.target.closest("[data-new-sess]")) newSessPick(); });
 function renderCounter() {
