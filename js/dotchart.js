@@ -69,7 +69,7 @@ function dotOpenEditor(p) {
     if (confirm("저장하지 않은 그림이 남아 있어요. 이어서 그릴까요?")) Object.assign(dotEd, { name: dr.name || "", w: dr.w, h: dr.h, cells: dec(dr.cells), pal: dr.pal.slice(), cur: Math.min(dotEd.cur, dr.pal.length - 1) });
     else dotDraft(false);
   }
-  $("dot-title").textContent = p ? "도트 도안 고치기" : "도트 도안 그리기";
+  $("dot-title").textContent = p ? "방안 도안 고치기" : "방안 도안 그리기";
   dotRenderEditor(); openSheet("sheet-dot");
 }
 // 도트 편집 아이콘 (선 아이콘, 글자색을 따라가요)
@@ -124,7 +124,7 @@ function dotRenderEditor() {
         <button type="button" data-dot-clear class="warn">${DICON.clear}<span>지우기</span></button></div></div>
     <div class="knit-live${knitLiveOn() ? "" : " off"}"><div class="kl-hd"><span class="label">떴을 때 모습 · 실시간</span><button type="button" class="link" data-knit-toggle>${knitLiveOn() ? "접기" : "펼치기"}</button></div>
       <div class="kl-box"${knitLiveOn() ? "" : " hidden"}><canvas id="dot-knit" aria-label="떴을 때 모습 미리보기"></canvas></div></div>
-    <div class="dot-wrap${d.tool === "move" ? " move" : ""}"><canvas id="dot-cv" aria-label="도트 도안 그리기 판"></canvas></div>
+    <div class="dot-wrap${d.tool === "move" ? " move" : ""}"><canvas id="dot-cv" aria-label="방안 도안 그리기 판"></canvas></div>
     <p class="my-hint">칸을 누르거나 끌어서 칠해요. 판이 화면보다 크면 ‘화면 이동’을 골라 밀어서 옮겨요. 지우개는 바탕색으로 칠하고, 채우기는 같은 색으로 이어진 칸을 한 번에 칠해요. 맨 아래 줄이 1단이에요.</p>
     <button type="button" class="primary wide" data-dot-save>저장</button></div>`;
   requestAnimationFrame(() => { dotDraw.last = dotDraw($("dot-cv"), d, { sym: d.sym }); knitLive(); });
@@ -156,13 +156,13 @@ function dotThumb(d) {
   return cv.toDataURL("image/png");
 }
 function dotSave() {
-  const d = dotEd; d.name = ($("dot-name").value || "").trim() || "이름 없는 도트 도안";
+  const d = dotEd; d.name = ($("dot-name").value || "").trim() || "이름 없는 방안 도안";
   const data = { type: "dot", name: d.name, w: d.w, h: d.h, cells: enc(d.cells), pal: d.pal.slice(), thumb: dotThumb(d), target: d.h, craft: "any", pages: [] };
   const old = d.id && myPats.find(x => x.id === d.id);
   if (old) Object.assign(old, data, { row: Math.min(old.row || 0, d.h) });
   else myPats.push(Object.assign({ id: "d" + Date.now().toString(36), row: 0, created: Date.now() }, data));
   if (!mySave()) return;   // 저장 공간 부족 — 그림은 그대로 두고 알림만
-  dotDraft(false); d.base = null; closeSheets(); state.tab = "patterns"; state.mode = "mine"; saveLocal(); render(); toast(old ? "도트 도안을 고쳤어요" : "도트 도안을 저장했어요");
+  dotDraft(false); d.base = null; closeSheets(); state.tab = "patterns"; state.mode = "mine"; saveLocal(); render(); toast(old ? "방안 도안을 고쳤어요" : "방안 도안을 저장했어요");
 }
 
 // ----- 보면서 뜨기 -----
@@ -188,7 +188,7 @@ function dotOpenView(p) {
       <div class="knit-map"><span class="label">실 색 · 내 바구니 실로 바꿔 보기</span>${p.pal.map((h, i) => `<label class="kmap bsel"><i style="background:${h}"></i><span class="ar">→</span><i style="background:${vpal[i]}"></i>
         <select data-knit-map="${i}" aria-label="${i + 1}번 색을 뜰 실"><option value="" data-sw="background:${h}">원래 색</option>${state.yarns.map(y => `<option value="${y.id}" data-sw="${yarnSw(y)}"${ymap[i] === y.id ? " selected" : ""}>${esc(yarnLabel(y))}</option>`).join("")}</select></label>`).join("")}
         ${Object.values(ymap).some(Boolean) ? `<button type="button" class="ghost-btn" data-knit-reset>원래 색으로</button>` : ""}</div>`
-    : `<div class="dot-wrap view"><canvas id="dot-vcv" aria-label="도트 도안 ${p.w}코 × ${p.h}단"></canvas></div>
+    : `<div class="dot-wrap view"><canvas id="dot-vcv" aria-label="방안 도안 ${p.w}코 × ${p.h}단"></canvas></div>
     <div class="dot-vtools"><button type="button" data-dot-vsym aria-pressed="${dotView.sym}">기호 ${dotView.sym ? "켜짐" : "꺼짐"}</button><span class="my-hint">초록 ✓ 다 뜬 단 · 보라 테두리 지금 단 · ◀▶ 뜨는 방향(왕복 기준)</span></div>`;
   $("mypat-body").innerHTML = `${vtabs}${vbody}
     ${now}

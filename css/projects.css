@@ -36,3 +36,7 @@
 .prow .src-btn { grid-column: 2; justify-self: start; margin: 0 0 4px; }
 .prow .src-btn.go::before { content: "🧶"; }
 .skipped .plist { margin-top: 10px; }
+/* 작품 탭 구역 제목 (접지 않고 모두 펼쳐 보여요) */
+.psec { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; margin: 18px 2px 8px; font-size: 15px; font-weight: 700; }
+.psec .n { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.psec .hint { flex-basis: 100%; font-size: 12.5px; color: var(--muted); font-weight: 400; }

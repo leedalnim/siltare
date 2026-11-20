@@ -310,7 +310,7 @@ function filetDotSVG(cur) {
   s += `</g>`;
   if (cur >= 0 && cur < F.rows) s += `<text x="${L + F.cols * cs + 4}" y="${yTop(cur + 1) + cs - 1.5}" font-size="9" font-weight="700" fill="#7B5CE0">${!filetBack(cur + 1) || mir ? "◀" : "▶"}${cur + 1}</text>`;
   for (let k = 1; k <= F.rows; k++) if (k === 1 || k % 5 === 0) s += `<text x="${L - 3}" y="${yTop(k) + cs - 2}" font-size="7.5" text-anchor="end" fill="${cur >= 0 && k <= cur ? "#1F8A5A" : "#6F6A7E"}">${k}</text>`;
-  return `<svg class="filet-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="고양이 필레 커튼 도트 도안 ${F.cols}칸 × ${F.rows}단">${s}</svg>`;
+  return `<svg class="filet-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="고양이 필레 커튼 방안 도안 ${F.cols}칸 × ${F.rows}단">${s}</svg>`;
 }
 function filetImgSVG(cur) {
   const F = FILETCAT, ph = (F.y1 - F.y0) / F.rows, yOf = k => F.y1 - k * ph;
@@ -329,7 +329,7 @@ function filetImgSVG(cur) {
 }
 function filetChartHTML(hiRow, opt = {}) {
   const F = FILETCAT, cur = hiRow >= 0 ? Math.min(hiRow, F.rows) : -1, photo = filetUI.v === "photo", dot = !photo && filetUI.v !== "img";
-  const tools = `<div class="filet-tools">${opt.noSeg ? "" : `<div class="seg" role="group" aria-label="도안 보기"><button type="button" data-filet-v="dot" aria-pressed="${dot}">도트 도안</button><button type="button" data-filet-v="img" aria-pressed="${!dot && !photo}">원본 이미지</button><button type="button" data-filet-v="photo" aria-pressed="${photo}">완성 사진</button></div>`}
+  const tools = `<div class="filet-tools">${opt.noSeg ? "" : `<div class="seg" role="group" aria-label="도안 보기"><button type="button" data-filet-v="dot" aria-pressed="${dot}">방안 도안</button><button type="button" data-filet-v="img" aria-pressed="${!dot && !photo}">원본 이미지</button><button type="button" data-filet-v="photo" aria-pressed="${photo}">완성 사진</button></div>`}
     <button type="button" class="ghost-btn" data-filet-z aria-pressed="${filetUI.scale > 1.05}">${filetUI.scale > 1.05 ? "− 화면에 맞추기" : "＋ 크게 보기"}</button>
     ${cur >= 0 ? `<button type="button" class="ghost-btn" data-filet-flip aria-pressed="${filetUI.flip !== "off"}" title="누를 때마다 짝수 단 → 홀수 단 → 끔">${FLIP_LABEL[filetUI.flip]}</button>` : ""}</div>`;
   const now = !opt.noNow && cur >= 0 && cur < F.rows ? `<div class="filet-now fr-now">${filetRowBody(cur + 1)}</div>` : "";

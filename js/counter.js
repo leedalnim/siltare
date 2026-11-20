@@ -64,14 +64,25 @@ function nextHTML(s, next) {
   return `<p class="next one" data-clamp>다음 단: ${esc(next.row.t)} · ${esc(next.row.d)}</p>`;
 }
 document.addEventListener("click", e => { const c = e.target.closest && e.target.closest("[data-clamp].more"); if (c) c.classList.toggle("open"); });
+// 단수 세기 탭에서 바로 새 카운터: 무늬를 고르면 '어떻게 뜰까요' 설정으로 이어져요 (실을 안 담아도 돼요)
+function newSessPick() {
+  const items = [];
+  [state.craft, state.craft === "knit" ? "crochet" : "knit"].forEach(c => {
+    items.push({ grp: `${craftName(c)} 무늬` });
+    PATTERNS[c].forEach(p => items.push({ v: `${c}:${p.id}`, label: p.name, sub: p.en }));
+  });
+  pickShow("어떤 무늬로 뜰까요?", items, v => { const [c, pid] = v.split(":"); openSetup({ pid, craft: c, proj: null }); });
+}
+document.addEventListener("click", e => { if (e.target.closest && e.target.closest("[data-new-sess]")) newSessPick(); });
 function renderCounter() {
   const box = $("v-counter");
   const s = state.sessions.find(x => x.id === state.sess);
   if (!s) {
     state.sess = null;
     let html = `<div class="view-title"><h2 id="h-counter">단수 세기</h2><span class="meta">${state.sessions.length ? `${state.sessions.length}개 뜨는 중` : ""}</span></div>`;
+    html += `<button type="button" class="primary wide" data-new-sess>+ 새 단수 세기</button>`;
     if (!state.sessions.length) {
-      html += `<div class="empty">아직 뜨는 중인 작품이 없어요. 무늬를 열고 '이 무늬로 뜨기 시작'을 누르면 여기에 단수 카운터가 생겨요.<button type="button" class="primary" data-tab="patterns">무늬 보러 가기</button></div>`;
+      html += `<div class="empty">아직 뜨는 중인 작품이 없어요. 위 버튼으로 무늬를 고르면 단수 카운터가 생겨요.</div>`;
     } else {
       html += `<ul class="sess-list">${state.sessions.map(x => {
         const p = PATTERNS[x.craft].find(q => q.id === x.pid), pr = projFind(x.craft, x.proj);

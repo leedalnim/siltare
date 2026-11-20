@@ -173,15 +173,17 @@ function renderProjects() {
     requestAnimationFrame(() => paintAll($("v-projects"), PH)); return;
   }
   const { doable, later } = projectRows(g), act = activeSet();
-  const counts = {}; doable.forEach(r => { counts[r.cat] = (counts[r.cat] || 0) + 1; });
   const seen = new Set([...doable, ...later].map(r => r.pr.id));
   const other = PROJECTS[state.craft].filter(pr => !seen.has(pr.id) && PATTERNS[state.craft].some(p => pr.tags.some(t => p.suits.includes(t)) && WKEYS.some((w, i) => pr.g[i] != null && p.w.includes(w))));
+  // 종류별 개수: 실이 모자라거나 다른 굵기로 뜨는 작품도 모두 세요 (모두 볼 수 있게)
+  const counts = {}; [...doable, ...later].forEach(r => { counts[r.cat] = (counts[r.cat] || 0) + 1; }); other.forEach(pr => { const c = CAT_OF[pr.id] || "small"; counts[c] = (counts[c] || 0) + 1; });
+  const total = doable.length + later.length + other.length;
   const starJ = r => isStar(starKey("j", r.id || r.pr.id)), nStar = doable.filter(starJ).length + later.filter(starJ).length + other.filter(starJ).length;
   if (state.cat === "star" && !nStar) state.cat = "all";
   if (state.cat !== "all" && state.cat !== "star" && !counts[state.cat]) state.cat = "all";
   html += groupBar(gs, g);
   html += `<div class="chiprow cats" role="group" aria-label="작품 종류">${CATS.filter(([k]) => k === "all" || counts[k]).map(([k, nm]) =>
-    `<button type="button" class="gchip" data-cat="${k}" aria-pressed="${state.cat === k}">${nm}<span class="n">${k === "all" ? doable.length : counts[k]}</span></button>`).join("")}${nStar ? `<button type="button" class="gchip" data-cat="star" aria-pressed="${state.cat === "star"}">★ 즐겨찾기<span class="n">${nStar}</span></button>` : ""}</div>`;
+    `<button type="button" class="gchip" data-cat="${k}" aria-pressed="${state.cat === k}">${nm}<span class="n">${k === "all" ? total : counts[k]}</span></button>`).join("")}${nStar ? `<button type="button" class="gchip" data-cat="star" aria-pressed="${state.cat === "star"}">★ 즐겨찾기<span class="n">${nStar}</span></button>` : ""}</div>`;
   if (state.cat === "star") {   // 즐겨찾기: 지금 실로 뜰 수 있는지와 상관없이 모두
     html += `<ul class="plist">${[...doable.filter(starJ).map(r => projRow(r, act)), ...later.filter(starJ).map(laterRow), ...other.filter(starJ).map(otherRow)].join("")}</ul>`;
     $("v-projects").innerHTML = html; requestAnimationFrame(() => paintAll($("v-projects"), g)); return;
@@ -189,13 +191,15 @@ function renderProjects() {
   const shown = pinSort(doable.filter(r => state.cat === "all" || r.cat === state.cat), r => starKey("j", r.pr.id), act);
   const sure = shown.filter(r => r.best.x.st !== "risk" || act.has(starKey("j", r.pr.id)) || isStar(starKey("j", r.pr.id)));
   const maybe = shown.filter(r => !sure.includes(r));
-  if (sure.length) html += `<ul class="plist">${sure.map(r => projRow(r, act)).join("")}</ul>`;
-  else html += `<div class="empty">이 종류에서 지금 실로 넉넉히 뜰 수 있는 작품은 없어요.</div>`;
-  if (maybe.length) html += `<details class="skipped"${state.openMaybe ? " open" : ""} data-maybe><summary>작게 뜨면 될 수도 있는 것 ${maybe.length}개</summary><ul class="plist">${maybe.map(r => projRow(r, act)).join("")}</ul></details>`;
+  // 접지 않고 모두 펼쳐 보여 줘요. 실 형편은 구역 제목과 카드 표시로 알려 줘요
+  const sec = (t, n, hint) => `<h3 class="psec">${t}<span class="n">${n}</span>${hint ? `<span class="hint">${hint}</span>` : ""}</h3>`;
+  if (sure.length) html += sec("지금 실로 뜰 수 있어요", sure.length) + `<ul class="plist">${sure.map(r => projRow(r, act)).join("")}</ul>`;
+  else html += `<div class="empty">이 종류에서 지금 실로 넉넉히 뜰 수 있는 작품은 없어요. 아래 작품도 무늬 보기와 단수 세기는 할 수 있어요.</div>`;
+  if (maybe.length) html += sec("작게 뜨면 될 수도 있어요", maybe.length) + `<ul class="plist">${maybe.map(r => projRow(r, act)).join("")}</ul>`;
   const laterF = later.filter(r => state.cat === "all" || r.cat === state.cat);
-  if (laterF.length) html += `<details class="skipped"><summary>실이 더 있으면 뜰 수 있는 것 ${laterF.length}개</summary><ul class="plist">${laterF.map(laterRow).join("")}</ul></details>`;
+  if (laterF.length) html += sec("실이 더 있으면 뜰 수 있어요", laterF.length, "도안 보기·단수 세기는 지금도 돼요") + `<ul class="plist">${laterF.map(laterRow).join("")}</ul>`;
   const otherF = other.filter(pr => state.cat === "all" || (CAT_OF[pr.id] || "small") === state.cat);
-  if (otherF.length) html += `<details class="skipped"><summary>다른 굵기 실로 뜨는 것 ${otherF.length}개</summary><ul class="plist">${otherF.map(otherRow).join("")}</ul></details>`;
+  if (otherF.length) html += sec("다른 굵기 실로 떠요", otherF.length, "도안 보기·단수 세기는 지금도 돼요") + `<ul class="plist">${otherF.map(otherRow).join("")}</ul>`;
   $("v-projects").innerHTML = html;
   requestAnimationFrame(() => paintAll($("v-projects"), g));
 }
