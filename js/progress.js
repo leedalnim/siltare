@@ -7,7 +7,7 @@ function ctrViews(s, rx) {
   if (s.pid === "cat") return { kind, list: [["chart", "도안"], ["rows", "단별 읽기"]] };
   // 필레 커튼: 칸 도안이 전부라 도안 보기들을 맨 위 탭으로 바로 골라요
   if (s.pid === "filetcat") return { kind, list: [["dot", "방안 도안"], ["img", "원본"], ["photo", "완성 사진"], ["rows", "단별 읽기"]] };
-  return { kind, list: [["pat", "무늬 확대"], ["chart", "기호 도안"], ...(kind === "meas" ? [["all", "전체 편물"]] : []), ["rows", "단별 읽기"]] };
+  return { kind, list: [["pat", "무늬 확대"], ["chart", chartLabel(s.craft, s.pid)], ...(kind === "meas" ? [["all", "전체 편물"]] : []), ["rows", "단별 읽기"]] };
 }
 function ctrChartBody(s, rx, info) {
   const done = info.done, hi = done ? -1 : info.hi;

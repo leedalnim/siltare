@@ -218,7 +218,7 @@ const photoFigure = (src, name, cap) => `<figure class="filet-photo"><button typ
 function stageHTML(p, sel, cols, rx) {
   if (p.chartFirst) return detailChartHTML(p, rx, cols);   // 무늬 크게 그림이 실제 모양과 달라서 도안(도트·원본·완성 사진)부터 보여 줘요
   if (detailUI.pid !== p.id) { detailUI.pid = p.id; detailUI.view = p.id === "cat" ? "chart" : "swatch"; detailUI.zoom = 1; }
-  const views = [["swatch", "무늬 크게"], ["chart", "기호 도안"]];
+  const views = [["swatch", "무늬 크게"], ["chart", chartLabel(state.craft, p.id)]];
   if (p.photo) views.push(["photo", "완성 사진"]);
   if (!views.some(v => v[0] === detailUI.view)) detailUI.view = "swatch";
   const seg = `<div class="seg dv-seg" role="group" aria-label="무늬 보기 방식">${views.map(([k, n]) => `<button type="button" data-dv="${k}" aria-pressed="${detailUI.view === k}">${n}</button>`).join("")}</div>`;

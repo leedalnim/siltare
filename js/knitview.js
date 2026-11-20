@@ -108,5 +108,5 @@ function knitDraw(cv, d, opt = {}) {
 let knitLiveQ = false;
 function knitLive() {
   if (knitLiveQ) return; knitLiveQ = true;
-  requestAnimationFrame(() => { knitLiveQ = false; const cv = $("dot-knit"); if (cv && !cv.closest("[hidden]")) knitDraw(cv, dotEd, { maxH: 190 }); });
+  requestAnimationFrame(() => { knitLiveQ = false; const cv = $("dot-knit"); if (cv && !cv.closest("[hidden]")) knitDraw(cv, dotEd, { maxH: 190, stitch: dotEd.kind === "crochet" ? "sc" : "knit" }); });
 }

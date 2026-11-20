@@ -15,6 +15,7 @@ myPats = myPats.filter(p => p && typeof p === "object" && p.id).map(p => {
     const top = (q.pal.length - 1).toString(36), cs = String(p.cells || "").replace(/[^0-9a-z]/g, "0").split("").map(ch => parseInt(ch, 36) < q.pal.length ? ch : top);
     q.cells = cs.concat(new Array(Math.max(0, q.w * q.h - cs.length)).fill("0")).slice(0, q.w * q.h).join("");
     q.row = Math.min(q.row, q.h); q.target = q.h;
+    q.kind = ["knit", "crochet", "filet"].includes(p.kind) ? p.kind : "knit";   // 기법 (예전 도안은 대바늘 배색)
   }
   return q;
 });
@@ -74,14 +75,14 @@ async function myProcess(file) {
 // ----- 무늬 탭의 '내 도안' 목록 -----
 const MY_CRAFT = { crochet: "코바늘", knit: "대바늘", any: "공통" };
 function myListHTML() {
-  const add = `<div class="my-add-row"><button type="button" class="primary my-add-btn" data-my-add>+ 이미지·PDF 도안</button><button type="button" class="primary my-add-btn" data-dot-new>+ 방안 도안 그리기</button></div>
-    <p class="note my-note">인터넷에서 받은 도안 이미지·PDF를 등록하거나, 칸에 색을 칠해 방안 도안을 직접 그릴 수 있어요. 이 기기에만 저장돼요.</p>`;
-  if (!myPats.length) return `<div class="empty">아직 등록한 도안이 없어요.<br>도안 이미지를 올리거나 방안 도안을 그려 보세요.</div>${add}`;
+  const add = `<div class="my-add-row"><button type="button" class="primary my-add-btn" data-my-add>+ 이미지·PDF 도안</button><button type="button" class="primary my-add-btn" data-dot-new>+ 도안 그리기</button></div>
+    <p class="note my-note">인터넷에서 받은 도안 이미지·PDF를 등록하거나, 칸을 칠해 배색 도안·방안 도안을 직접 그릴 수 있어요. 이 기기에만 저장돼요.</p>`;
+  if (!myPats.length) return `<div class="empty">아직 등록한 도안이 없어요.<br>도안 이미지를 올리거나 직접 그려 보세요.</div>${add}`;
   const items = myPats.slice().sort((a, b) => b.created - a.created).map(p => {
     const pct = p.target ? Math.min(100, Math.round(p.row / p.target * 100)) : 0;
     return `<li><button type="button" class="my-card" data-my-open="${p.id}">
       <span class="my-th${p.type === "dot" ? " dot" : ""}">${p.thumb ? `<img src="${p.thumb}" alt="">` : `<span class="my-pdf">PDF</span>`}${(p.pages || []).length > 1 ? `<i>${p.pages.length}장</i>` : ""}</span>
-      <span class="my-tx"><b>${esc(p.name)}</b><span class="s">${p.type === "dot" ? `방안 도안 · ${p.w}×${p.h}` : MY_CRAFT[p.craft] || ""}${p.row ? ` · ${p.row}단${p.target ? ` / ${p.target}단` : ""}` : ""}</span>
+      <span class="my-tx"><b>${esc(p.name)}</b><span class="s">${p.type === "dot" ? `${dotChartName(p.kind)} · ${DOT_KIND[dotKindOf(p)]} · ${p.w}×${p.h}` : MY_CRAFT[p.craft] || ""}${p.row ? ` · ${p.row}단${p.target ? ` / ${p.target}단` : ""}` : ""}</span>
       ${p.target ? `<span class="pbar sm"><i style="width:${pct}%"></i></span>` : ""}</span></button></li>`;
   }).join("");
   return `${add}<ul class="my-list">${items}</ul>`;

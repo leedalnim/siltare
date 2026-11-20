@@ -232,6 +232,12 @@ function chartHTML(ch, hexes, hi, cn) {
   return `<div class="chart-wrap"><div class="chart" role="img" aria-label="기호 도안, 아래에서 위로 1단부터">${out}</div></div><div class="legend">${legend.join("")}</div>`;
 }
 function chartHexes(cols) { const h = cols.map(c => c.hex); while (h.length < 4) h.push(FALLBACK[h.length % 4]); return h; }
+// 무늬마다 도안 이름: 방안뜨기는 방안 도안, 칸에 색으로 그린 배색은 배색 도안, 나머지는 기호 도안
+function chartLabel(craft, pid) {
+  if (pid === "filetcat") return "방안 도안";
+  const rx = recipe(craft, pid, [], "flat");
+  return rx.chart && rx.chart.cols ? "배색 도안" : "기호 도안";
+}
 function recipeHTML(rx, cols, opts = {}) {
   const cn = labelsFor(cols);
   let h = `<section class="recipe" aria-labelledby="rx-h"><h4 id="rx-h">도안</h4>`;
